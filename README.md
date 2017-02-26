@@ -80,9 +80,9 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 
 ###Assembly of a Chorus device
 
-1. Make several Solo devices 
+1. Make several Solo devices
 2. Stack them together
-3. Connect a Bluetooth module to the last Solo device in a chain 
+3. Connect a Bluetooth module to the last Solo device in a chain
 4. Use a jumper on the first Solo device to shorten two upper pins
 
 <img src="docs/img/chorus_assembly.png" alt="Assembly of a Chorus Device" width="900">
@@ -92,9 +92,9 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 Download the project from Arduino folder, open **chorus-rf-laptimer.ino** file with Arduino IDE and upload to each Solo device.
 
 ###Android App
-Download the **Chorus_RF_Laptimer.apk** file from Android folder and install on your Android device or use the following QR code to download:
+Download the **ChorusRFLaptimer-release.apk** file from Android folder and install on your Android device or use the following QR code to download:
 
-<img src="docs/img/apkDownloadQRcode.png" alt="QR code" width="">
+<img src="docs/img/apkDownloadQRcode.png" alt="QR code" width="250">
 
 (Make sure to allow installation from unknown sources in your Android device settings).
 
@@ -116,14 +116,14 @@ The app consists of 4 tabs:
 - **PILOTS** - Pilot name and RSSI threshold for each channel
 - **RACE** - start/stop race and race results
 
-Controls on the tabs are mostly self-explanatory. Still some clarifications might be useful: 
+Controls on the tabs are mostly self-explanatory. Still some clarifications might be useful:
 
 - **Enable device sounds**: check to enable device buzzers.
 - **Minimal Lap Time**: use +/- to increase/decrease minimal lap time. Set enough time to let a drone leave the "above-threshold RSSI area" after lap time is captured.
 - **Skip first lap**: check if start table is located before the start/finish gate (first lap time will be skipped because it's not a full lap); uncheck if start table is located right behind the laptimer (first lap time will be tracked only after minimal lap time is passed).
 - **RSSI Threshold**: use +/- to fine-tune RSSI threshold.
 - **Set/Clear**: tap to capture/clear currently measured RSSI value as a threshold.
-- **Calibrate Timers**: different Arduino devices have different oscillator accuracy and it may slightly deviate from 16MHz. In order to make sure that same timespan is measured equally on different devices, you need to calibrate their "timers" before the race. It's required only if 2 or more Solo devices used in a Chorus. 
+- **Calibrate Timers**: different Arduino devices have different oscillators accuracy and it may slightly deviate from 16MHz. In order to make sure that same timespan is measured equally on different devices, you need to calibrate them before the race.
 - **Start Race**: tap to start tracking laps. This same button is used to Stop the race.
 
 When you stop the race, Chorus device immediately clears saved lap times, but they remain visible in the application until new race is started.
