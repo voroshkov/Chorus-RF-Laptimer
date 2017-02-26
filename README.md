@@ -92,7 +92,7 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 Download the project from Arduino folder, open **chorus-rf-laptimer.ino** file with Arduino IDE and upload to each Solo device.
 
 ###Android App
-Download the **ChorusRFLaptimer-release.apk** file from Android folder and install on your Android device or use the following QR code to download:
+Download the [**ChorusRFLaptimer-release.apk**](https://github.com/voroshkov/Chorus-RF-Laptimer/blob/master/Android/ChorusRFLaptimer/app/ChorusRFLaptimer-release.apk) file from Android/app folder and install on your Android device or use the following QR code to download:
 
 <img src="docs/img/apkDownloadQRcode.png" alt="QR code" width="250">
 
