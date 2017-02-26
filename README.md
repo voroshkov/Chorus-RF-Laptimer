@@ -1,6 +1,6 @@
 #Chorus RF Laptimer
 
-<img src="docs/img/logo.png" alt="Logo" width="100"/>
+<img src="docs/img/logo.png" align="left" alt="Logo" width="200"/>
 
 ***Chorus*** [ˈkɔr əs] - *1. (Music) a group of persons singing in unison.*
 
@@ -11,13 +11,14 @@ Several updated Solo Laptimer devices connected together make up a Chorus Laptim
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 
 ##Terminology
-**Solo** - device for tracking a single drone. Parts cost about $12. Consists of Arduino Pro mini, RX5808 module, connectors, optional buzzer, optional resistors.
 
-<img src="docs/img/Solo_device.png" alt="Solo device" width="300"/>
+**Solo** - device for tracking a single drone. Parts cost about $12. Consists of Arduino Pro mini, RX5808 module, connectors, optional buzzer, optional resistors:
 
-**Chorus** - several (2+) connected Solo devices.
+<img src="docs/img/Solo_device.png" alt="Solo device" height="400"/>
 
-<img src="docs/img/Chorus_device.png" alt="Chorus device" width="300"/>
+**Chorus** - several (2+) connected Solo devices:
+
+<img src="docs/img/Chorus_device.png" alt="Chorus device" height="400"/>
 
 
 ##NEW Features!
@@ -66,7 +67,7 @@ For older versions of RX5808 use [these instructions](https://github.com/markoho
 ###Wiring of a Solo device
 Parts may be connected directly without using any additional components:
 
-<img src="docs/img/wiring_solo.png" alt="Wiring Solo schematic" width="600">
+<img src="docs/img/wiring_solo.png" alt="Wiring Solo schematic" width="400">
 
 It seems to work fine being connected this way, however adding 100 Ω resistors in line on SPI wires (Arduino pins 10, 11, 12) is a good idea to prevent possible glitches with channel selection:
 
@@ -79,7 +80,12 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 
 ###Assembly of a Chorus device
 
-<img src="docs/img/chorus_assembly.png" alt="Assembly of a Chorus Device" width="300">
+1. Make several Solo devices 
+2. Stack them together
+3. Connect a Bluetooth module to the last Solo device in a chain 
+4. Use a jumper on the first Solo device to shorten two upper pins
+
+<img src="docs/img/chorus_assembly.png" alt="Assembly of a Chorus Device" width="900">
 
 ##Software
 ###Arduino
@@ -97,7 +103,7 @@ Application startup screen:
 
 <img src="docs/img/androidAppStartup.png" alt="Application startup screen" width="350">
 
-Use "..." menu to connect/disconnect to your Chorus device.
+Use "⋮" menu to connect/disconnect to your Chorus device.
 
 <img src="docs/img/androidAppConnect.png" alt="Application connect" width="350">
 
@@ -110,17 +116,17 @@ The app consists of 4 tabs:
 - **PILOTS** - Pilot name and RSSI threshold for each channel
 - **RACE** - start/stop race and race results
 
-Controls on the tabs are mostly self-explanatory. Still here are some explanations:
-- **Enable device sounds**:
-- **Skip first lap**:
-- **Minimal Lap Time**: use +/- to increase/decrease minimal lap time. Set enough time to let a drone leave the "above-threshold RSSI area" after lap time is captured.
+Controls on the tabs are mostly self-explanatory. Still some clarifications might be useful: 
 
+- **Enable device sounds**: check to enable device buzzers.
+- **Minimal Lap Time**: use +/- to increase/decrease minimal lap time. Set enough time to let a drone leave the "above-threshold RSSI area" after lap time is captured.
+- **Skip first lap**: check if start table is located before the start/finish gate (first lap time will be skipped because it's not a full lap); uncheck if start table is located right behind the laptimer (first lap time will be tracked only after minimal lap time is passed).
 - **RSSI Threshold**: use +/- to fine-tune RSSI threshold.
 - **Set/Clear**: tap to capture/clear currently measured RSSI value as a threshold.
+- **Calibrate Timers**: different Arduino devices have different oscillator accuracy and it may slightly deviate from 16MHz. In order to make sure that same timespan is measured equally on different devices, you need to calibrate their "timers" before the race. It's required only if 2 or more Solo devices used in a Chorus. 
+- **Start Race**: tap to start tracking laps. This same button is used to Stop the race.
 
-- **Start Race**: tap to start tracking laps.
-
-When you stop the race, Laptimer device immediately clears saved lap times, but they remain visible in the application until new race is started.
+When you stop the race, Chorus device immediately clears saved lap times, but they remain visible in the application until new race is started.
 
 ##Setup and Usage Guide
  1. Power on the Chorus device and place it on one side of the finish gate.
