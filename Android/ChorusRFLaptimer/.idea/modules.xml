@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ChorusRFLapTImer.iml" filepath="$PROJECT_DIR$/ChorusRFLapTImer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bluetoothSPP/bluetoothspp.iml" filepath="$PROJECT_DIR$/bluetoothSPP/bluetoothspp.iml" />
+    </modules>
+  </component>
+</project>

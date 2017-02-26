@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/channelGrpLayout">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:text="Channel: #1 (Race)"
+            android:layout_width="match_parent"
+            android:id="@+id/txtChannelLabel"
+            android:layout_weight="1"
+            android:gravity="center_vertical|center_horizontal"
+            android:textStyle="normal|bold"
+            android:layout_height="40dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent">
+
+            <TextView
+                android:text="Pilot Name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView1"
+                android:layout_weight="1"
+                android:gravity="center_vertical" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:id="@+id/editPilotName"
+                android:inputType="text"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1">
+
+            <TextView
+                android:text="RSSI Threshold"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/textView3"
+                android:layout_weight="1"
+                android:gravity="center_vertical" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <Button
+                    android:text="-"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/btnDecThresh"
+                    android:textStyle="normal|bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/txtThreshold"
+                    android:inputType="number"
+                    android:text="0"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+                <Button
+                    android:text="+"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/btnIncThresh"
+                    android:textStyle="normal|bold" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/txtRssi"
+                    android:layout_weight="1"
+                    android:text="1"
+                    android:gravity="center_vertical"
+                    android:layout_gravity="center_horizontal"/>
+
+                <ProgressBar
+                    style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/rssiBar"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:paddingRight="10dp"
+                    android:progress="256"
+                    android:max="350" />
+            </LinearLayout>
+
+            <Button
+                android:text="Capture"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:id="@+id/btnCapture"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:layout_weight="1"
+                android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+        </LinearLayout>
+    </LinearLayout>
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+</LinearLayout>

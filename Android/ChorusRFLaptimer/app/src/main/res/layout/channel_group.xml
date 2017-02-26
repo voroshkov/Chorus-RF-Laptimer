@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/channelGrpLayout">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="Device #1"
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:layout_weight = "0"
+                android:id="@+id/txtDeviceLabel"
+                android:gravity="center_vertical"
+                android:textStyle="normal|bold"
+                android:textAllCaps="false" />
+
+            <ProgressBar
+                style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight = "1"
+                android:id="@+id/rssiBar"
+                android:layout_gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:progress="256"
+                android:max="350" />
+
+            <TextView
+                android:layout_width="50dp"
+                android:layout_weight = "0"
+                android:id="@+id/txtRssi"
+                android:text="234"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="40dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="RF Band "
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/textView4"
+                android:layout_weight="1"
+                android:gravity="center_vertical" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <Button
+                    android:text="\u25C0"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/btnDecBand"
+                    android:textStyle="normal|bold" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/txtBand"
+                    android:layout_weight="1"
+                    android:text="Race"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+                <Button
+                    android:text="\u25B6"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/btnIncBand"
+                    android:textStyle="normal|bold" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:text="Channel #"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/textView2"
+                android:layout_weight="1"
+                android:gravity="center_vertical" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <Button
+                    android:text="\u25C0"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/btnDecChannel"
+                    android:textStyle="normal|bold" />
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/txtChannel"
+                    android:layout_weight="1"
+                    android:text="1"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+                <Button
+                    android:text="\u25B6"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/btnIncChannel"
+                    android:textStyle="normal|bold" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
