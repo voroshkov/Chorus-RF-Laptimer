@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ChorusRFLapTImer.iml" filepath="$PROJECT_DIR$/ChorusRFLapTImer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ChorusRFLaptimer.iml" filepath="$PROJECT_DIR$/ChorusRFLaptimer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bluetoothSPP/bluetoothspp.iml" filepath="$PROJECT_DIR$/bluetoothSPP/bluetoothspp.iml" />
     </modules>
