@@ -105,6 +105,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_CALIBR_STATE   'i'
 #define RESPONSE_MONITOR_STATE  'V'
 #define RESPONSE_LAP0_STATE     'F'
+#define RESPONSE_END_SEQUENCE   'X'
 
 // send item byte constants
 // Must correspond to sequence of numbers used in "send data" switch statement
@@ -113,16 +114,17 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_RACE_STATE     1
 #define SEND_MIN_LAP_TIME   2
 #define SEND_THRESHOLD      3
-#define SEND_CURRENT_RSSI   4
-#define SEND_ALL_LAPTIMES   5
-#define SEND_SOUND_STATE    6
-#define SEND_BAND           7
-#define SEND_CALIBR_STATE   8
-#define SEND_MONITOR_STATE  9
-#define SEND_LAP0_STATE     10
+#define SEND_ALL_LAPTIMES   4
+#define SEND_SOUND_STATE    5
+#define SEND_BAND           6
+#define SEND_CALIBR_STATE   7
+#define SEND_MONITOR_STATE  8
+#define SEND_LAP0_STATE     9
+#define SEND_END_SEQUENCE   10
 // following itmes don't participate in "send all itmes" response
 #define SEND_LAST_LAPTIMES  100
 #define SEND_CALIBR_TIME    101
+#define SEND_CURRENT_RSSI   102
 // special item that sends all subsequent items from 0 (see above)
 #define SEND_ALL_DEVICE_STATE 255
 
@@ -294,12 +296,7 @@ void loop() {
                     onItemSent();
                 }
                 break;
-            case 4: // SEND_CURRENT_RSSI
-                if (sendIntToSerial(RESPONSE_CURRENT_RSSI, rssi)) {
-                    onItemSent();
-                }
-                break;
-            case 5: // SEND_ALL_LAPTIMES
+            case 4: // SEND_ALL_LAPTIMES
                 if (sendLapTimesIndex < newLapIndex) {
                     if (sendLaptimeToSerial(RESPONSE_LAPTIME, sendLapTimesIndex, lapTimes[sendLapTimesIndex])) {
                         sendLapTimesIndex++;
@@ -309,37 +306,39 @@ void loop() {
                     onItemSent();
                 }
                 break;
-            case 6: // SEND_SOUND_STATE
+            case 5: // SEND_SOUND_STATE
                 if (send4BitsToSerial(RESPONSE_SOUND_STATE, isSoundEnabled)) {
                     onItemSent();
                 }
                 break;
-            case 7: // SEND_BAND
+            case 6: // SEND_BAND
                 if (send4BitsToSerial(RESPONSE_BAND, bandIndex)) {
                     onItemSent();
                 }
                 break;
-            case 8: // SEND_CALIBR_STATE
+            case 7: // SEND_CALIBR_STATE
                 if (send4BitsToSerial(RESPONSE_CALIBR_STATE, isCalibrated)) {
                     onItemSent();
                 }
                 break;
-            case 9: // SEND_MONITOR_STATE
+            case 8: // SEND_MONITOR_STATE
                 if (send4BitsToSerial(RESPONSE_MONITOR_STATE, rssiMonitor)) {
                     onItemSent();
                 }
                 break;
-            case 10: // SEND_LAP0_STATE
+            case 9: // SEND_LAP0_STATE
                 if (send4BitsToSerial(RESPONSE_LAP0_STATE, shouldSkipFirstLap)) {
                     onItemSent();
                 }
                 break;
-
             // Below is a termination case, to notify that data for CONTROL_DATA_REQUEST is over.
             // Must be the last item in the sequence!
-            case 11:
-                isSendingData = 0;
-                shouldSendSingleItem = 1;
+            case 10: // SEND_END_SEQUENCE
+                if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
+                    onItemSent();
+                    isSendingData = 0;
+                    shouldSendSingleItem = 1;
+                }
                 break;
 
             //--------------------------------------------------------------------------------------
@@ -360,6 +359,11 @@ void loop() {
                 break;
             case 101: // SEND_CALIBR_TIME
                 if (sendLongToSerial(RESPONSE_CALIBR_TIME, calibrationMilliseconds)) {
+                    onItemSent();
+                }
+                break;
+            case 102: // SEND_CURRENT_RSSI
+                if (sendIntToSerial(RESPONSE_CURRENT_RSSI, rssi)) {
                     onItemSent();
                 }
                 break;
