@@ -54,6 +54,13 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
  - HC-06 Bluetooth module (**1** item)
  - 5V power supply (for example 2-4S LiPo with 5V BEC) (**1** item)
 
+###Bluetooth module setup Make sure your bluetooth module baud rate is set to 115200 (use any of numerous tutorials on internet). Generalized steps:
+
+Connect HC-06 -> USB-UART Adapter -> PC
+Open Arduino IDE, set adapter's COM port, run Serial Monitor
+Send command: "AT+BAUD8" (module replies "OK115200")
+You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively.
+
 ###RX5808 SPI patch (required)
 (copied from [sheaivey/rx5808-pro-diversity](https://github.com/sheaivey/rx5808-pro-diversity) repo)
 
