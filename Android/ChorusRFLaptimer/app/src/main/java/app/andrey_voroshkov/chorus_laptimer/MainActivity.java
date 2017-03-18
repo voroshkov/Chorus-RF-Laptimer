@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             public void onDeviceDisconnected() {
                 Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
+                AppState.getInstance().onDisconnected();
                 toggleConnectionMenu(false);
             }
 
@@ -159,9 +160,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setup() {
-        if (AppState.getInstance().bt == null) {
-            AppState.getInstance().bt = bt;
-        }
+        AppState.getInstance().bt = bt;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -133,7 +133,9 @@ public class RaceResultFragment extends Fragment {
             public boolean onLongClick(View v) {
                 boolean isStarted = AppState.getInstance().raceState.isStarted;
                 if (isStarted) {
+                    //stop race and start RSSI monitoring
                     AppState.getInstance().sendBtCommand("R*r");
+                    AppState.getInstance().sendBtCommand("R*V");
                     return true;
                 } else {
                     return false; //allow short click after long to start race on both short and long clicks

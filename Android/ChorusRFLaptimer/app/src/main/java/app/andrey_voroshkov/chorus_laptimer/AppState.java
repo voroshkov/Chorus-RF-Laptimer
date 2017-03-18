@@ -29,6 +29,8 @@ public class AppState {
     public RaceState raceState;
     public ArrayList<DeviceState> deviceStates;
     public ArrayList<ArrayList<LapResult>> raceResults;
+
+    private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
 
     private AppState() {
@@ -36,6 +38,7 @@ public class AppState {
         raceState = new RaceState(false, 5, 3);
         raceResults = new ArrayList<ArrayList<LapResult>>();
         deviceStates = new ArrayList<DeviceState>();
+        deviceTransmissionStates = new ArrayList<Boolean>();
     }
 
     public void addListener(IDataListener listener) {
@@ -74,6 +77,19 @@ public class AppState {
         } else if (count > numberOfDevices) {
             for(int i = numberOfDevices; i < count; i++) {
                 deviceStates.remove(deviceStates.size() - 1);
+            }
+        }
+    }
+
+    public void actualizeDeviceTransmissionStates() {
+        int count = deviceTransmissionStates.size();
+        if (count < numberOfDevices) {
+            for(int i = count; i < numberOfDevices; i++) {
+                deviceTransmissionStates.add(false);
+            }
+        } else if (count > numberOfDevices) {
+            for(int i = numberOfDevices; i < count; i++) {
+                deviceTransmissionStates.remove(deviceStates.size() - 1);
             }
         }
     }
@@ -195,6 +211,10 @@ public class AppState {
         sendBtCommand("N0");
     }
 
+    public void onDisconnected() {
+        clearRssi();
+        emitEvent(DataAction.DeviceRSSI);
+    }
     //---------------------------------------------------------------------
     public void setNumberOfDevices(int n) {
         if (n <= 0) return;
@@ -202,8 +222,17 @@ public class AppState {
         numberOfDevices = n;
         actualizeDeviceStates();
         actualizeRaceResults();
+        actualizeDeviceTransmissionStates();
         emitEvent(DataAction.NDevices);
+
+        resetDeviceTransmissionStates();
         sendBtCommand("R*A");
+    }
+
+    public void resetDeviceTransmissionStates() {
+        for(int i=0; i<deviceTransmissionStates.size(); i++) {
+            deviceTransmissionStates.set(i, false);
+        }
     }
 
     public void changeDeviceChannel(int deviceId, int channel) {
@@ -285,12 +314,6 @@ public class AppState {
         if (raceState == null) {
             return;
         }
-        if (isStarted && isRssiMonitorOn) {
-            sendBtCommand("R*v"); // turn RSSI Monitoring off
-        }
-        if (!isStarted && !isRssiMonitorOn) {
-            sendBtCommand("R*V"); // turn RSSI Monitoring on
-        }
         if (raceState.isStarted!= isStarted) {
             raceState.isStarted = isStarted;
             emitEvent(DataAction.RaceState);
@@ -365,7 +388,6 @@ public class AppState {
     }
 
     public void calculateAndSendCalibrationValues() {
-//        int baseTime = deviceStates.get(0).calibrationTime;
         int baseTime = CALIBRATION_TIME_MS;
         for (int i = 0; i < numberOfDevices; i++) {
             int time = deviceStates.get(i).calibrationTime;
@@ -381,13 +403,41 @@ public class AppState {
     }
 
     public void changeRssiMonitorState(boolean isMonitorOn) {
-        if (isRssiMonitorOn != isMonitorOn) {
-            isRssiMonitorOn = isMonitorOn;
-            if (!isRssiMonitorOn) {
-                clearRssi();
-                emitEvent(DataAction.DeviceRSSI);
+        if (isMonitorOn == isRssiMonitorOn) {
+            return;
+        }
+        isRssiMonitorOn = isMonitorOn;
+        if (!isRssiMonitorOn) {
+            clearRssi();
+            emitEvent(DataAction.DeviceRSSI);
+        }
+        emitEvent(DataAction.RSSImonitorState);
+    }
+
+    //use to determine if all devices reported their state after connection
+    public boolean isDevicesInitializationOver() {
+        for (int i=0; i<deviceTransmissionStates.size(); i++) {
+            if (!deviceTransmissionStates.get(i)) {
+                return false;
             }
-            emitEvent(DataAction.RSSImonitorState);
+        }
+        return true;
+    }
+
+    public void receivedEndOfSequence(int deviceId) {
+        deviceTransmissionStates.set(deviceId, true);
+
+        //run or stop RSSI monitoring after connecction, only after all device states are received
+        if (isDevicesInitializationOver()) {
+            if (raceState == null) {
+                return;
+            }
+            if (raceState.isStarted && isRssiMonitorOn) {
+                sendBtCommand("R*v"); // turn RSSI Monitoring off
+            }
+            if (!raceState.isStarted && !isRssiMonitorOn) {
+                sendBtCommand("R*V"); // turn RSSI Monitoring on
+            }
         }
     }
 }

@@ -98,6 +98,10 @@ public class Utils {
                     result += "RSSI Monitor: " + ((isMonitorOn!= 0) ? "on" : "off");
                     AppState.getInstance().changeRssiMonitorState(isMonitorOn!=0);
                     break;
+                case 'X':
+                    result += "EndOfSequence. Device# " + moduleId;
+                    AppState.getInstance().receivedEndOfSequence(moduleId);
+                    break;
             }
         } else if (dest == 'R') {
 

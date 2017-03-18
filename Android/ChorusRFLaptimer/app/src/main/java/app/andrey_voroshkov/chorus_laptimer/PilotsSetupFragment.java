@@ -1,5 +1,6 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ public class PilotsSetupFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private View mRootView;
+    private Context mContext;
 
     public PilotsSetupFragment() {
     }
@@ -47,6 +49,7 @@ public class PilotsSetupFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.pilots_setup, container, false);
         mRootView = rootView;
+        mContext = getContext();
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
@@ -68,8 +71,7 @@ public class PilotsSetupFragment extends Fragment {
     }
     public void useNewAdapter() {
         ListView listView = (ListView)mRootView.findViewById(R.id.lvPilots);
-        PilotsRssiListAdapter adapter = new PilotsRssiListAdapter(getContext(), AppState.getInstance().deviceStates);
-//        ChannelsListAdapter adapter = new ChannelsListAdapter(getContext(), AppState.getInstance().deviceStates);
+        PilotsRssiListAdapter adapter = new PilotsRssiListAdapter(mContext, AppState.getInstance().deviceStates);
         listView.setAdapter(adapter);
     }
 
@@ -94,7 +96,7 @@ public class PilotsSetupFragment extends Fragment {
                 int rssiThreshold = AppState.getInstance().getRssiThreshold(i);
                 bar.setProgress(AppState.convertRssiToProgress(curRssi));
                 int colorId = (curRssi > rssiThreshold) ? R.color.colorAccent : R.color.colorPrimary;
-                int color = ContextCompat.getColor(getContext(),colorId);
+                int color = ContextCompat.getColor(mContext,colorId);
                 bar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
                 txt.setText(Integer.toString(curRssi));
             }
