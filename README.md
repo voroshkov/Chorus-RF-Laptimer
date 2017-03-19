@@ -159,6 +159,7 @@ Also consider shielding the Chorus device with a piece of metal on one side wher
 # Contacts
 - YouTube channel: https://www.youtube.com/user/voroshkov
 - Facebook: https://www.facebook.com/andrey.voroshkov
+- RCGroups discussion thread: https://www.rcgroups.com/forums/showthread.php?2801815
 
 Feel free to ask questions, suggest improvements, report your usage results.
 
