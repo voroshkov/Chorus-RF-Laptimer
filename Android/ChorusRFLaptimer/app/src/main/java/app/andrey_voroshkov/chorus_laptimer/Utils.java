@@ -21,6 +21,24 @@ public class Utils {
         return String.format("%d : %02d : %02d . %03d", h,m,s, msec);
     }
 
+    public static String convertMsToSpeakableTime(int ms) {
+        int h = (int)Math.floor(ms/1000/60/60);
+        int m = (int)Math.floor(ms/1000/60)-h*60;
+        int s = (int)Math.floor(ms/1000)-(h*60+m)*60;
+        int msec = ms-(int)Math.floor(ms/1000)*1000;
+        String mills = new String(Integer.toString(msec));
+        mills = mills.substring(0,mills.length()-1);
+        mills = mills.replace(""," ").trim();
+        String seconds = new String(Integer.toString(s));
+        String text = new String(seconds + " point " + mills + " seconds");
+        //only add minutes if lap is longer than 1 minute
+        if (m > 0) {
+            text = Integer.toString(m) + " minutes " + text;
+        }
+        return text;
+
+    }
+
     public static String btDataChunkParser(String chunk) {
         String result = "";
 

@@ -1,5 +1,8 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.content.Context;
+import android.speech.tts.TextToSpeech;
+
 import java.util.ArrayList;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -14,8 +17,10 @@ public class AppState {
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
     public static final int CALIBRATION_TIME_MS = 10000;
     public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D"};
+    private Context c;
+    private TextSpeaker tts1;
 
-    private static AppState instance = new AppState();
+    private static AppState instance = new AppState(AppHolder.getContext());
 
     public static AppState getInstance() {
         return instance;
@@ -24,6 +29,7 @@ public class AppState {
     public BluetoothSPP bt;
     public int numberOfDevices = 0;
     public boolean isDeviceSoundEnabled = false;
+    public boolean shouldSpeakLapTimes = true;
     public boolean shouldSkipFirstLap = true;
     public boolean isRssiMonitorOn = false;
     public RaceState raceState;
@@ -33,12 +39,14 @@ public class AppState {
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
 
-    private AppState() {
+    private AppState(Context c) {
         mListeners = new ArrayList<IDataListener>();
         raceState = new RaceState(false, 5, 3);
         raceResults = new ArrayList<ArrayList<LapResult>>();
         deviceStates = new ArrayList<DeviceState>();
         deviceTransmissionStates = new ArrayList<Boolean>();
+        this.c = c;
+        tts1 = new TextSpeaker(c);
     }
 
     public void addListener(IDataListener listener) {
@@ -351,6 +359,23 @@ public class AppState {
         }
         deviceResults.get(lapNumber).setMs(lapTime);
         emitEvent(DataAction.LapResult);
+        //code to speak lap times
+        if (shouldSpeakLapTimes == true) {
+            DeviceState currentState = deviceStates.get(deviceId);
+            String textToSay = new String();
+            textToSay = currentState.pilotName;
+            if (this.shouldSkipFirstLap && lapNumber == 0) {
+                tts1.tts.speak(textToSay + ". Starting Race", TextToSpeech.QUEUE_ADD, null);
+            }
+            else {
+
+                if (raceState.lapsToGo == lapNumber)
+                {
+                    textToSay = textToSay + " Finished Race. ";
+                }
+                tts1.tts.speak(textToSay + ". Lap " + Integer.toString(lapNumber) + ". " + Utils.convertMsToSpeakableTime(lapTime), TextToSpeech.QUEUE_ADD, null);
+            }
+        }
     }
 
     public void changeCalibration(int deviceId, boolean isCalibrated) {

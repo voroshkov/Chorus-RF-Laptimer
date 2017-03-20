@@ -66,6 +66,35 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:text="Speak Lap Times"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView9"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
+
+            <CheckBox
+                android:layout_height="50dp"
+                android:id="@+id/chkSpeakLapTimes"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:gravity="center_vertical|center_horizontal" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
             android:text="Laps To Go"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

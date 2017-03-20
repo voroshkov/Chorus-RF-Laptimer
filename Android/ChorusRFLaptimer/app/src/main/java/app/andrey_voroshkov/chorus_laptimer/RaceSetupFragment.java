@@ -70,6 +70,7 @@ public class RaceSetupFragment extends Fragment {
         Button btnDecLaps = (Button) rootView.findViewById(R.id.btnDecLaps);
         Button btnIncLaps = (Button) rootView.findViewById(R.id.btnIncLaps);
         CheckBox chkSkipFirstLap = (CheckBox) rootView.findViewById(R.id.chkSkipFirstLap);
+        CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
 
         btnDecMLT.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +128,22 @@ public class RaceSetupFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonView.setChecked(AppState.getInstance().shouldSkipFirstLap);
+            }
+        });
+
+        chkSpeakLapTimes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //AppState.getInstance().shouldSpeakLapTimes = true;
+                //AppState.getInstance().sendBtCommand("R*F");
+            }
+        });
+
+        chkSpeakLapTimes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AppState.getInstance().shouldSpeakLapTimes = isChecked;
+                buttonView.setChecked(AppState.getInstance().shouldSpeakLapTimes);
             }
         });
 
