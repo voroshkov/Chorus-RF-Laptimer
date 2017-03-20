@@ -134,8 +134,7 @@ public class RaceSetupFragment extends Fragment {
         chkSpeakLapTimes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //AppState.getInstance().shouldSpeakLapTimes = true;
-                //AppState.getInstance().sendBtCommand("R*F");
+               
             }
         });
 
