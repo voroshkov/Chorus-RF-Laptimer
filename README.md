@@ -31,7 +31,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - No additional equipment besides 5.8GHz Video Transmitter required on a drone.
 - Measure lap times with 1ms resolution (in theory; need to perform live tests).
 - Android application for controlling the device via Bluetooth.
-- Compatible with [EasyRaceLapTimer](https://github.com/polyvision/EasyRaceLapTimer) software v.0.6 (can act as a VTx sensor).
+- Compatible with [EasyRaceLapTimer](https://github.com/polyvision/EasyRaceLapTimer) software v.0.6 (can act as simple VTx sensor but still needs to be preliminarily set up via Bluetooth).
 - 5V * 250 mA power consumption (per device)
 - Low cost (around $16 per device, excluding power supply), compared to similar solutions available on market.
 
