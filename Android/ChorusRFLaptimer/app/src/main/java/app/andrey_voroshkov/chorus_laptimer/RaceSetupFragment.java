@@ -131,18 +131,10 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
-        chkSpeakLapTimes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-               
-            }
-        });
-
         chkSpeakLapTimes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 AppState.getInstance().shouldSpeakLapTimes = isChecked;
-                buttonView.setChecked(AppState.getInstance().shouldSpeakLapTimes);
             }
         });
 

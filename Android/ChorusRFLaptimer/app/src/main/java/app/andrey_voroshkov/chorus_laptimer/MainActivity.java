@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.speech.tts.TextToSpeech;
 
 import app.andrey_voroshkov.chorus_laptimer.R;
 
@@ -107,11 +108,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         initBluetooth();
+        AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext());
     }
 
     public void onDestroy() {
         super.onDestroy();
         bt.stopService();
+        AppState.getInstance().textSpeaker.shutdown();
     }
 
     @Override
