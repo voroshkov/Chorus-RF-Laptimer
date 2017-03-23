@@ -10,11 +10,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import app.andrey_voroshkov.chorus_laptimer.R;
-
-/**
- * A placeholder fragment containing a simple view.
- */
 public class RaceSetupFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this

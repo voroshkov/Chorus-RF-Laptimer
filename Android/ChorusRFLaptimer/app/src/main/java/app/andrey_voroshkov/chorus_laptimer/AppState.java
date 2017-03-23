@@ -1,8 +1,5 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
-import android.content.Context;
-import android.speech.tts.TextToSpeech;
-
 import java.util.ArrayList;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
