@@ -14,7 +14,6 @@ public class AppState {
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
     public static final int CALIBRATION_TIME_MS = 10000;
     public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D"};
-
     private static AppState instance = new AppState();
 
     public static AppState getInstance() {
@@ -22,8 +21,11 @@ public class AppState {
     }
 
     public BluetoothSPP bt;
+    public TextSpeaker textSpeaker;
+
     public int numberOfDevices = 0;
     public boolean isDeviceSoundEnabled = false;
+    public boolean shouldSpeakLapTimes = true;
     public boolean shouldSkipFirstLap = true;
     public boolean isRssiMonitorOn = false;
     public RaceState raceState;
@@ -351,6 +353,18 @@ public class AppState {
         }
         deviceResults.get(lapNumber).setMs(lapTime);
         emitEvent(DataAction.LapResult);
+
+        //speak lap times if initialization is over
+        if (shouldSpeakLapTimes && isDevicesInitializationOver()) {
+            DeviceState currentState = deviceStates.get(deviceId);
+            String textToSay = currentState.pilotName;
+            if (!this.shouldSkipFirstLap || lapNumber != 0) {
+                if (raceState.lapsToGo == lapNumber) {
+                    textToSay = textToSay + " Finished. ";
+                }
+                textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumber) + ". " + Utils.convertMsToSpeakableTime(lapTime));
+            }
+        }
     }
 
     public void changeCalibration(int deviceId, boolean isCalibrated) {

@@ -10,11 +10,6 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import app.andrey_voroshkov.chorus_laptimer.R;
-
-/**
- * A placeholder fragment containing a simple view.
- */
 public class RaceSetupFragment extends Fragment {
     /**
      * The fragment argument representing the section number for this
@@ -70,6 +65,7 @@ public class RaceSetupFragment extends Fragment {
         Button btnDecLaps = (Button) rootView.findViewById(R.id.btnDecLaps);
         Button btnIncLaps = (Button) rootView.findViewById(R.id.btnIncLaps);
         CheckBox chkSkipFirstLap = (CheckBox) rootView.findViewById(R.id.chkSkipFirstLap);
+        CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
 
         btnDecMLT.setOnClickListener(new View.OnClickListener() {
@@ -127,6 +123,13 @@ public class RaceSetupFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonView.setChecked(AppState.getInstance().shouldSkipFirstLap);
+            }
+        });
+
+        chkSpeakLapTimes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AppState.getInstance().shouldSpeakLapTimes = isChecked;
             }
         });
 

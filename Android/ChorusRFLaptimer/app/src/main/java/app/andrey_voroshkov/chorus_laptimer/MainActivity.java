@@ -14,8 +14,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import app.andrey_voroshkov.chorus_laptimer.R;
-
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
@@ -107,11 +105,13 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         initBluetooth();
+        AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext());
     }
 
     public void onDestroy() {
         super.onDestroy();
         bt.stopService();
+        AppState.getInstance().textSpeaker.shutdown();
     }
 
     @Override
