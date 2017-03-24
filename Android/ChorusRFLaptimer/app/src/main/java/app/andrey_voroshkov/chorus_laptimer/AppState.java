@@ -14,6 +14,7 @@ public class AppState {
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
     public static final int CALIBRATION_TIME_MS = 10000;
     public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D"};
+
     private static AppState instance = new AppState();
 
     public static AppState getInstance() {
