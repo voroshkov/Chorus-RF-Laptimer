@@ -27,8 +27,26 @@ public class RaceResultFragment extends Fragment {
 
     private View mRootView;
     private RaceResultsListAdapter mAdapter;
+    private boolean mIsStartingRace = false;
+    private Handler mRaceStartingHandler;
 
     public RaceResultFragment() {
+        mRaceStartingHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                int counter = msg.what;
+                if (counter == 0) {
+                    //last beep
+                    AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_GO);
+                    AppState.getInstance().sendBtCommand("R*R");
+                } else {
+                    this.sendEmptyMessageDelayed(counter - 1, 1000);
+                    //first 3 beeps
+                    if (counter < 4) {
+                        AppState.getInstance().playTone(AppState.TONE_PREPARE, AppState.DURATION_PREPARE);
+                    }
+                }
+            }
+        };
     }
 
     /**
@@ -58,6 +76,7 @@ public class RaceResultFragment extends Fragment {
                     case RaceState:
                     case NDevices:
                         if (AppState.getInstance().raceState.isStarted) {
+                            mIsStartingRace = false;
                             resetRaceResults();
                         }
                         updateButtons(rootView);
@@ -119,10 +138,18 @@ public class RaceResultFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 boolean isStarted = AppState.getInstance().raceState.isStarted;
-                if (!isStarted) {
+                if (!isStarted && !mIsStartingRace) {
                     //stop rssi monitoring first, then start race
                     AppState.getInstance().sendBtCommand("R*v");
-                    AppState.getInstance().sendBtCommand("R*R");
+
+                    Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
+                    btnRace.setText("Starting...");
+                    mIsStartingRace = true;
+                    int timeBeforeRace = AppState.getInstance().timeToPrepareForRace;
+                    if (timeBeforeRace >= AppState.MIN_TIME_BEFORE_RACE_TO_SPEAK)
+                        AppState.getInstance().speakMessage("Starting race in " + Integer.toString(timeBeforeRace - 2) + " seconds");
+
+                    mRaceStartingHandler.sendEmptyMessage(timeBeforeRace);
                 }
             }
         });
@@ -136,14 +163,20 @@ public class RaceResultFragment extends Fragment {
                     //stop race and start RSSI monitoring
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
+                    AppState.getInstance().speakMessage("Race is finished");
+                    return true;
+                } else if (mIsStartingRace) {
+                    //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
+                    mIsStartingRace = false;
+                    mRaceStartingHandler.removeCallbacksAndMessages(null);
+                    Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
+                    btnRace.setText("Start Race");
                     return true;
                 } else {
                     return false; //allow short click after long to start race on both short and long clicks
                 }
             }
         });
-
-
         return rootView;
     }
 
@@ -174,8 +207,7 @@ public class RaceResultFragment extends Fragment {
         if (AppState.getInstance().numberOfDevices == 1) {
             areAllCalibrated = true;
         }
-//        Button btnRunRace = (Button) rootView.findViewById(R.id.btnStartRace);
-//        btnRunRace.setEnabled(areAllCalibrated);
+
         Button btnCalibrate = (Button) rootView.findViewById(R.id.btnCalibrate);
         btnCalibrate.setEnabled(!areAllCalibrated);
         btnCalibrate.setVisibility(areAllCalibrated ? View.GONE : View.VISIBLE);
@@ -190,23 +222,6 @@ public class RaceResultFragment extends Fragment {
                 btnRace.setEnabled(false);
                 btnRace.setText("Start Race");
             } else if (areAllThrSet) {
-                btnRace.setEnabled(true);
-                btnRace.setText("Start Race");
-            } else {
-                btnRace.setEnabled(false);
-                btnRace.setText("Set All Thresholds Before Race");
-            }
-        }
-    }
-
-    public void updateRunButton(View rootView) {
-        Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
-        if (AppState.getInstance().raceState.isStarted) {
-            btnRace.setEnabled(true);
-            btnRace.setText("Stop Race (Long Press)");
-        } else {
-            boolean areAllThrSet = AppState.getInstance().areAllThresholdsSet();
-            if (areAllThrSet) {
                 btnRace.setEnabled(true);
                 btnRace.setText("Start Race");
             } else {

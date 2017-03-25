@@ -1,5 +1,8 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+
 import java.util.ArrayList;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
@@ -14,6 +17,14 @@ public class AppState {
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
     public static final int CALIBRATION_TIME_MS = 10000;
     public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D"};
+    public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
+
+    public static final int TONE_PREPARE = ToneGenerator.TONE_DTMF_1;
+    public static final int DURATION_PREPARE = 80;
+    public static final int TONE_GO = ToneGenerator.TONE_DTMF_D;
+    public static final int DURATION_GO = 600;
+    public static final int TONE_LAP = ToneGenerator.TONE_DTMF_S;
+    public static final int DURATION_LAP = 400;
 
     private static AppState instance = new AppState();
 
@@ -27,14 +38,17 @@ public class AppState {
     public int numberOfDevices = 0;
     public boolean isDeviceSoundEnabled = false;
     public boolean shouldSpeakLapTimes = true;
+    public boolean shouldSpeakMessages = true;
     public boolean shouldSkipFirstLap = true;
     public boolean isRssiMonitorOn = false;
+    public int timeToPrepareForRace = 5; //in seconds
     public RaceState raceState;
     public ArrayList<DeviceState> deviceStates;
     public ArrayList<ArrayList<LapResult>> raceResults;
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
+    private ToneGenerator mToneGenerator;
 
     private AppState() {
         mListeners = new ArrayList<IDataListener>();
@@ -42,6 +56,7 @@ public class AppState {
         raceResults = new ArrayList<ArrayList<LapResult>>();
         deviceStates = new ArrayList<DeviceState>();
         deviceTransmissionStates = new ArrayList<Boolean>();
+        mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
     }
 
     public void addListener(IDataListener listener) {
@@ -218,6 +233,17 @@ public class AppState {
         clearRssi();
         emitEvent(DataAction.DeviceRSSI);
     }
+
+    //---------------------------------------------------------------------
+    public void playTone(int tone, int duration) {
+        mToneGenerator.startTone(tone, duration);
+    }
+
+    public void speakMessage(String msg) {
+        if (shouldSpeakMessages) {
+            textSpeaker.speak(msg);
+        }
+    }
     //---------------------------------------------------------------------
     public void setNumberOfDevices(int n) {
         if (n <= 0) return;
@@ -355,15 +381,18 @@ public class AppState {
         deviceResults.get(lapNumber).setMs(lapTime);
         emitEvent(DataAction.LapResult);
 
-        //speak lap times if initialization is over
-        if (shouldSpeakLapTimes && isDevicesInitializationOver()) {
-            DeviceState currentState = deviceStates.get(deviceId);
-            String textToSay = currentState.pilotName;
-            if (!this.shouldSkipFirstLap || lapNumber != 0) {
-                if (raceState.lapsToGo == lapNumber) {
-                    textToSay = textToSay + " Finished. ";
+        if  (isDevicesInitializationOver()) {
+            playTone(TONE_LAP, DURATION_LAP);
+            //speak lap times if initialization is over
+            if (shouldSpeakLapTimes) {
+                DeviceState currentState = deviceStates.get(deviceId);
+                String textToSay = currentState.pilotName;
+                if (!this.shouldSkipFirstLap || lapNumber != 0) {
+                    if (raceState.lapsToGo == lapNumber) {
+                        textToSay = textToSay + " Finished. ";
+                    }
+                    textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumber) + ". " + Utils.convertMsToSpeakableTime(lapTime));
                 }
-                textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumber) + ". " + Utils.convertMsToSpeakableTime(lapTime));
             }
         }
     }

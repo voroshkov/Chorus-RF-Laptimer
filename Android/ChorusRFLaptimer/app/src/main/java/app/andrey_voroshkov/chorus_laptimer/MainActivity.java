@@ -63,17 +63,21 @@ public class MainActivity extends AppCompatActivity {
         bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             public void onDeviceDisconnected() {
                 Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
+                AppState.getInstance().speakMessage("Disconnected");
                 AppState.getInstance().onDisconnected();
                 toggleConnectionMenu(false);
             }
 
             public void onDeviceConnectionFailed() {
                 Toast.makeText(getApplicationContext(), "Connection failed", Toast.LENGTH_SHORT).show();
+                AppState.getInstance().speakMessage("Connection failed");
                 toggleConnectionMenu(false);
             }
 
             public void onDeviceConnected(String name, String address) {
-                Toast.makeText(getApplicationContext(), "Connected to " + name, Toast.LENGTH_SHORT).show();
+                String txt = "Connected to " + name;
+                Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
+                AppState.getInstance().speakMessage("Connected");
                 toggleConnectionMenu(true);
                 AppState.getInstance().onConnected();
             }

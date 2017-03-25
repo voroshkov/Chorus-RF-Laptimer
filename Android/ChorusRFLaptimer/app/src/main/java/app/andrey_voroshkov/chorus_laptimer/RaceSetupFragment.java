@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class RaceSetupFragment extends Fragment {
@@ -64,8 +65,11 @@ public class RaceSetupFragment extends Fragment {
         Button btnIncMLT = (Button) rootView.findViewById(R.id.btnIncMinLapTime);
         Button btnDecLaps = (Button) rootView.findViewById(R.id.btnDecLaps);
         Button btnIncLaps = (Button) rootView.findViewById(R.id.btnIncLaps);
+        Button btnDecPrepTime = (Button) rootView.findViewById(R.id.btnDecPreparationTime);
+        Button btnIncPrepTime = (Button) rootView.findViewById(R.id.btnIncPreparationTime);
         CheckBox chkSkipFirstLap = (CheckBox) rootView.findViewById(R.id.chkSkipFirstLap);
         CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
+        CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
 
         btnDecMLT.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +99,24 @@ public class RaceSetupFragment extends Fragment {
             public void onClick(View v) {
                 int laps = AppState.getInstance().raceState.lapsToGo;
                 AppState.getInstance().changeRaceLaps(laps + 1);
+            }
+        });
+
+        btnDecPrepTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (AppState.getInstance().timeToPrepareForRace > 0) {
+                    AppState.getInstance().timeToPrepareForRace--;
+                    updateText(mRootView);
+                }
+            }
+        });
+
+        btnIncPrepTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().timeToPrepareForRace++;
+                updateText(mRootView);
             }
         });
 
@@ -133,6 +155,13 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
+        chkSpeakMessages.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AppState.getInstance().shouldSpeakMessages = isChecked;
+            }
+        });
+
         return rootView;
     }
 
@@ -142,6 +171,9 @@ public class RaceSetupFragment extends Fragment {
 
         TextView txtLaps = (TextView) rootView.findViewById(R.id.txtLaps);
         txtLaps.setText(Integer.toString(AppState.getInstance().raceState.lapsToGo));
+
+        TextView txtPreparationTime = (TextView) rootView.findViewById(R.id.txtPreparationTime);
+        txtPreparationTime.setText(Integer.toString(AppState.getInstance().timeToPrepareForRace) + " sec.");
     }
 
     private void updateSkipFirstLapCheckbox(View rootView) {

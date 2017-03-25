@@ -9,92 +9,6 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:text="Enable device sounds"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView6"
-            android:layout_weight="1"
-            android:elevation="1dp"
-            android:layout_gravity="center_vertical" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal">
-
-            <CheckBox
-                android:layout_height="50dp"
-                android:id="@+id/chkDeviceSoundEnabled"
-                android:layout_width="wrap_content"
-                android:gravity="center_vertical|center_horizontal" />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="Skip first lap"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView7"
-            android:layout_weight="1"
-            android:elevation="1dp"
-            android:layout_gravity="center_vertical" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal">
-
-            <CheckBox
-                android:layout_height="50dp"
-                android:id="@+id/chkSkipFirstLap"
-                android:checked="true"
-                android:layout_width="wrap_content"
-                android:gravity="center_vertical|center_horizontal" />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="Speak Lap Times"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView9"
-            android:layout_weight="1"
-            android:elevation="1dp"
-            android:layout_gravity="center_vertical" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center_horizontal">
-
-            <CheckBox
-                android:layout_height="50dp"
-                android:id="@+id/chkSpeakLapTimes"
-                android:checked="true"
-                android:layout_width="wrap_content"
-                android:gravity="center_vertical|center_horizontal" />
-        </LinearLayout>
-    </LinearLayout>
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
             android:text="Laps To Go"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -176,6 +90,170 @@
                 android:id="@+id/btnIncMinLapTime"
                 android:layout_width="50dp"
                 android:textStyle="normal|bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:text="Skip First Lap" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <CheckBox
+                android:id="@+id/chkSkipFirstLap"
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:checked="true"
+                android:gravity="center_vertical|center_horizontal" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Time to Prepare for Race"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView11"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <Button
+                android:text="-"
+                android:layout_height="50dp"
+                android:id="@+id/btnDecPreparationTime"
+                android:layout_width="50dp"
+                android:textStyle="normal|bold" />
+
+            <TextView
+                android:text="5 sec."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/txtPreparationTime"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+            <Button
+                android:text="+"
+                android:layout_height="50dp"
+                android:id="@+id/btnIncPreparationTime"
+                android:layout_width="50dp"
+                android:textStyle="normal|bold" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Enable Device Sounds"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView6"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
+
+            <CheckBox
+                android:layout_height="50dp"
+                android:id="@+id/chkDeviceSoundEnabled"
+                android:layout_width="wrap_content"
+                android:gravity="center_vertical|center_horizontal" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Speak Lap Times"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView9"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
+
+            <CheckBox
+                android:layout_height="50dp"
+                android:id="@+id/chkSpeakLapTimes"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:gravity="center_vertical|center_horizontal" />
+        </LinearLayout>
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Speak Messages"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView10"
+            android:layout_weight="1"
+            android:elevation="1dp"
+            android:layout_gravity="center_vertical" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal">
+
+            <CheckBox
+                android:layout_height="50dp"
+                android:id="@+id/chkSpeakMessages"
+                android:checked="true"
+                android:layout_width="wrap_content"
+                android:gravity="center_vertical|center_horizontal" />
         </LinearLayout>
 
     </LinearLayout>
