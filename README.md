@@ -25,7 +25,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - Monitors several frequencies simultaneously  (corresponding to a number of devices)
 - Expandable: make one Solo device and track your solo flight times; make more devices, connect them into a Chorus and compete with teammates
 - Automatic detection of a number of Solo devices in a Chorus
-
+- Spoken notifications, including lap results
 
 ## Features (legacy from a Solo-Laptimer project)
 - No additional equipment besides 5.8GHz Video Transmitter required on a drone.
