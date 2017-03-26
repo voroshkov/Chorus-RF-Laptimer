@@ -13,18 +13,24 @@ public class Utils {
     private Utils() {
     }
 
-    public static String convertMsToHMS(int ms) {
-        int h = (int)Math.floor(ms/1000/60/60);
-        int m = (int)Math.floor(ms/1000/60)-h*60;
-        int s = (int)Math.floor(ms/1000)-(h*60+m)*60;
+//    public static String convertMsToHMS(int ms) {
+//        int h = (int)Math.floor(ms/1000/60/60);
+//        int m = (int)Math.floor(ms/1000/60)-h*60;
+//        int s = (int)Math.floor(ms/1000)-(h*60+m)*60;
+//        int msec = ms-(int)Math.floor(ms/1000)*1000;
+//        return String.format("%d : %02d : %02d . %03d", h, m, s, msec);
+//    }
+
+    public static String convertMsToDisplayTime(int ms) {
+        int m = (int)Math.floor(ms/1000/60);
+        int s = (int)Math.floor(ms/1000)-m*60;
         int msec = ms-(int)Math.floor(ms/1000)*1000;
-        return String.format("%d : %02d : %02d . %03d", h,m,s, msec);
+        return String.format("%d : %02d . %03d", m, s, msec);
     }
 
     public static String convertMsToSpeakableTime(int ms) {
-        int h = (int)Math.floor(ms/1000/60/60);
-        int m = (int)Math.floor(ms/1000/60)-h*60;
-        int s = (int)Math.floor(ms/1000)-(h*60+m)*60;
+        int m = (int)Math.floor(ms/1000/60);
+        int s = (int)Math.floor(ms/1000)-m*60;
         int msec = ms-(int)Math.floor(ms/1000)*1000;
 
         //speak 2 higher digits of milliseconds separately, or single zero

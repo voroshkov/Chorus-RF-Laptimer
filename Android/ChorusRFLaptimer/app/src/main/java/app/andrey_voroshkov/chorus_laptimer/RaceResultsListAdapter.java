@@ -84,15 +84,27 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
         int color = ContextCompat.getColor(mContext,colorId);
         textGroup.setTextColor(color);
 
+        TextView textPosition = (TextView) convertView.findViewById(R.id.textPosition);
+        int positionByTime = AppState.getInstance().getPilotPositionByTotalTime(groupPosition);
+        textPosition.setText(positionByTime != -1 ? Integer.toString(positionByTime) : "-");
+
+        TextView textPositionByBestLap = (TextView) convertView.findViewById(R.id.textPositionByBestLap);
+        int positionByBestLap = AppState.getInstance().getPilotPositionByBestLap(groupPosition);
+        textPositionByBestLap.setText("Best lap position: " + (positionByBestLap != -1 ? Integer.toString(positionByBestLap) : "-"));
+
+        TextView textRaceTime = (TextView) convertView.findViewById(R.id.textTotalRaceTime);
+        int raceTime = AppState.getInstance().getTotalRaceTime(groupPosition);
+        textRaceTime.setText(Utils.convertMsToDisplayTime(raceTime));
+
         TextView textLastLap = (TextView) convertView.findViewById(R.id.textLastLap);
         LapResult last = AppState.getInstance().getLastLap(groupPosition);
-        textLastLap.setText(last != null ? last.getHMS() : "-");
+        textLastLap.setText(last != null ? last.getDisplayTime() : "-");
 
         TextView textBestLap = (TextView) convertView.findViewById(R.id.textBestLap);
         int bestLapId = AppState.getInstance().getBestLapId(groupPosition);
         if (bestLapId != -1) {
             LapResult best = AppState.getInstance().raceResults.get(groupPosition).get(bestLapId);
-            textBestLap.setText(best.getHMS());
+            textBestLap.setText(best.getDisplayTime());
         } else {
             textBestLap.setText("-");
         }
@@ -131,7 +143,7 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
         }
 
         TextView textChild = (TextView) convertView.findViewById(R.id.textChild);
-        textChild.setText("Lap # " + childPosition + ":  " + mGroups.get(groupPosition).get(childPosition).getHMS());
+        textChild.setText("Lap # " + childPosition + ":  " + mGroups.get(groupPosition).get(childPosition).getDisplayTime());
 
         int bestLapId = AppState.getInstance().getBestLapId(groupPosition);
         int colorId = (childPosition == bestLapId) ? R.color.colorRaceResultChildBest : R.color.colorRaceResultChild;

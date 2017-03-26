@@ -6,7 +6,7 @@ package app.andrey_voroshkov.chorus_laptimer;
 
 public class LapResult {
     private int mLapTime;
-    private String mHMS;
+    private String mDisplayTime;
 
     LapResult() {
         this(0);
@@ -14,18 +14,18 @@ public class LapResult {
 
     LapResult(int lapTime) {
         mLapTime = lapTime;
-        mHMS = Utils.convertMsToHMS(lapTime);
+        mDisplayTime = Utils.convertMsToDisplayTime(lapTime);
     }
 
-    public String getHMS () {
-        return mHMS;
+    public String getDisplayTime () {
+        return mDisplayTime;
     }
 
     public int getMs () { return mLapTime; }
 
     public String setMs(int ms) {
         mLapTime = ms;
-        mHMS = Utils.convertMsToHMS(ms);
-        return mHMS;
+        mDisplayTime = Utils.convertMsToDisplayTime(ms);
+        return mDisplayTime;
     }
 }

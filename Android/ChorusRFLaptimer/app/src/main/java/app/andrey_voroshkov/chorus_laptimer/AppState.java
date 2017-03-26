@@ -18,6 +18,8 @@ public class AppState {
     public static final int CALIBRATION_TIME_MS = 10000;
     public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D"};
     public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
+    public static final int DEFAULT_MIN_LAP_TIME = 5;
+    public static final int DEFAULT_LAPS_TO_GO = 3;
 
     public static final int TONE_PREPARE = ToneGenerator.TONE_DTMF_1;
     public static final int DURATION_PREPARE = 80;
@@ -27,6 +29,10 @@ public class AppState {
     public static final int DURATION_LAP = 400;
 
     private static AppState instance = new AppState();
+
+    public static void Reset_Instance_TEST_ONLY() {
+        instance = new AppState();
+    }
 
     public static AppState getInstance() {
         return instance;
@@ -52,7 +58,7 @@ public class AppState {
 
     private AppState() {
         mListeners = new ArrayList<IDataListener>();
-        raceState = new RaceState(false, 5, 3);
+        raceState = new RaceState(false, DEFAULT_MIN_LAP_TIME, DEFAULT_LAPS_TO_GO);
         raceResults = new ArrayList<ArrayList<LapResult>>();
         deviceStates = new ArrayList<DeviceState>();
         deviceTransmissionStates = new ArrayList<Boolean>();
@@ -119,6 +125,74 @@ public class AppState {
         }
     }
 
+    public int getPilotPositionByBestLap(int deviceId) {
+        int count = raceResults.size();
+        if (count <= deviceId) return -1;
+
+        int myPosition = count;
+
+        int myBestLapId = getBestLapId(deviceId);
+        for (int i = 0; i < count; i++ ) {
+            if (i != deviceId) {
+                int curDeviceBestLapId = getBestLapId(i);
+                if (curDeviceBestLapId == -1) {
+                    myPosition--;
+                } else if (myBestLapId != -1) {
+                    int myBestTime = raceResults.get(deviceId).get(myBestLapId).getMs();
+                    int curDeviceBestTime = raceResults.get(i).get(curDeviceBestLapId).getMs();
+                    if (myBestTime <= curDeviceBestTime) {
+                        myPosition--;
+                    }
+                }
+            }
+        }
+        return myPosition;
+    }
+
+    public int getPilotPositionByTotalTime(int deviceId) {
+        int count = raceResults.size();
+        if (count <= deviceId) return -1;
+
+        int myPosition = count;
+
+        int myLapsCount = getValidRaceLapsCount(deviceId);
+        int myTotalTime = getTotalRaceTime(deviceId);
+
+        for (int i = 0; i < count; i++ ) {
+            if (i != deviceId) {
+                int curDeviceLapsCount = getValidRaceLapsCount(i);
+                int curDeviceTotalTime = getTotalRaceTime(i);
+                if (myLapsCount > curDeviceLapsCount) {
+                    myPosition--;
+                } else if (curDeviceLapsCount == myLapsCount && myTotalTime <= curDeviceTotalTime) {
+                    myPosition--;
+                }
+            }
+        }
+        return myPosition;
+    }
+
+    public int getValidRaceLapsCount(int deviceId) {
+        int lapsCount = getLapsCount(deviceId);
+        return lapsCount < raceState.lapsToGo ? lapsCount : raceState.lapsToGo;
+    }
+
+    public int getTotalRaceTime(int deviceId) {
+        if (raceResults.size() <= deviceId) return 0;
+
+        int total = 0;
+        int firstLapIndex = shouldSkipFirstLap ? 1 : 0;
+        int lapsCount = getValidRaceLapsCount(deviceId);
+        int lastLapIndex = shouldSkipFirstLap ? lapsCount : lapsCount - 1;
+
+        if (raceResults.get(deviceId).size() <= lastLapIndex) return 0;
+
+        for (int i = firstLapIndex; i <= lastLapIndex; i++) {
+            total += raceResults.get(deviceId).get(i).getMs();
+        }
+        return total;
+    }
+
     public LapResult getLastLap(int deviceId) {
         if (raceResults.size() <= deviceId) return null;
         ArrayList<LapResult> rr = raceResults.get(deviceId);
@@ -163,6 +237,11 @@ public class AppState {
         int size = raceResults.get(deviceId).size();
         int count  = shouldSkipFirstLap ? size - 1 : size;
         return count < 0 ? 0 : count;
+    }
+
+    public boolean isJustFinished(int deviceId) {
+        int laps = getLapsCount(deviceId);
+        return laps == raceState.lapsToGo;
     }
 
     public boolean getIsFinished(int deviceId) {
@@ -388,8 +467,10 @@ public class AppState {
                 DeviceState currentState = deviceStates.get(deviceId);
                 String textToSay = currentState.pilotName;
                 if (!this.shouldSkipFirstLap || lapNumber != 0) {
-                    if (raceState.lapsToGo == lapNumber) {
-                        textToSay = textToSay + " Finished. ";
+                    if (isJustFinished(deviceId)) {
+                        textToSay = textToSay + " finished";
+                    } else if (getIsFinished(deviceId)) {
+                        textToSay = textToSay + " already finished";
                     }
                     textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumber) + ". " + Utils.convertMsToSpeakableTime(lapTime));
                 }
