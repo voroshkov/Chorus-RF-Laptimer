@@ -10,6 +10,33 @@ This is a VTX Radio Frequency Lap Timing solution for drone racers - the evoluti
 Several updated Solo Laptimer devices connected together make up a Chorus Laptimer device which is capable of tracking several drones at once.
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 
+## Contents
+
+<!-- MarkdownTOC depth=0 bracket="round" autolink="true" autoanchor="true" -->
+
+- [Terminology](#terminology)
+- [NEW Features!](#new-features)
+- [Features \(legacy from a Solo-Laptimer project\)](#features-legacy-from-a-solo-laptimer-project)
+- [Limitations](#limitations)
+- [How it works](#how-it-works)
+- [Hardware](#hardware)
+    - [Used parts:](#used-parts)
+    - [Bluetooth module setup](#bluetooth-module-setup)
+    - [RX5808 SPI patch \(required\)](#rx5808-spi-patch-required)
+    - [Wiring of a Solo device](#wiring-of-a-solo-device)
+    - [Assembly of a Solo device](#assembly-of-a-solo-device)
+    - [Assembly of a Chorus device](#assembly-of-a-chorus-device)
+- [Software](#software)
+    - [Arduino](#arduino)
+    - [Android App](#android-app)
+        - [App User Guide](#app-user-guide)
+- [Setup and Usage Guide](#setup-and-usage-guide)
+- [Troubleshooting](#troubleshooting)
+- [Contacts](#contacts)
+
+<!-- /MarkdownTOC -->
+
+<a name="terminology"></a>
 ## Terminology
 
 **Solo** - device for tracking a single drone. Parts cost about $12. Consists of Arduino Pro mini, RX5808 module, connectors, optional buzzer, optional resistors:
@@ -20,6 +47,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 
 <img src="docs/img/Chorus_device.png" alt="Chorus device" height="400"/>
 
+<a name="new-features"></a>
 ## NEW Features!
 - Can be tuned to any RF band/channel
 - Monitors several frequencies simultaneously  (corresponding to a number of devices)
@@ -27,6 +55,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - Automatic detection of a number of Solo devices in a Chorus
 - Spoken notifications, including lap results
 
+<a name="features-legacy-from-a-solo-laptimer-project"></a>
 ## Features (legacy from a Solo-Laptimer project)
 - No additional equipment besides 5.8GHz Video Transmitter required on a drone.
 - Measure lap times with 1ms resolution (in theory; need to perform live tests).
@@ -35,6 +64,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - 5V * 250 mA power consumption (per device)
 - Low cost (around $16 per device, excluding power supply), compared to similar solutions available on market.
 
+<a name="limitations"></a>
 ## Limitations
 - Tracks up to 100 laps.
 - Doesn't work with digital VTx equipment (like Connex)
@@ -42,21 +72,25 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - Although expandable, definitely has a physical limit on a number of stacked devices (depending on UART throughput of the last device in a chain)
 - No software for iOS so far (iOS develpers, please join!).
 
+<a name="how-it-works"></a>
 ## How it works
 Each Solo device measures a VTx signal strength (RSSI value) and compares it with a threshold set up. If the RSSI value is above the threshold, the corresponding drone is considered passing a finish gate.
 
-
+<a name="hardware"></a>
 ## Hardware
+
+<a name="used-parts"></a>
 ### Used parts:
  - RX5808 (with SPI patch) (**N** items)
- - Arduino Pro Mini 5V 16MHz (**N** items)
+ - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
  - Piezo buzzer (5V, without built-in generator) - optional (**N** items)
- - HC-06 Bluetooth module (**1** item)
+ - HC-06/HC-05 Bluetooth module (**1** item)
  - 5V power supply (for example 2-4S LiPo with 5V BEC) (**1** item)
 
+<a name="bluetooth-module-setup"></a>
 ### Bluetooth module setup
 
-Make sure your bluetooth module baud rate is set to 115200 (use any of numerous tutorials on internet). 
+Make sure your bluetooth module baud rate is set to 115200 (use any of numerous tutorials on internet).
 
 Generalized steps:
 
@@ -66,6 +100,7 @@ Generalized steps:
 
 You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively.
 
+<a name="rx5808-spi-patch-required"></a>
 ### RX5808 SPI patch (required)
 (copied from [sheaivey/rx5808-pro-diversity](https://github.com/sheaivey/rx5808-pro-diversity) repo)
 
@@ -75,6 +110,7 @@ In order to get the RX5808 to use SPI you will need to open it and remove a sing
 
 For older versions of RX5808 use [these instructions](https://github.com/markohoepken/rx5808_pro_osd/wiki/rs5808-spi-patch).
 
+<a name="wiring-of-a-solo-device"></a>
 ### Wiring of a Solo device
 Parts may be connected directly without using any additional components:
 
@@ -84,11 +120,13 @@ It seems to work fine being connected this way, however adding 100 Ω resistors 
 
 <img src="docs/img/wiring_resistors.png" alt="Wiring with resistors" width="">
 
+<a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
 Correct positioning of RX5808 module against the finish gate area is vital for correct measurements.
 
 I tried using different types of antennas and shields with RX5808 to achieve the best possible accuracy, and finally found that the module itself works as a short-range directional antenna. The non-shielded side of the module is a surface that should face the gate, so consider this fact upon assembling.
 
+<a name="assembly-of-a-chorus-device"></a>
 ### Assembly of a Chorus device
 
 1. Make several Solo devices.
@@ -99,10 +137,13 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 
 <img src="docs/img/chorus_assembly.png" alt="Assembly of a Chorus Device" width="900">
 
+<a name="software"></a>
 ## Software
+<a name="arduino"></a>
 ### Arduino
 Download the project from Arduino folder, open **chorus-rf-laptimer.ino** file with Arduino IDE and upload to each Solo device.
 
+<a name="android-app"></a>
 ### Android App
 Download the [**ChorusRFLaptimer-release.apk**](https://github.com/voroshkov/Chorus-RF-Laptimer/blob/master/Android/ChorusRFLaptimer/app/ChorusRFLaptimer-release.apk) file from Android/app folder and install on your Android device or use the following QR code to download:
 
@@ -110,6 +151,7 @@ Download the [**ChorusRFLaptimer-release.apk**](https://github.com/voroshkov/Cho
 
 (Make sure to allow installation from unknown sources in your Android device settings).
 
+<a name="app-user-guide"></a>
 #### App User Guide
 Application startup screen:
 
@@ -140,6 +182,7 @@ Controls on the tabs are mostly self-explanatory. Still some clarifications migh
 
 When you stop the race, Chorus device immediately clears saved lap times, but they remain visible in the application until new race is started.
 
+<a name="setup-and-usage-guide"></a>
 ## Setup and Usage Guide
  1. Power on the Chorus device and place it on one side of the finish gate.
  2. Start the Android app and connect to the Chorus device.
@@ -156,7 +199,18 @@ When you stop the race, Chorus device immediately clears saved lap times, but th
 
 Also consider shielding the Chorus device with a piece of metal on one side where drones are approaching from. It might increase the accuracy by partially blocking the VTx signal before a drone is inside a gate.
 
-# Contacts
+<a name="troubleshooting"></a>
+## Troubleshooting
+
+If the app connects to Bluetooth module but doesn't seem to communicate with the device, check the following:
+
+1. Arduino must be 5V 16Mhz (proper work of 3.3V 8Mhz is not guaranteed)
+2. Bluetooth module baud rate must correspond to Arduino's: 115200 baud
+3. Loopback jumper must be in place.
+4. Wiring :)
+
+<a name="contacts"></a>
+## Contacts
 - YouTube channel: https://www.youtube.com/user/voroshkov
 - Facebook: https://www.facebook.com/andrey.voroshkov
 - RCGroups discussion thread: https://www.rcgroups.com/forums/showthread.php?2801815
