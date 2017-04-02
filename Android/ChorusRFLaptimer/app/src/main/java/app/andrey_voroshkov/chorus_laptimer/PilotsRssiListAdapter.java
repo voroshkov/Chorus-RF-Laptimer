@@ -57,7 +57,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
-        final String deviceId = Integer.toString(position);
+        final String deviceId = String.format("%X", position);
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

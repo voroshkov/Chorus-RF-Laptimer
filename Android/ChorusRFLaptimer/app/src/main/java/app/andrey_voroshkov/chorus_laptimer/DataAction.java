@@ -19,5 +19,9 @@ public enum DataAction {
     DeviceBand,
     SkipFirstLap,
     RSSImonitorState,
-    DeviceRSSI
+    DeviceRSSI,
+    SpeakMessages,
+    SpeakLapTimes,
+    PreparationTime,
+    SPECIAL_DevicePilot_EditUpdate
 };

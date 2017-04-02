@@ -42,6 +42,10 @@ public class RaceSetupFragment extends Fragment {
         mRootView = rootView;
 
         updateText(rootView);
+        updateSkipFirstLapCheckbox(rootView);
+        updateSoundCheckbox(rootView);
+        updateSpeakLapTimesCheckbox(rootView);
+        updateSpeakMessagesCheckbox(rootView);
 
         AppState.getInstance().addListener(new IDataListener() {
             @Override
@@ -49,6 +53,7 @@ public class RaceSetupFragment extends Fragment {
                 switch (dataItemName) {
                     case RaceMinLap:
                     case RaceLaps:
+                    case PreparationTime:
                         updateText(rootView);
                         break;
                     case SoundEnable:
@@ -56,6 +61,12 @@ public class RaceSetupFragment extends Fragment {
                         break;
                     case SkipFirstLap:
                         updateSkipFirstLapCheckbox(rootView);
+                        break;
+                    case SpeakLapTimes:
+                        updateSpeakLapTimesCheckbox(rootView);
+                        break;
+                    case SpeakMessages:
+                        updateSpeakMessagesCheckbox(rootView);
                         break;
                 }
             }
@@ -105,18 +116,16 @@ public class RaceSetupFragment extends Fragment {
         btnDecPrepTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (AppState.getInstance().timeToPrepareForRace > 0) {
-                    AppState.getInstance().timeToPrepareForRace--;
-                    updateText(mRootView);
-                }
+                int time = AppState.getInstance().timeToPrepareForRace;
+                AppState.getInstance().changeTimeToPrepareForRace(time - 1);
             }
         });
 
         btnIncPrepTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().timeToPrepareForRace++;
-                updateText(mRootView);
+                int time = AppState.getInstance().timeToPrepareForRace;
+                AppState.getInstance().changeTimeToPrepareForRace(time + 1);
             }
         });
 
@@ -151,14 +160,14 @@ public class RaceSetupFragment extends Fragment {
         chkSpeakLapTimes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                AppState.getInstance().shouldSpeakLapTimes = isChecked;
+                AppState.getInstance().changeShouldSpeakLapTimes(isChecked);
             }
         });
 
         chkSpeakMessages.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                AppState.getInstance().shouldSpeakMessages = isChecked;
+                AppState.getInstance().changeShouldSpeakMessages(isChecked);
             }
         });
 
@@ -184,5 +193,15 @@ public class RaceSetupFragment extends Fragment {
     private void updateSoundCheckbox(View rootView) {
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
         chkDeviceSoundEnabled.setChecked(AppState.getInstance().isDeviceSoundEnabled);
+    }
+
+    private void updateSpeakLapTimesCheckbox(View rootView) {
+        CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
+        chkSpeakLapTimes.setChecked(AppState.getInstance().shouldSpeakLapTimes);
+    }
+
+    private void updateSpeakMessagesCheckbox(View rootView) {
+        CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
+        chkSpeakMessages.setChecked(AppState.getInstance().shouldSpeakMessages);
     }
 }

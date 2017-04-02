@@ -1,5 +1,6 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 
@@ -40,12 +41,14 @@ public class AppState {
 
     public BluetoothSPP bt;
     public TextSpeaker textSpeaker;
+    public SharedPreferences preferences;
 
     public int numberOfDevices = 0;
     public boolean isDeviceSoundEnabled = false;
     public boolean shouldSpeakLapTimes = true;
     public boolean shouldSpeakMessages = true;
     public boolean shouldSkipFirstLap = true;
+    public boolean wereDevicesConfigured = false;
     public boolean isRssiMonitorOn = false;
     public int timeToPrepareForRace = 5; //in seconds
     public RaceState raceState;
@@ -301,11 +304,13 @@ public class AppState {
 
     //---------------------------------------------------------------------
     public void sendBtCommand(String cmd) {
+        if (bt == null) return;
         bt.send(cmd + (char)DELIMITER);
     }
 
     public void onConnected() {
         sendBtCommand("N0");
+        wereDevicesConfigured = false;
     }
 
     public void onDisconnected() {
@@ -351,6 +356,7 @@ public class AppState {
         if (currentState.channel != channel) {
             currentState.channel = channel;
             emitEvent(DataAction.DeviceChannel);
+            AppPreferences.save(AppPreferences.DEVICE_CHANNELS);
         }
     }
 
@@ -362,6 +368,7 @@ public class AppState {
         if (currentState.band != band) {
             currentState.band = band;
             emitEvent(DataAction.DeviceBand);
+            AppPreferences.save(AppPreferences.DEVICE_BANDS);
         }
     }
 
@@ -373,7 +380,12 @@ public class AppState {
         if (!currentState.pilotName.equals(pilot)) {
             currentState.pilotName = pilot;
             emitEvent(DataAction.DevicePilot);
+            AppPreferences.save(AppPreferences.DEVICE_PILOTS);
         }
+    }
+
+    public void updatePilotNamesInEdits() {
+        emitEvent(DataAction.SPECIAL_DevicePilot_EditUpdate);
     }
 
     public void changeDeviceThreshold(int deviceId, int threshold) {
@@ -405,6 +417,7 @@ public class AppState {
         if (raceState.minLapTime!= minLapTime) {
             raceState.minLapTime = minLapTime;
             emitEvent(DataAction.RaceMinLap);
+            AppPreferences.save(AppPreferences.MIN_LAP_TIME);
         }
     }
 
@@ -415,6 +428,18 @@ public class AppState {
         if (raceState.lapsToGo!= laps) {
             raceState.lapsToGo = laps;
             emitEvent(DataAction.RaceLaps);
+            AppPreferences.save(AppPreferences.LAPS_TO_GO);
+        }
+    }
+
+    public void changeTimeToPrepareForRace(int time) {
+        if (time < 0) {
+            return;
+        }
+        if (timeToPrepareForRace != time) {
+            timeToPrepareForRace = time;
+            emitEvent(DataAction.PreparationTime);
+            AppPreferences.save(AppPreferences.PREPARATION_TIME);
         }
     }
 
@@ -431,11 +456,31 @@ public class AppState {
     public void changeDeviceSoundState(boolean isSoundEnabled) {
         this.isDeviceSoundEnabled = isSoundEnabled;
         emitEvent(DataAction.SoundEnable);
+        AppPreferences.save(AppPreferences.ENABLE_DEVICE_SOUNDS);
     }
 
     public void changeSkipFirstLap(boolean shouldSkip) {
-        this.shouldSkipFirstLap = shouldSkip;
-        emitEvent(DataAction.SkipFirstLap);
+        if (shouldSkipFirstLap != shouldSkip) {
+            shouldSkipFirstLap = shouldSkip;
+            emitEvent(DataAction.SkipFirstLap);
+            AppPreferences.save(AppPreferences.SKIP_FIRST_LAP);
+        };
+    }
+
+    public void changeShouldSpeakLapTimes(boolean shouldSpeak) {
+        if (shouldSpeakLapTimes != shouldSpeak) {
+            shouldSpeakLapTimes = shouldSpeak;
+            emitEvent(DataAction.SpeakLapTimes);
+            AppPreferences.save(AppPreferences.SPEAK_LAP_TIMES);
+        }
+    }
+
+    public void changeShouldSpeakMessages(boolean shouldSpeak) {
+        if (shouldSpeakMessages != shouldSpeak) {
+            shouldSpeakMessages = shouldSpeak;
+            emitEvent(DataAction.SpeakMessages);
+            AppPreferences.save(AppPreferences.SPEAK_MESSAGES);
+        }
     }
 
     /*
@@ -460,7 +505,7 @@ public class AppState {
         deviceResults.get(lapNumber).setMs(lapTime);
         emitEvent(DataAction.LapResult);
 
-        if  (isDevicesInitializationOver()) {
+        if (isDevicesInitializationOver()) {
             playTone(TONE_LAP, DURATION_LAP);
             //speak lap times if initialization is over
             if (shouldSpeakLapTimes) {
@@ -522,7 +567,7 @@ public class AppState {
                 calibrationValue = baseTime/diff;
             }
             deviceStates.get(i).calibrationValue = calibrationValue;
-            sendBtCommand("C" + i + String.format("%08X", calibrationValue));
+            sendBtCommand("C" + String.format("%X", i) + String.format("%08X", calibrationValue));
         }
         emitEvent(DataAction.DeviceCalibrationValue);
     }
@@ -552,8 +597,8 @@ public class AppState {
     public void receivedEndOfSequence(int deviceId) {
         deviceTransmissionStates.set(deviceId, true);
 
-        //run or stop RSSI monitoring after connecction, only after all device states are received
         if (isDevicesInitializationOver()) {
+            //run or stop RSSI monitoring after connecction, only after all device states are received
             if (raceState == null) {
                 return;
             }
@@ -563,7 +608,19 @@ public class AppState {
             if (!raceState.isStarted && !isRssiMonitorOn) {
                 sendBtCommand("R*V"); // turn RSSI Monitoring on
             }
+            //also decide to apply preferences after all states are received
+            AppPreferences.applyInAppPreferences();
+
+            if (!wereDevicesConfigured) {
+                AppPreferences.applyDeviceDependentPreferences();
+                wereDevicesConfigured = true;
+            }
         }
+    }
+
+
+    public void changeDeviceConfigStatus(int deviceId, boolean isConfigured) {
+        wereDevicesConfigured = wereDevicesConfigured || isConfigured;
     }
 }
 

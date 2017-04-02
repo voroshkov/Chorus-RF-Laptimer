@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -63,6 +64,8 @@ public class PilotsSetupFragment extends Fragment {
                     case DeviceRSSI:
                         updateCurrentRSSI();
                         break;
+                    case SPECIAL_DevicePilot_EditUpdate:
+                        updatePilotNames();
                 }
             }
         });
@@ -78,6 +81,17 @@ public class PilotsSetupFragment extends Fragment {
     public void updateResults() {
         ListView listView = (ListView)mRootView.findViewById(R.id.lvPilots);
         ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+    }
+
+    public void updatePilotNames() {
+        ListView mListView = (ListView)mRootView.findViewById(R.id.lvPilots);
+        int count = AppState.getInstance().deviceStates.size();
+        for (int i = 0; i < count; i++) {
+            View convertView = mListView.getChildAt(i);
+            EditText pilotName = (EditText) convertView.findViewById(R.id.editPilotName);
+            String curPilotName = AppState.getInstance().deviceStates.get(i).pilotName;
+            pilotName.setText(curPilotName);
+        }
     }
 
     public void updateCurrentRSSI() {

@@ -133,6 +133,11 @@ public class Utils {
                     result += "EndOfSequence. Device# " + moduleId;
                     AppState.getInstance().receivedEndOfSequence(moduleId);
                     break;
+                case 'P':
+                    int isDeviceConfigured = Integer.parseInt(chunk.substring(3,4), 16);
+                    result += "Device is configured: " + ((isDeviceConfigured!= 0) ? "yes" : "no");
+                    AppState.getInstance().changeDeviceConfigStatus(moduleId, (isDeviceConfigured!=0));
+                    break;
             }
         } else if (dest == 'R') {
 
