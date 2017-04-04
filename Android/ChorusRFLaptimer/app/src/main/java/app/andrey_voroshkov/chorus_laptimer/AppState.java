@@ -130,13 +130,13 @@ public class AppState {
 
     public int getPilotPositionByBestLap(int deviceId) {
         int count = raceResults.size();
-        if (count <= deviceId) return -1;
+        if (count <= deviceId || !getIsPilotEnabled(deviceId)) return -1;
 
-        int myPosition = count;
+        int myPosition = getEnabledPilotsCount();
 
         int myBestLapId = getBestLapId(deviceId);
         for (int i = 0; i < count; i++ ) {
-            if (i != deviceId) {
+            if (i != deviceId && getIsPilotEnabled(i)) {
                 int curDeviceBestLapId = getBestLapId(i);
                 if (curDeviceBestLapId == -1) {
                     myPosition--;
@@ -154,15 +154,15 @@ public class AppState {
 
     public int getPilotPositionByTotalTime(int deviceId) {
         int count = raceResults.size();
-        if (count <= deviceId) return -1;
+        if (count <= deviceId || !getIsPilotEnabled(deviceId)) return -1;
 
-        int myPosition = count;
+        int myPosition = getEnabledPilotsCount();
 
         int myLapsCount = getValidRaceLapsCount(deviceId);
         int myTotalTime = getTotalRaceTime(deviceId);
 
         for (int i = 0; i < count; i++ ) {
-            if (i != deviceId) {
+            if (i != deviceId && getIsPilotEnabled(i)) {
                 int curDeviceLapsCount = getValidRaceLapsCount(i);
                 int curDeviceTotalTime = getTotalRaceTime(i);
                 if (myLapsCount > curDeviceLapsCount) {
@@ -281,6 +281,12 @@ public class AppState {
         return Integer.toString(deviceStates.get(deviceId).channel + 1);
     }
 
+    public Boolean getIsPilotEnabled(int deviceId) {
+        if (deviceStates == null) return false;
+        if (deviceStates.size() <= deviceId) return false;
+        return deviceStates.get(deviceId).isEnabled;
+    }
+
     public static int convertRssiToProgress(int rssi) {
         return rssi - MIN_RSSI;
     }
@@ -293,15 +299,37 @@ public class AppState {
     }
 
     public boolean areAllThresholdsSet() {
-        int count = deviceStates.size();
-        for (int i = 0; i< count; i++) {
-            if (deviceStates.get(i).threshold < MIN_RSSI) {
+        for(DeviceState ds: deviceStates) {
+            if (ds.threshold < MIN_RSSI && ds.isEnabled) {
                 return false;
             }
         }
         return true;
     }
 
+    public boolean areAllEnabledDevicesCalibrated() {
+        //no need to calibrate device for single enabled pilot
+        if (AppState.getInstance().getEnabledPilotsCount() == 1) {
+            return true;
+        }
+        for (DeviceState ds: deviceStates) {
+            if (!ds.isCalibrated && ds.isEnabled) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public int getEnabledPilotsCount() {
+        int count = deviceStates.size();
+        int result = 0;
+        for (int i = 0; i< count; i++) {
+            if (deviceStates.get(i).isEnabled) {
+                result++;
+            }
+        }
+        return result;
+    }
     //---------------------------------------------------------------------
     public void sendBtCommand(String cmd) {
         if (bt == null) return;
@@ -491,6 +519,10 @@ public class AppState {
         if (deviceId >= numberOfDevices) {
             return;
         }
+        //don't track laps from disabled device
+        if (!deviceStates.get(deviceId).isEnabled) {
+            return;
+        }
         actualizeRaceResults();
         ArrayList<LapResult> deviceResults = raceResults.get(deviceId);
         if (deviceResults == null) {
@@ -618,9 +650,23 @@ public class AppState {
         }
     }
 
-
     public void changeDeviceConfigStatus(int deviceId, boolean isConfigured) {
         wereDevicesConfigured = wereDevicesConfigured || isConfigured;
+    }
+
+    public void changeDeviceEnabled(int deviceId, boolean isEnabled) {
+        if (deviceStates == null || deviceId >= deviceStates.size()) {
+            return;
+        }
+        //TODO: update the code so that the below check is not necessary (now it prevents endless loop(!))
+        // endless loop(!): click checkbox -> changeDeviceEnabled() -> emitEvent -> updateCheckbox -> changeDeviceEnabled()...
+        // probably there are more such places
+        if (deviceStates.get(deviceId).isEnabled == isEnabled) {
+            return;
+        }
+        deviceStates.get(deviceId).isEnabled = isEnabled;
+        emitEvent(DataAction.PilotEnabledDisabled);
+        AppPreferences.save(AppPreferences.DEVICE_ENABLED);
     }
 }
 

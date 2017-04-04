@@ -59,6 +59,7 @@ public class PilotsSetupFragment extends Fragment {
                     case DeviceChannel:
                     case DeviceBand:
                     case DeviceThreshold:
+                    case PilotEnabledDisabled:
                         updateResults();
                         break;
                     case DeviceRSSI:

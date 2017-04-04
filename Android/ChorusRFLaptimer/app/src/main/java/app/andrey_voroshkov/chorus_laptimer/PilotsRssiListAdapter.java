@@ -8,7 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,6 +40,19 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         Button btnIncThr;
         Button btnSetThr;
         ProgressBar rssiBar;
+        CheckBox isPilotEnabled;
+    }
+
+    private static void enableDisableView(View view, boolean enabled) {
+        view.setEnabled(enabled);
+
+        if ( view instanceof ViewGroup ) {
+            ViewGroup group = (ViewGroup)view;
+
+            for ( int i = 0 ; i < group.getChildCount() ; i++ ) {
+                enableDisableView(group.getChildAt(i), enabled);
+            }
+        }
     }
 
     @Override
@@ -70,6 +86,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.btnIncThr = (Button) convertView.findViewById(R.id.btnIncThresh);
             viewHolder.btnSetThr = (Button) convertView.findViewById(R.id.btnCapture);
             viewHolder.rssiBar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
+            viewHolder.isPilotEnabled = (CheckBox) convertView.findViewById(R.id.checkIsPilotEnabled);
 
             viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
 
@@ -109,6 +126,16 @@ public class PilotsRssiListAdapter extends BaseAdapter {
                 }
             });
 
+            final LinearLayout innerGroup = (LinearLayout) convertView.findViewById(R.id.innerGroupLayout);
+
+            viewHolder.isPilotEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    enableDisableView(innerGroup, isChecked);
+                    AppState.getInstance().changeDeviceEnabled(position, isChecked);
+                }
+            });
+
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -117,9 +144,11 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
         viewHolder.txtChannelLabel.setText("Channel: #" + ch + " (" + band + ")");
+        viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         if (ds.threshold == 0) {
             viewHolder.btnSetThr.setText("Set");

@@ -87,6 +87,10 @@ public class RaceResultFragment extends Fragment {
                     case DeviceCalibrationStatus:
                         updateButtons(rootView);
                         break;
+                    case PilotEnabledDisabled:
+                        updateButtons(rootView);
+                        updateResults();
+                        break;
                     case LapResult:
                     case RaceLaps:
                     case SkipFirstLap:
@@ -169,8 +173,7 @@ public class RaceResultFragment extends Fragment {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
                     mIsStartingRace = false;
                     mRaceStartingHandler.removeCallbacksAndMessages(null);
-                    Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
-                    btnRace.setText("Start Race");
+                    updateButtons(rootView);
                     return true;
                 } else {
                     return false; //allow short click after long to start race on both short and long clicks
@@ -197,16 +200,8 @@ public class RaceResultFragment extends Fragment {
 
     public void updateButtons(View rootView) {
         ArrayList<DeviceState> dsList = AppState.getInstance().deviceStates;
-        boolean areAllCalibrated = true;
-        for (DeviceState ds: dsList) {
-            if (!ds.isCalibrated) {
-                areAllCalibrated = false;
-                break;
-            }
-        }
-        if (AppState.getInstance().numberOfDevices == 1) {
-            areAllCalibrated = true;
-        }
+
+        boolean areAllCalibrated = AppState.getInstance().areAllEnabledDevicesCalibrated();
 
         Button btnCalibrate = (Button) rootView.findViewById(R.id.btnCalibrate);
         btnCalibrate.setEnabled(!areAllCalibrated);
@@ -218,15 +213,21 @@ public class RaceResultFragment extends Fragment {
             btnRace.setText("Stop Race (Long Press)");
         } else {
             boolean areAllThrSet = AppState.getInstance().areAllThresholdsSet();
+            int numberOfPilots = AppState.getInstance().getEnabledPilotsCount();
             if (!areAllCalibrated) {
                 btnRace.setEnabled(false);
                 btnRace.setText("Start Race");
             } else if (areAllThrSet) {
-                btnRace.setEnabled(true);
-                btnRace.setText("Start Race");
+                if (numberOfPilots == 0) {
+                    btnRace.setEnabled(false);
+                    btnRace.setText("Enable pilots to start Race");
+                } else {
+                    btnRace.setEnabled(true);
+                    btnRace.setText("Start Race (" + Integer.toString(numberOfPilots) + (numberOfPilots == 1 ? "pilot" : "pilots") +  ")");
+                }
             } else {
                 btnRace.setEnabled(false);
-                btnRace.setText("Set All Thresholds Before Race");
+                btnRace.setText("Set all thresholds before Race");
             }
         }
     }

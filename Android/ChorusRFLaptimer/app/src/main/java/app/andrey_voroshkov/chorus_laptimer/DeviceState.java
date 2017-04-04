@@ -13,4 +13,11 @@ public class DeviceState {
     public int calibrationTime;
     public int calibrationValue;
     public int currentRSSI;
+    public boolean isEnabled;
+
+    DeviceState() {
+        isCalibrated = false;
+        isEnabled = true;
+    }
 }
+

@@ -22,6 +22,7 @@ public class AppPreferences {
     public static final String DEVICE_BANDS = "device_bands";
     public static final String DEVICE_CHANNELS = "device_channels";
     public static final String DEVICE_PILOTS = "device_pilots";
+    public static final String DEVICE_ENABLED = "device_enabled";
 
     public static void save(String preferenceName) {
         AppState app = AppState.getInstance();
@@ -80,6 +81,15 @@ public class AppPreferences {
                 String pilots = TextUtils.join(STRING_ITEMS_DELIMITER, pilotsList);
                 editor.putString(DEVICE_PILOTS, pilots);
                 break;
+            case DEVICE_ENABLED:
+                if (app.deviceStates == null) break;
+                ArrayList<String> statusesList = new ArrayList<>();
+                for(int i = 0; i < app.deviceStates.size(); i++) {
+                    statusesList.add(Boolean.toString(app.deviceStates.get(i).isEnabled));
+                }
+                String statuses = TextUtils.join(STRING_ITEMS_DELIMITER, statusesList);
+                editor.putString(DEVICE_ENABLED, statuses);
+                break;
         }
         editor.apply();
     }
@@ -103,6 +113,19 @@ public class AppPreferences {
                     }
                 }
                 app.updatePilotNamesInEdits(); //because pilot names in UI are not updated via changeDevicePilot()
+            }
+        }
+
+        if (app.deviceStates != null) {
+            String statuses = app.preferences.getString(DEVICE_ENABLED, "");
+            if (!statuses.equals("")) {
+                String[] statusesArray = TextUtils.split(statuses, STRING_ITEMS_DELIMITER);
+                int statusesCount = statusesArray.length;
+                for(int i = 0; i < app.deviceStates.size(); i++) {
+                    if (i < statusesCount) {
+                        app.changeDeviceEnabled(i, Boolean.parseBoolean(statusesArray[i]));
+                    }
+                }
             }
         }
     }

@@ -69,10 +69,17 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.race_result_list_group, null);
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(groupPosition);
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        //don't show results for disabled pilot
+        if (!isEnabled) {
+            convertView = inflater.inflate(R.layout.race_result_list_disabled_group, null);
+            return convertView;
         }
+
+        convertView = inflater.inflate(R.layout.race_result_list_group, null);
 
         TextView textGroup = (TextView) convertView.findViewById(R.id.textGroupHeading);
 

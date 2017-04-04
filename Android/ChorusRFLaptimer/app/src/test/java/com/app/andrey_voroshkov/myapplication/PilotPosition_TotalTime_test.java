@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 @RunWith(MockitoJUnitRunner.class)
-public class ExampleUnitTest {
+public class PilotPosition_TotalTime_test {
 
     BluetoothSPP bt = Mockito.mock(BluetoothSPP.class);
 
@@ -190,5 +190,39 @@ public class ExampleUnitTest {
         assertEquals(1, pos);
         pos = as.getPilotPositionByTotalTime(3);
         assertEquals(1, pos);
+    }
+
+    @Test
+    public void getPilotPositionByTotalTime_considers_disabled_pilots() throws Exception {
+        AppState as = getFreshAppState();
+        as.setNumberOfDevices(4);
+
+        as.shouldSkipFirstLap = false;
+        as.changeDeviceEnabled(1, false); //disable second device
+
+        as.addLapResult(0, 0, 10);
+        as.addLapResult(0, 1, 1);
+        as.addLapResult(0, 2, 100);
+        as.addLapResult(0, 3, 1000);
+
+
+        as.addLapResult(1, 0, 5);
+        as.addLapResult(1, 1, 1000);
+        as.addLapResult(1, 2, 10000);
+
+        as.addLapResult(2, 0, 1);
+        as.addLapResult(2, 1, 1);
+
+        as.addLapResult(3, 0, 1);
+        as.addLapResult(3, 1, 1);
+
+        int pos = as.getPilotPositionByTotalTime(0);
+        assertEquals(1, pos);
+        pos = as.getPilotPositionByTotalTime(1);
+        assertEquals(-1, pos);
+        pos = as.getPilotPositionByTotalTime(2);
+        assertEquals(2, pos);
+        pos = as.getPilotPositionByTotalTime(3);
+        assertEquals(2, pos);
     }
 }
