@@ -114,6 +114,8 @@ For older versions of RX5808 use [these instructions](https://github.com/markoho
 ### Wiring of a Solo device
 Parts may be connected directly without using any additional components:
 
+**UPDATE:** powering RX5808 from Arduino's VCC was a bad idea - Pro Mini's linear regulator might not be able to provide enough power for RX, so use raw 5V power instead.
+
 <img src="docs/img/wiring_solo.png" alt="Wiring Solo schematic" width="400">
 
 It seems to work fine being connected this way, however adding 100 Ω resistors in line on SPI wires (Arduino pins 10, 11, 12) is a good idea to prevent possible glitches with channel selection:
