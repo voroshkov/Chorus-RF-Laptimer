@@ -81,18 +81,21 @@ public class ChannelsSetupFragment extends Fragment {
 
     public void updateCurrentRSSI() {
         ListView mListView = (ListView)mRootView.findViewById(R.id.lvChannels);
-        int count = AppState.getInstance().deviceStates.size();
-        for (int i = 0; i < count; i++) {
-            View convertView = mListView.getChildAt(i);
-            ProgressBar bar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
-            TextView txt = (TextView) convertView.findViewById(R.id.txtRssi);
-            int curRssi = AppState.getInstance().getCurrentRssi(i);
-            int rssiThreshold = AppState.getInstance().getRssiThreshold(i);
-            bar.setProgress(AppState.convertRssiToProgress(curRssi));
-            int colorId = (curRssi > rssiThreshold) ? R.color.colorAccent : R.color.colorPrimary;
-            int color = ContextCompat.getColor(mContext,colorId);
-            bar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            txt.setText(Integer.toString(curRssi));
+        int first = mListView.getFirstVisiblePosition();
+        int last = mListView.getLastVisiblePosition();
+        for (int i = first; i <= last; i++) {
+            View convertView = mListView.getChildAt(i - first);
+            if (convertView != null) {
+                ProgressBar bar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
+                TextView txt = (TextView) convertView.findViewById(R.id.txtRssi);
+                int curRssi = AppState.getInstance().getCurrentRssi(i);
+                int rssiThreshold = AppState.getInstance().getRssiThreshold(i);
+                bar.setProgress(AppState.convertRssiToProgress(curRssi));
+                int colorId = (curRssi > rssiThreshold) ? R.color.colorAccent : R.color.colorPrimary;
+                int color = ContextCompat.getColor(mContext, colorId);
+                bar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                txt.setText(Integer.toString(curRssi));
+            }
         }
     }
 }
