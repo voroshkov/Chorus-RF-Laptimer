@@ -89,9 +89,11 @@ public class PilotsSetupFragment extends Fragment {
         int count = AppState.getInstance().deviceStates.size();
         for (int i = 0; i < count; i++) {
             View convertView = mListView.getChildAt(i);
-            EditText pilotName = (EditText) convertView.findViewById(R.id.editPilotName);
-            String curPilotName = AppState.getInstance().deviceStates.get(i).pilotName;
-            pilotName.setText(curPilotName);
+            if (convertView != null) {
+                EditText pilotName = (EditText) convertView.findViewById(R.id.editPilotName);
+                String curPilotName = AppState.getInstance().deviceStates.get(i).pilotName;
+                pilotName.setText(curPilotName);
+            }
         }
     }
 

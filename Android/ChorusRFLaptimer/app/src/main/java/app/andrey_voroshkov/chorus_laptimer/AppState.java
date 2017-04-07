@@ -618,7 +618,11 @@ public class AppState {
 
     //use to determine if all devices reported their state after connection
     public boolean isDevicesInitializationOver() {
-        for (int i=0; i<deviceTransmissionStates.size(); i++) {
+        int count = deviceTransmissionStates.size();
+        if (count == 0) {
+            return false;
+        }
+        for (int i = 0; i < count; i++) {
             if (!deviceTransmissionStates.get(i)) {
                 return false;
             }

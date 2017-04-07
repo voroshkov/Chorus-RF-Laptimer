@@ -24,6 +24,42 @@ public class AppPreferences {
     public static final String DEVICE_PILOTS = "device_pilots";
     public static final String DEVICE_ENABLED = "device_enabled";
 
+    public String[] mBands;
+    public String[] mChannels;
+    public String[] mPilots;
+    public String[] mDeviceEnabledStatuses;
+
+    private static AppPreferences instance = new AppPreferences();
+
+    public static AppPreferences getInstance() {
+        return instance;
+    }
+
+    private AppPreferences() {
+        mBands = getArrayFromStringPreference(DEVICE_BANDS);
+        mChannels = getArrayFromStringPreference(DEVICE_CHANNELS);
+        mPilots = getArrayFromStringPreference(DEVICE_PILOTS);
+        mDeviceEnabledStatuses = getArrayFromStringPreference(DEVICE_ENABLED);
+    }
+
+    private static String[] getArrayFromStringPreference(String prefName) {
+        String value = AppState.getInstance().preferences.getString(prefName, "");
+        if (value.equals("")) {
+            return new String[0];
+        }
+        return TextUtils.split(value, STRING_ITEMS_DELIMITER);
+    }
+
+    private static void AppendExtraItemsFromSavedArrayPreference(ArrayList<String> list, String[] savedPreferenceArr) {
+        int currentCount = list.size();
+        int savedCount = savedPreferenceArr.length;
+        if (currentCount < savedCount) {
+            for(int i = currentCount; i < savedCount; i++ ) {
+                list.add(savedPreferenceArr[i]);
+            }
+        }
+    }
+
     public static void save(String preferenceName) {
         AppState app = AppState.getInstance();
         // don't save anything to prefs before device initialization is done
@@ -60,6 +96,7 @@ public class AppPreferences {
                 for(int i = 0; i < app.deviceStates.size(); i++) {
                     bandsList.add(Integer.toString(app.deviceStates.get(i).band));
                 }
+                AppendExtraItemsFromSavedArrayPreference(bandsList, AppPreferences.getInstance().mBands);
                 String bands = TextUtils.join(STRING_ITEMS_DELIMITER, bandsList);
                 editor.putString(DEVICE_BANDS, bands);
                 break;
@@ -69,6 +106,7 @@ public class AppPreferences {
                 for(int i = 0; i < app.deviceStates.size(); i++) {
                     channelsList.add(Integer.toString(app.deviceStates.get(i).channel));
                 }
+                AppendExtraItemsFromSavedArrayPreference(channelsList, AppPreferences.getInstance().mChannels);
                 String channels = TextUtils.join(STRING_ITEMS_DELIMITER, channelsList);
                 editor.putString(DEVICE_CHANNELS, channels);
                 break;
@@ -78,6 +116,7 @@ public class AppPreferences {
                 for(int i = 0; i < app.deviceStates.size(); i++) {
                     pilotsList.add(app.deviceStates.get(i).pilotName);
                 }
+                AppendExtraItemsFromSavedArrayPreference(pilotsList, AppPreferences.getInstance().mPilots);
                 String pilots = TextUtils.join(STRING_ITEMS_DELIMITER, pilotsList);
                 editor.putString(DEVICE_PILOTS, pilots);
                 break;
@@ -87,6 +126,7 @@ public class AppPreferences {
                 for(int i = 0; i < app.deviceStates.size(); i++) {
                     statusesList.add(Boolean.toString(app.deviceStates.get(i).isEnabled));
                 }
+                AppendExtraItemsFromSavedArrayPreference(statusesList, AppPreferences.getInstance().mDeviceEnabledStatuses);
                 String statuses = TextUtils.join(STRING_ITEMS_DELIMITER, statusesList);
                 editor.putString(DEVICE_ENABLED, statuses);
                 break;
@@ -161,7 +201,6 @@ public class AppPreferences {
                 // first devices don't delay propagation of commands to next devices
                 for(int i = app.deviceStates.size() - 1; i >= 0 ; i--) {
                     if (i < bandsCount) {
-                        int deviceBand = app.deviceStates.get(i).band;
                         int prefBand = Integer.parseInt(bandsArray[i]);
                         app.changeDeviceBand(i, prefBand);
                         app.sendBtCommand("R" +  String.format("%X", i) + "N" + String.format("%X", prefBand));
@@ -177,7 +216,6 @@ public class AppPreferences {
                 // first devices don't delay propagation of commands to next devices
                 for(int i = app.deviceStates.size() - 1; i >= 0 ; i--) {
                    if (i < channelsCount) {
-                        int deviceChannel = app.deviceStates.get(i).channel;
                         int prefChannel = Integer.parseInt(channelsArray[i]);
                         app.changeDeviceChannel(i, prefChannel);
                         app.sendBtCommand("R" +  String.format("%X", i) + "H" + String.format("%X", prefChannel));
