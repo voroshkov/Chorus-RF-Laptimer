@@ -24,5 +24,6 @@ public enum DataAction {
     SpeakLapTimes,
     PreparationTime,
     PilotEnabledDisabled,
-    SPECIAL_DevicePilot_EditUpdate
+    SPECIAL_DevicePilot_EditUpdate,
+    BatteryPercentage
 };

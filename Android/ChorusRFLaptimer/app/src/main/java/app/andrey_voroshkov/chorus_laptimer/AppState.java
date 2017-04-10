@@ -3,6 +3,8 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Handler;
+import android.os.Message;
 
 import java.util.ArrayList;
 
@@ -13,21 +15,31 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP;
  */
 public class AppState {
     public static final byte DELIMITER = '\n';
+
     public static final int MIN_RSSI = 80;
     public static final int MAX_RSSI = 315;
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
     public static final int CALIBRATION_TIME_MS = 10000;
     public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D"};
-    public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
     public static final int DEFAULT_MIN_LAP_TIME = 5;
     public static final int DEFAULT_LAPS_TO_GO = 3;
 
+    //tone sounds and durations (race start, lap count, etc)
     public static final int TONE_PREPARE = ToneGenerator.TONE_DTMF_1;
     public static final int DURATION_PREPARE = 80;
     public static final int TONE_GO = ToneGenerator.TONE_DTMF_D;
     public static final int DURATION_GO = 600;
     public static final int TONE_LAP = ToneGenerator.TONE_DTMF_S;
     public static final int DURATION_LAP = 400;
+    public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
+
+    //voltage measuring constants
+    public static final int BATTERY_CHECK_INTERVAL = 60000; // 1 minute
+    public static final double VOLTAGE_LOW = 3.4;
+    public static final double VOLTAGE_HIGH = 4.2;
+    public static final double VOLTAGE_DIVIDER_CONSTANT = 11; //(10K + 1K)/1K
+    public static final double ARDUINO_VOLTAGE = 4.9;
+    public static final double ARDUINO_ANALOG_PER_VOLT = 1024/ARDUINO_VOLTAGE;
 
     private static AppState instance = new AppState();
 
@@ -54,18 +66,30 @@ public class AppState {
     public RaceState raceState;
     public ArrayList<DeviceState> deviceStates;
     public ArrayList<ArrayList<LapResult>> raceResults;
+    public int batteryPercentage = 0;
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
     private ToneGenerator mToneGenerator;
+    private Handler mBatteryMonitorHandler;
 
     private AppState() {
         mListeners = new ArrayList<IDataListener>();
-        raceState = new RaceState(false, DEFAULT_MIN_LAP_TIME, DEFAULT_LAPS_TO_GO);
         raceResults = new ArrayList<ArrayList<LapResult>>();
         deviceStates = new ArrayList<DeviceState>();
         deviceTransmissionStates = new ArrayList<Boolean>();
         mToneGenerator = new ToneGenerator(AudioManager.STREAM_MUSIC, ToneGenerator.MAX_VOLUME);
+
+        mBatteryMonitorHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                AppState app = AppState.getInstance();
+                if (app.raceState != null && !app.raceState.isStarted) {
+                    AppState.getInstance().sendBtCommand("R*Y");
+                }
+                sendEmptyMessageDelayed(0, BATTERY_CHECK_INTERVAL);
+            }
+        };
+        raceState = new RaceState(false, DEFAULT_MIN_LAP_TIME, DEFAULT_LAPS_TO_GO);
     }
 
     public void addListener(IDataListener listener) {
@@ -338,6 +362,7 @@ public class AppState {
 
     public void onConnected() {
         sendBtCommand("N0");
+        mBatteryMonitorHandler.sendEmptyMessageDelayed(0, 10);
         wereDevicesConfigured = false;
     }
 
@@ -671,6 +696,22 @@ public class AppState {
         deviceStates.get(deviceId).isEnabled = isEnabled;
         emitEvent(DataAction.PilotEnabledDisabled);
         AppPreferences.save(AppPreferences.DEVICE_ENABLED);
+    }
+
+    public void changeVoltage(int voltageReading) {
+        //calc voltage percents
+        double volts = (double)voltageReading*VOLTAGE_DIVIDER_CONSTANT/ARDUINO_ANALOG_PER_VOLT; //11 - voltage divider constant, 210 - analog value per Volt
+        int cellsCount = (int)(volts/VOLTAGE_LOW);
+        double cellVoltage = volts/cellsCount;
+        int percent = (int)((cellVoltage - VOLTAGE_LOW) * 100 / (VOLTAGE_HIGH - VOLTAGE_LOW));
+        percent = (percent > 130) ? 0 : (percent > 100) ? 100 : percent;
+        batteryPercentage = percent;
+        if (percent <= 10) {
+            speakMessage("Device battery critical");
+        } else if (percent <= 20){
+            speakMessage("Device battery low");
+        }
+        emitEvent(DataAction.BatteryPercentage);
     }
 }
 

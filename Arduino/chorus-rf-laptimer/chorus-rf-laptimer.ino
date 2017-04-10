@@ -91,6 +91,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_MONITOR_ON      'V'
 #define CONTROL_MONITOR_OFF     'v'
 #define CONTROL_SET_SKIP_LAP0   'F'
+#define CONTROL_GET_VOLTAGE     'Y'
 // input control byte constants for long "set value" commands
 #define CONTROL_SET_MIN_LAP     'L'
 #define CONTROL_SET_CHANNEL     'H'
@@ -111,6 +112,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_LAP0_STATE     'F'
 #define RESPONSE_END_SEQUENCE   'X'
 #define RESPONSE_IS_CONFIGURED  'P'
+#define RESPONSE_VOLTAGE        'Y'
 
 // send item byte constants
 // Must correspond to sequence of numbers used in "send data" switch statement
@@ -127,10 +129,11 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_LAP0_STATE     9
 #define SEND_IS_CONFIGURED  10
 #define SEND_END_SEQUENCE   11
-// following itmes don't participate in "send all itmes" response
+// following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES  100
 #define SEND_CALIBR_TIME    101
 #define SEND_CURRENT_RSSI   102
+#define SEND_VOLTAGE        103
 // special item that sends all subsequent items from 0 (see above)
 #define SEND_ALL_DEVICE_STATE 255
 
@@ -147,6 +150,17 @@ uint16_t rssi;
 uint16_t rssiThresholdArray[THRESHOLD_ARRAY_SIZE];
 
 #define MAX_RSSI_MONITOR_DELAY_CYCLES 1000 //each 100ms, if cycle takes 100us
+
+//----- Voltage monitoring -------------------------
+#define VOLTAGE_READS 3 //get average of VOLTAGE_READS readings
+
+// analog readings less than VOLTAGE_ZERO_THRESHOLD value won't be sent.
+// This way entire chorus device will send voltages only from devices that are attached to LiPo
+// So if single Solo device has LiPo attached, then broadcast voltage request to
+// entire Chorus device will produce a single voltage response.
+#define VOLTAGE_ZERO_THRESHOLD 100
+
+uint16_t voltage = 0;
 
 //----- Send Queue ---------------------------------
 #define SEND_QUEUE_MAXLEN 20
@@ -376,6 +390,15 @@ void loop() {
                 break;
             case 102: // SEND_CURRENT_RSSI
                 if (sendIntToSerial(RESPONSE_CURRENT_RSSI, rssi)) {
+                    onItemSent();
+                }
+                break;
+            case 103: // SEND_VOLTAGE
+                if (voltage > VOLTAGE_ZERO_THRESHOLD) {
+                    if (sendIntToSerial(RESPONSE_VOLTAGE, voltage)) {
+                        onItemSent();
+                    }
+                } else {
                     onItemSent();
                 }
                 break;
@@ -618,6 +641,10 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 playClickTones();
                 isConfigured = 1;
                 break;
+            case CONTROL_GET_VOLTAGE: //get battery voltage
+                voltage = readVoltage();
+                addToSendQueue(SEND_VOLTAGE);
+                break;
             case CONTROL_DATA_REQUEST: // request all data
                 addToSendQueue(SEND_ALL_DEVICE_STATE);
                 break;
@@ -837,7 +864,6 @@ void wait_rssi_ready() {
 }
 // ----------------------------------------------------------------------------
 uint16_t readRSSI() {
-    int rssi = 0;
     int rssiA = 0;
 
     for (uint8_t i = 0; i < RSSI_READS; i++) {
@@ -846,4 +872,15 @@ uint16_t readRSSI() {
 
     rssiA = rssiA/RSSI_READS; // average of RSSI_READS readings
     return rssiA;
+}
+// ----------------------------------------------------------------------------
+uint16_t readVoltage() {
+    int voltageA = 0;
+
+    for (uint8_t i = 0; i < VOLTAGE_READS; i++) {
+        voltageA += analogRead(voltagePinA);
+    }
+
+    voltageA = voltageA/VOLTAGE_READS; // average of RSSI_READS readings
+    return voltageA;
 }

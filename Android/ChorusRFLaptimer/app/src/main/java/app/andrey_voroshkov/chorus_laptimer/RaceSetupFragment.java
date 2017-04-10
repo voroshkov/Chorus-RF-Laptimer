@@ -1,7 +1,12 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.content.Context;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +14,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class RaceSetupFragment extends Fragment {
@@ -19,8 +25,10 @@ public class RaceSetupFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private View mRootView;
+    private Context mContext;
 
     public RaceSetupFragment() {
+
     }
 
     /**
@@ -40,6 +48,7 @@ public class RaceSetupFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.race_setup, container, false);
         mRootView = rootView;
+        mContext = getContext();
 
         updateText(rootView);
         updateSkipFirstLapCheckbox(rootView);
@@ -67,6 +76,9 @@ public class RaceSetupFragment extends Fragment {
                         break;
                     case SpeakMessages:
                         updateSpeakMessagesCheckbox(rootView);
+                        break;
+                    case BatteryPercentage:
+                        updateBatteryProgressIndicator(rootView);
                         break;
                 }
             }
@@ -203,5 +215,15 @@ public class RaceSetupFragment extends Fragment {
     private void updateSpeakMessagesCheckbox(View rootView) {
         CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
         chkSpeakMessages.setChecked(AppState.getInstance().shouldSpeakMessages);
+    }
+
+    private void updateBatteryProgressIndicator(View rootView) {
+        ProgressBar bar = (ProgressBar) rootView.findViewById(R.id.batteryCharge);
+        TextView txt = (TextView) rootView.findViewById(R.id.txtRssi);
+        int percent = AppState.getInstance().batteryPercentage;
+        bar.setProgress(percent);
+        int colorId = (percent > 10) ? (percent > 20) ? R.color.colorPrimary : R.color.colorWarn: R.color.colorAccent;
+        int color = ContextCompat.getColor(mContext, colorId);
+        bar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
     }
 }

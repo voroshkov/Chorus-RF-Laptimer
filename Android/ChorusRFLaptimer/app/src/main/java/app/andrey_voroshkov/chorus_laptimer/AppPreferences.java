@@ -186,7 +186,6 @@ public class AppPreferences {
         };
 
         if (app.raceState != null) {
-            int curMLT = app.raceState.minLapTime;
             int prefMLT = app.preferences.getInt(MIN_LAP_TIME, 3);
             app.changeRaceMinLapTime(prefMLT);
             app.sendBtCommand("R*L" + String.format("%02X", prefMLT));
