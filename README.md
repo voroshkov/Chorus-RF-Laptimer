@@ -15,8 +15,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 <!-- MarkdownTOC depth=0 bracket="round" autolink="true" autoanchor="true" -->
 
 - [Terminology](#terminology)
-- [NEW Features!](#new-features)
-- [Features \(legacy from a Solo-Laptimer project\)](#features-legacy-from-a-solo-laptimer-project)
+- [Features](#features)
 - [Limitations](#limitations)
 - [How it works](#how-it-works)
 - [Hardware](#hardware)
@@ -24,6 +23,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
     - [Bluetooth module setup](#bluetooth-module-setup)
     - [RX5808 SPI patch \(required\)](#rx5808-spi-patch-required)
     - [Wiring of a Solo device](#wiring-of-a-solo-device)
+    - [Schematic and PCB](#schematic-and-pcb)
     - [Assembly of a Solo device](#assembly-of-a-solo-device)
     - [Assembly of a Chorus device](#assembly-of-a-chorus-device)
 - [Software](#software)
@@ -47,22 +47,20 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 
 <img src="docs/img/Chorus_device.png" alt="Chorus device" height="400"/>
 
-<a name="new-features"></a>
-## NEW Features!
+<a name="features"></a>
+## Features
+- No additional equipment besides 5.8GHz Video Transmitter required on a drone.
+- Measure lap times with 1ms resolution.
+- Android application for controlling the device via Bluetooth.
+- 5V * 250 mA power consumption (per device)
+- Low cost (around $16 per device, excluding power supply), compared to similar solutions available on market.
 - Can be tuned to any RF band/channel
-- Monitors several frequencies simultaneously  (corresponding to a number of devices)
+- Monitors several frequencies simultaneously (corresponding to a number of devices)
 - Expandable: make one Solo device and track your solo flight times; make more devices, connect them into a Chorus and compete with teammates
 - Automatic detection of a number of Solo devices in a Chorus
 - Spoken notifications, including lap results
-
-<a name="features-legacy-from-a-solo-laptimer-project"></a>
-## Features (legacy from a Solo-Laptimer project)
-- No additional equipment besides 5.8GHz Video Transmitter required on a drone.
-- Measure lap times with 1ms resolution (in theory; need to perform live tests).
-- Android application for controlling the device via Bluetooth.
+- Battery monitoring and spoken notifications of low battery
 - Compatible with [EasyRaceLapTimer](https://github.com/polyvision/EasyRaceLapTimer) software v.0.6 (can act as simple VTx sensor but still needs to be preliminarily set up via Bluetooth).
-- 5V * 250 mA power consumption (per device)
-- Low cost (around $16 per device, excluding power supply), compared to similar solutions available on market.
 
 <a name="limitations"></a>
 ## Limitations
@@ -121,6 +119,14 @@ Parts may be connected directly without using any additional components:
 It seems to work fine being connected this way, however adding 100 Ω resistors in line on SPI wires (Arduino pins 10, 11, 12) is a good idea to prevent possible glitches with channel selection:
 
 <img src="docs/img/wiring_resistors.png" alt="Wiring with resistors" width="">
+
+<a name="schematic-and-pcb"></a>
+### Schematic and PCB
+Schematic and PCB design in DipTrace format are available in the **DipTrace** folder.
+
+<img src="docs/img/schematic.png" alt="Wiring with resistors" width="200">
+
+<img src="docs/img/pdb.png" alt="Wiring with resistors" width="200">
 
 <a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
