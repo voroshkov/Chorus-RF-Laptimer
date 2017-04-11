@@ -133,6 +133,16 @@ public class Utils {
                     result += "EndOfSequence. Device# " + moduleId;
                     AppState.getInstance().receivedEndOfSequence(moduleId);
                     break;
+                case 'P':
+                    int isDeviceConfigured = Integer.parseInt(chunk.substring(3,4), 16);
+                    result += "Device is configured: " + ((isDeviceConfigured!= 0) ? "yes" : "no");
+                    AppState.getInstance().changeDeviceConfigStatus(moduleId, (isDeviceConfigured!=0));
+                    break;
+                case 'Y':
+                    int voltageReading = Integer.parseInt(chunk.substring(3,7), 16);
+                    result += "Voltage(abstract): " + voltageReading;
+                    AppState.getInstance().changeVoltage(voltageReading);
+                    break;
             }
         } else if (dest == 'R') {
 

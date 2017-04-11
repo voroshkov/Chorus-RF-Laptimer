@@ -35,6 +35,7 @@ SOFTWARE.
 #define spiClockPin 12
 #define pinRaspiInt 5 //digital
 #define rssiPinA 3  //analog
+#define voltagePinA 0  //analog
 #define buzzerPin 9 // PWM buzzer
 
 #ifdef DEBUG

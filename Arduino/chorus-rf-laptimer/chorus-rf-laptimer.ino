@@ -91,6 +91,11 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_MONITOR_ON      'V'
 #define CONTROL_MONITOR_OFF     'v'
 #define CONTROL_SET_SKIP_LAP0   'F'
+#define CONTROL_GET_VOLTAGE     'Y'
+// input control byte constants for long "set value" commands
+#define CONTROL_SET_MIN_LAP     'L'
+#define CONTROL_SET_CHANNEL     'H'
+#define CONTROL_SET_BAND        'N'
 
 // output id byte constants
 #define RESPONSE_CHANNEL        'C'
@@ -106,6 +111,8 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_MONITOR_STATE  'V'
 #define RESPONSE_LAP0_STATE     'F'
 #define RESPONSE_END_SEQUENCE   'X'
+#define RESPONSE_IS_CONFIGURED  'P'
+#define RESPONSE_VOLTAGE        'Y'
 
 // send item byte constants
 // Must correspond to sequence of numbers used in "send data" switch statement
@@ -120,11 +127,13 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_CALIBR_STATE   7
 #define SEND_MONITOR_STATE  8
 #define SEND_LAP0_STATE     9
-#define SEND_END_SEQUENCE   10
-// following itmes don't participate in "send all itmes" response
+#define SEND_IS_CONFIGURED  10
+#define SEND_END_SEQUENCE   11
+// following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES  100
 #define SEND_CALIBR_TIME    101
 #define SEND_CURRENT_RSSI   102
+#define SEND_VOLTAGE        103
 // special item that sends all subsequent items from 0 (see above)
 #define SEND_ALL_DEVICE_STATE 255
 
@@ -141,6 +150,17 @@ uint16_t rssi;
 uint16_t rssiThresholdArray[THRESHOLD_ARRAY_SIZE];
 
 #define MAX_RSSI_MONITOR_DELAY_CYCLES 1000 //each 100ms, if cycle takes 100us
+
+//----- Voltage monitoring -------------------------
+#define VOLTAGE_READS 3 //get average of VOLTAGE_READS readings
+
+// analog readings less than VOLTAGE_ZERO_THRESHOLD value won't be sent.
+// This way entire chorus device will send voltages only from devices that are attached to LiPo
+// So if single Solo device has LiPo attached, then broadcast voltage request to
+// entire Chorus device will produce a single voltage response.
+#define VOLTAGE_ZERO_THRESHOLD 100
+
+uint16_t voltage = 0;
 
 //----- Send Queue ---------------------------------
 #define SEND_QUEUE_MAXLEN 20
@@ -171,6 +191,7 @@ uint8_t channelIndex = 0;
 uint8_t bandIndex = 0;
 uint8_t isRaceStarted = 0;
 uint8_t isSoundEnabled = 1;
+uint8_t isConfigured = 0; //changes to 1 if any input changes the state of the device. it will mean that externally stored preferences should not be applied
 uint8_t rssiMonitor = 0;
 uint8_t newLapIndex = 0;
 uint8_t shouldSkipFirstLap = 1; //start table is before the laptimer, so first lap is not a full-fledged lap (i.e. don't respect min-lap-time for the very first lap)
@@ -331,9 +352,14 @@ void loop() {
                     onItemSent();
                 }
                 break;
+            case 10: // SEND_IS_CONFIGURED
+                if (send4BitsToSerial(RESPONSE_IS_CONFIGURED, isConfigured)) {
+                    onItemSent();
+                }
+                break;
             // Below is a termination case, to notify that data for CONTROL_DATA_REQUEST is over.
             // Must be the last item in the sequence!
-            case 10: // SEND_END_SEQUENCE
+            case 11: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -364,6 +390,15 @@ void loop() {
                 break;
             case 102: // SEND_CURRENT_RSSI
                 if (sendIntToSerial(RESPONSE_CURRENT_RSSI, rssi)) {
+                    onItemSent();
+                }
+                break;
+            case 103: // SEND_VOLTAGE
+                if (voltage > VOLTAGE_ZERO_THRESHOLD) {
+                    if (sendIntToSerial(RESPONSE_VOLTAGE, voltage)) {
+                        onItemSent();
+                    }
+                } else {
                     onItemSent();
                 }
                 break;
@@ -469,9 +504,36 @@ void setupToSendSingleItem(uint8_t itemId) {
     shouldSendSingleItem = 1;
 }
 // ----------------------------------------------------------------------------
-void handleSerialControlInput(uint8_t controlData) {
-    if (controlData) {
-        switch (controlData) {
+void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
+    uint8_t controlByte = controlData[0];
+    uint8_t valueToSet;
+
+    if (length > 3) {
+        switch(controlByte) {
+            case CONTROL_SET_CHANNEL:
+                valueToSet = TO_BYTE(controlData[1]);
+                setChannel(valueToSet);
+                playClickTones();
+                addToSendQueue(SEND_CHANNEL);
+                isConfigured = 1;
+                break;
+            case CONTROL_SET_BAND:
+                valueToSet = TO_BYTE(controlData[1]);
+                setBand(valueToSet);
+                playClickTones();
+                addToSendQueue(SEND_BAND);
+                isConfigured = 1;
+                break;
+            case CONTROL_SET_MIN_LAP:
+                valueToSet = HEX_TO_BYTE(controlData[1], controlData[2]);
+                setMinLap(valueToSet);
+                playClickTones();
+                addToSendQueue(SEND_MIN_LAP_TIME);
+                isConfigured = 1;
+                break;
+        }
+    } else {
+        switch (controlByte) {
             case CONTROL_START_RACE: // start race
                 lastMilliseconds = millis();
                 DEBUG_CODE(
@@ -482,6 +544,7 @@ void handleSerialControlInput(uint8_t controlData) {
                 allowEdgeGeneration = 0;
                 playStartRaceTones();
                 addToSendQueue(SEND_RACE_STATE);
+                isConfigured = 1;
                 break;
             case CONTROL_END_CALIBRATE: // end calibration
                 calibrationMilliseconds = millis() - calibrationMilliseconds;
@@ -495,50 +558,60 @@ void handleSerialControlInput(uint8_t controlData) {
                 newLapIndex = 0;
                 playEndRaceTones();
                 addToSendQueue(SEND_RACE_STATE);
+                isConfigured = 1;
                 break;
             case CONTROL_DEC_MIN_LAP: // decrease minLapTime
                 decMinLap();
                 playClickTones();
                 addToSendQueue(SEND_MIN_LAP_TIME);
+                isConfigured = 1;
                 break;
             case CONTROL_INC_MIN_LAP: // increase minLapTime
                 incMinLap();
                 playClickTones();
                 addToSendQueue(SEND_MIN_LAP_TIME);
+                isConfigured = 1;
                 break;
             case CONTROL_DEC_CHANNEL: // decrease channel
                 decChannel();
                 playClickTones();
                 addToSendQueue(SEND_CHANNEL);
+                isConfigured = 1;
                 break;
             case CONTROL_INC_CHANNEL: // increase channel
                 incChannel();
                 playClickTones();
                 addToSendQueue(SEND_CHANNEL);
+                isConfigured = 1;
                 break;
             case CONTROL_DEC_BAND: // decrease band
                 decBand();
                 playClickTones();
                 addToSendQueue(SEND_BAND);
+                isConfigured = 1;
                 break;
             case CONTROL_INC_BAND: // increase channel
                 incBand();
                 playClickTones();
                 addToSendQueue(SEND_BAND);
+                isConfigured = 1;
                 break;
             case CONTROL_DEC_THRESHOLD: // decrease threshold
                 decThreshold();
                 playClickTones();
                 addToSendQueue(SEND_THRESHOLD);
+                isConfigured = 1;
                 break;
             case CONTROL_INC_THRESHOLD: // increase threshold
                 incThreshold();
                 playClickTones();
                 addToSendQueue(SEND_THRESHOLD);
+                isConfigured = 1;
                 break;
             case CONTROL_SET_THRESHOLD: // set threshold
                 setThreshold();
                 addToSendQueue(SEND_THRESHOLD);
+                isConfigured = 1;
                 break;
             case CONTROL_SET_SOUND: // set sound
                 isSoundEnabled = !isSoundEnabled;
@@ -547,6 +620,7 @@ void handleSerialControlInput(uint8_t controlData) {
                 }
                 addToSendQueue(SEND_SOUND_STATE);
                 playClickTones();
+                isConfigured = 1;
                 break;
             case CONTROL_MONITOR_ON: // start RSSI monitor
                 rssiMonitor = 1;
@@ -565,6 +639,11 @@ void handleSerialControlInput(uint8_t controlData) {
                 shouldSkipFirstLap = !shouldSkipFirstLap;
                 addToSendQueue(SEND_LAP0_STATE);
                 playClickTones();
+                isConfigured = 1;
+                break;
+            case CONTROL_GET_VOLTAGE: //get battery voltage
+                voltage = readVoltage();
+                addToSendQueue(SEND_VOLTAGE);
                 break;
             case CONTROL_DATA_REQUEST: // request all data
                 addToSendQueue(SEND_ALL_DEVICE_STATE);
@@ -605,12 +684,12 @@ void readSerialDataChunk () {
                 case 'R': //read data from module
                     if (readBuf[1] == MODULE_ID_HEX) {
                         //process input targeted for this device
-                        handleSerialControlInput(readBuf[2]);
+                        handleSerialControlInput(&readBuf[2], foundIdx);
                         shouldPassMsgFurther = 0;
                     }
                     else if (readBuf[1] == '*') {
                         //broadcast message. process in this module and pass further
-                        handleSerialControlInput(readBuf[2]);
+                        handleSerialControlInput(&readBuf[2], foundIdx);
                     }
                     break;
                 case 'C': //read calibration data for current module
@@ -619,6 +698,7 @@ void readSerialDataChunk () {
                         isCalibrated = 1;
                         shouldPassMsgFurther = 0;
                         addToSendQueue(SEND_CALIBR_STATE);
+                        isConfigured = 1;
                     }
                     break;
                 case 'N':  //enumerate modules
@@ -659,6 +739,12 @@ void incMinLap() {
     }
 }
 // ----------------------------------------------------------------------------
+void setMinLap(uint8_t mlt) {
+    if (mlt >= MIN_MIN_LAP_TIME && mlt <= MAX_MIN_LAP_TIME) {
+        minLapTime = mlt;
+    }
+}
+// ----------------------------------------------------------------------------
 void incChannel() {
     if (channelIndex < 7) {
         channelIndex++;
@@ -673,6 +759,14 @@ void decChannel() {
     }
     setChannelModule(channelIndex, bandIndex);
     wait_rssi_ready();
+}
+// ----------------------------------------------------------------------------
+void setChannel(uint8_t channel) {
+    if (channel >= 0 && channel <= 7) {
+        channelIndex = channel;
+        setChannelModule(channelIndex, bandIndex);
+        wait_rssi_ready();
+    }
 }
 // ----------------------------------------------------------------------------
 void incBand() {
@@ -690,7 +784,14 @@ void decBand() {
     setChannelModule(channelIndex, bandIndex);
     wait_rssi_ready();
 }
-
+// ----------------------------------------------------------------------------
+void setBand(uint8_t band) {
+    if (band >= 0 && band <= 5) {
+        bandIndex = band;
+        setChannelModule(channelIndex, bandIndex);
+        wait_rssi_ready();
+    }
+}
 // ----------------------------------------------------------------------------
 void incThreshold() {
     if (rssiThreshold < RSSI_MAX) {
@@ -763,7 +864,6 @@ void wait_rssi_ready() {
 }
 // ----------------------------------------------------------------------------
 uint16_t readRSSI() {
-    int rssi = 0;
     int rssiA = 0;
 
     for (uint8_t i = 0; i < RSSI_READS; i++) {
@@ -772,4 +872,15 @@ uint16_t readRSSI() {
 
     rssiA = rssiA/RSSI_READS; // average of RSSI_READS readings
     return rssiA;
+}
+// ----------------------------------------------------------------------------
+uint16_t readVoltage() {
+    int voltageA = 0;
+
+    for (uint8_t i = 0; i < VOLTAGE_READS; i++) {
+        voltageA += analogRead(voltagePinA);
+    }
+
+    voltageA = voltageA/VOLTAGE_READS; // average of RSSI_READS readings
+    return voltageA;
 }

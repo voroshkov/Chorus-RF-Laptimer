@@ -110,6 +110,9 @@ public class MainActivity extends AppCompatActivity {
 
         initBluetooth();
         AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext());
+        AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
+        AppPreferences.applyAll();
+
     }
 
     public void onDestroy() {

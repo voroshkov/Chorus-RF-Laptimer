@@ -67,12 +67,19 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
-                             ViewGroup parent) {
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.race_result_list_group, null);
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(groupPosition);
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        //don't show results for disabled pilot
+        if (!isEnabled) {
+            convertView = inflater.inflate(R.layout.race_result_list_disabled_group, null);
+            return convertView;
         }
+
+        convertView = inflater.inflate(R.layout.race_result_list_group, null);
 
         TextView textGroup = (TextView) convertView.findViewById(R.id.textGroupHeading);
 
@@ -120,21 +127,28 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
-                             View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.race_result_list_child, null);
+    public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
-            Button button = (Button)convertView.findViewById(R.id.buttonChild);
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast tst = Toast.makeText(mContext, "Clicked", Toast.LENGTH_SHORT);
-                    tst.show();
-                }
-            });
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(groupPosition);
+
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        //don't show results for disabled pilot
+        if (!isEnabled) {
+            convertView = inflater.inflate(R.layout.race_result_list_disabled_group, null);
+            return convertView;
         }
+
+        convertView = inflater.inflate(R.layout.race_result_list_child, null);
+
+        Button button = (Button)convertView.findViewById(R.id.buttonChild);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast tst = Toast.makeText(mContext, "Clicked", Toast.LENGTH_SHORT);
+                tst.show();
+            }
+        });
 
         int grpCnt = getGroupCount();
         int chldCnt = getChildrenCount(groupPosition);

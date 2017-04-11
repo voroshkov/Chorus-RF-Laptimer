@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -58,11 +59,14 @@ public class PilotsSetupFragment extends Fragment {
                     case DeviceChannel:
                     case DeviceBand:
                     case DeviceThreshold:
+                    case PilotEnabledDisabled:
                         updateResults();
                         break;
                     case DeviceRSSI:
                         updateCurrentRSSI();
                         break;
+                    case SPECIAL_DevicePilot_EditUpdate:
+                        updatePilotNames();
                 }
             }
         });
@@ -80,20 +84,37 @@ public class PilotsSetupFragment extends Fragment {
         ((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
     }
 
-    public void updateCurrentRSSI() {
+    public void updatePilotNames() {
         ListView mListView = (ListView)mRootView.findViewById(R.id.lvPilots);
         int count = AppState.getInstance().deviceStates.size();
         for (int i = 0; i < count; i++) {
             View convertView = mListView.getChildAt(i);
-            ProgressBar bar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
-            TextView txt = (TextView) convertView.findViewById(R.id.txtRssi);
-            int curRssi = AppState.getInstance().getCurrentRssi(i);
-            int rssiThreshold = AppState.getInstance().getRssiThreshold(i);
-            bar.setProgress(AppState.convertRssiToProgress(curRssi));
-            int colorId = (curRssi > rssiThreshold) ? R.color.colorAccent : R.color.colorPrimary;
-            int color = ContextCompat.getColor(mContext,colorId);
-            bar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-            txt.setText(Integer.toString(curRssi));
+            if (convertView != null) {
+                EditText pilotName = (EditText) convertView.findViewById(R.id.editPilotName);
+                String curPilotName = AppState.getInstance().deviceStates.get(i).pilotName;
+                pilotName.setText(curPilotName);
+            }
+        }
+    }
+
+    public void updateCurrentRSSI() {
+        ListView mListView = (ListView)mRootView.findViewById(R.id.lvPilots);
+        int first = mListView.getFirstVisiblePosition();
+        int last = mListView.getLastVisiblePosition();
+        int count = AppState.getInstance().deviceStates.size();
+        for (int i = first; i <= last; i++) {
+            View convertView = mListView.getChildAt(i - first);
+            if (convertView != null) {
+                ProgressBar bar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
+                TextView txt = (TextView) convertView.findViewById(R.id.txtRssi);
+                int curRssi = AppState.getInstance().getCurrentRssi(i);
+                int rssiThreshold = AppState.getInstance().getRssiThreshold(i);
+                bar.setProgress(AppState.convertRssiToProgress(curRssi));
+                int colorId = (curRssi > rssiThreshold) ? R.color.colorAccent : R.color.colorPrimary;
+                int color = ContextCompat.getColor(mContext, colorId);
+                bar.getProgressDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+                txt.setText(Integer.toString(curRssi));
+            }
         }
     }
 }
