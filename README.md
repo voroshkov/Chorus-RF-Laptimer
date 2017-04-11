@@ -124,9 +124,9 @@ It seems to work fine being connected this way, however adding 100 Ω resistors 
 ### Schematic and PCB
 Schematic and PCB design in DipTrace format are available in the **DipTrace** folder.
 
-<img src="docs/img/schematic.png" alt="Wiring with resistors" width="200">
+<img src="docs/img/Schematic.png" alt="Schematic" width="400">
 
-<img src="docs/img/pdb.png" alt="Wiring with resistors" width="200">
+<img src="docs/img/PCB.png" alt="Printed Circuit Board" width="200">
 
 <a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
