@@ -59,7 +59,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - Expandable: make one Solo device and track your solo flight times; make more devices, connect them into a Chorus and compete with teammates
 - Automatic detection of a number of Solo devices in a Chorus
 - Spoken notifications, including lap results
-- Battery monitoring and spoken notifications of low battery
+- Adjustable LiPo battery monitoring and spoken notifications of low battery
 - Compatible with [EasyRaceLapTimer](https://github.com/polyvision/EasyRaceLapTimer) software v.0.6 (can act as simple VTx sensor but still needs to be preliminarily set up via Bluetooth).
 
 <a name="limitations"></a>
@@ -81,9 +81,10 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
 ### Used parts:
  - RX5808 (with SPI patch) (**N** items)
  - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
- - Piezo buzzer (5V, without built-in generator) - optional (**N** items)
  - HC-06/HC-05 Bluetooth module (**1** item)
  - 5V power supply (for example 2-4S LiPo with 5V BEC) (**1** item)
+ - Piezo buzzer (5V, without built-in generator) - optional (**N** items)
+ - 2 Resistors (1K and 10K) for LiPo Voltage monitoring - optional (**N** items)
 
 <a name="bluetooth-module-setup"></a>
 ### Bluetooth module setup
@@ -114,6 +115,8 @@ Parts may be connected directly without using any additional components:
 
 **UPDATE:** powering RX5808 from Arduino's VCC was a bad idea - Pro Mini's linear regulator might not be able to provide enough power for RX, so use raw 5V power instead.
 
+Note the resistor divider for LiPo Battery monitoring. Although just one of the Solo devices in a Chorus should be connected to LiPo battery for monitoring, but make sure to have A0 Arduino pins on all other Solo devices connected to Ground (via 1K resistor) or just solder the resistors on each Solo device according to schematic.
+
 <img src="docs/img/wiring_solo.png" alt="Wiring Solo schematic" width="400">
 
 It seems to work fine being connected this way, however adding 100 Ω resistors in line on SPI wires (Arduino pins 10, 11, 12) is a good idea to prevent possible glitches with channel selection:
@@ -142,6 +145,7 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 3. Connect a Bluetooth module to the last Solo device in a chain.
 4. Use a jumper on the first Solo device to shorten two upper pins.
 5. Attach 5V power supply to one of the Solo devices (make sure to supply enough power - each Solo device consumes about 250mA).
+6. Optionally attach LiPo battery to one of the solo devices that has a resistor divider for LiPo Monitoring feature
 
 <img src="docs/img/chorus_assembly.png" alt="Assembly of a Chorus Device" width="900">
 
@@ -189,6 +193,14 @@ Controls on the tabs are mostly self-explanatory. Still some clarifications migh
 - **Start Race**: tap to start tracking laps. This same button is used to Stop the race.
 
 When you stop the race, Chorus device immediately clears saved lap times, but they remain visible in the application until new race is started.
+
+**LiPo Monitoring** feature has a "hidden" possibility for adjustment. If voltage measured by LiPo Monitor in Android App doesn't correspond to real voltage of your battery, perform a long tap on a voltage value to see the Adjustment controls:
+
+<img src="docs/img/androidAppLipoMonitor.png" alt="LiPo Monitor" width="350">
+
+<img src="docs/img/androidAppLipoAdjust.png" alt="LiPo Monitor Adjustment" width="350">
+
+Adjust until measured voltage corresponds to the voltage of your LiPo battery while it's powering the Chorus device.
 
 <a name="setup-and-usage-guide"></a>
 ## Setup and Usage Guide
