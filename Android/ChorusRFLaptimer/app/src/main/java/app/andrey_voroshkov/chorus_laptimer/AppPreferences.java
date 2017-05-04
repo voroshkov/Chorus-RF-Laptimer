@@ -23,6 +23,9 @@ public class AppPreferences {
     public static final String DEVICE_CHANNELS = "device_channels";
     public static final String DEVICE_PILOTS = "device_pilots";
     public static final String DEVICE_ENABLED = "device_enabled";
+    public static final String LIPO_MONITOR_ENABLED = "lipo_mon_enabled";
+    public static final String LIPO_ADJUSTMENT_CONST = "lipo_adjust_const";
+
 
     public String[] mBands;
     public String[] mChannels;
@@ -130,6 +133,12 @@ public class AppPreferences {
                 String statuses = TextUtils.join(STRING_ITEMS_DELIMITER, statusesList);
                 editor.putString(DEVICE_ENABLED, statuses);
                 break;
+            case LIPO_MONITOR_ENABLED:
+                editor.putBoolean(LIPO_MONITOR_ENABLED, app.isLiPoMonitorEnabled);
+                break;
+            case LIPO_ADJUSTMENT_CONST:
+                editor.putInt(LIPO_ADJUSTMENT_CONST, app.batteryAdjustmentConst);
+                break;
         }
         editor.apply();
     }
@@ -141,6 +150,8 @@ public class AppPreferences {
         app.changeShouldSpeakMessages(app.preferences.getBoolean(SPEAK_MESSAGES, true));
         app.changeTimeToPrepareForRace(app.preferences.getInt(PREPARATION_TIME, 5));
         app.changeRaceLaps(app.preferences.getInt(LAPS_TO_GO, 5));
+        app.changeAdjustmentConst(app.preferences.getInt(LIPO_ADJUSTMENT_CONST, 0));
+        app.changeEnableLiPoMonitor(app.preferences.getBoolean(LIPO_MONITOR_ENABLED, true));
 
         if (app.deviceStates != null) {
             String pilots = app.preferences.getString(DEVICE_PILOTS, "");
@@ -177,13 +188,13 @@ public class AppPreferences {
         if (app.shouldSkipFirstLap != prefSkipFirstLap) {
             app.changeSkipFirstLap(prefSkipFirstLap);
             app.sendBtCommand("R*F");
-        };
+        }
 
         boolean prefEnableDeviceSounds = app.preferences.getBoolean(ENABLE_DEVICE_SOUNDS, true);
         if (app.isDeviceSoundEnabled != prefEnableDeviceSounds) {
             app.changeDeviceSoundState(prefEnableDeviceSounds);
             app.sendBtCommand("R*D");
-        };
+        }
 
         if (app.raceState != null) {
             int prefMLT = app.preferences.getInt(MIN_LAP_TIME, 3);

@@ -43,17 +43,6 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         CheckBox isPilotEnabled;
     }
 
-    private static void enableDisableView(View view, boolean enabled) {
-        view.setEnabled(enabled);
-
-        if ( view instanceof ViewGroup ) {
-            ViewGroup group = (ViewGroup)view;
-
-            for ( int i = 0 ; i < group.getChildCount() ; i++ ) {
-                enableDisableView(group.getChildAt(i), enabled);
-            }
-        }
-    }
 
     @Override
     public int getCount() {
@@ -131,7 +120,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.isPilotEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    enableDisableView(innerGroup, isChecked);
+                    Utils.enableDisableView(innerGroup, isChecked);
                     AppState.getInstance().changeDeviceEnabled(position, isChecked);
                 }
             });

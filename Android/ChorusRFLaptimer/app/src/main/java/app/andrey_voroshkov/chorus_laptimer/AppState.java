@@ -34,12 +34,14 @@ public class AppState {
     public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
 
     //voltage measuring constants
-    public static final int BATTERY_CHECK_INTERVAL = 60000; // 1 minute
+    public static final int BATTERY_CHECK_INTERVAL = 10000; // 10 seconds
+    public static final int BATTERY_WARN_INTERVAL = 60000; // 1 minute
+    public static final int BATTERY_WARN_DELAY = 5000; // 5 seconds (increase to prevent false alarms upon connection
     public static final double VOLTAGE_LOW = 3.4;
     public static final double VOLTAGE_HIGH = 4.2;
     public static final double VOLTAGE_DIVIDER_CONSTANT = 11; //(10K + 1K)/1K
-    public static final double ARDUINO_VOLTAGE = 4.9;
-    public static final double ARDUINO_ANALOG_PER_VOLT = 1024/ARDUINO_VOLTAGE;
+    public static final double ARDUINO_VOLTAGE = 5;
+    public static final double ARDUINO_ANALOG_COUNTS = 1024;
 
     private static AppState instance = new AppState();
 
@@ -67,11 +69,17 @@ public class AppState {
     public ArrayList<DeviceState> deviceStates;
     public ArrayList<ArrayList<LapResult>> raceResults;
     public int batteryPercentage = 0;
+    public int lastVoltageReading = 0;
+    public double batteryVoltage = 0;
+    public int batteryAdjustmentConst = 1;
+    public boolean isLiPoMonitorEnabled = true;
+    public boolean isConnected = false;
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
     private ToneGenerator mToneGenerator;
     private Handler mBatteryMonitorHandler;
+    private Handler mBatteryNotifyHandler;
 
     private AppState() {
         mListeners = new ArrayList<IDataListener>();
@@ -83,12 +91,27 @@ public class AppState {
         mBatteryMonitorHandler = new Handler() {
             public void handleMessage(Message msg) {
                 AppState app = AppState.getInstance();
-                if (app.raceState != null && !app.raceState.isStarted) {
+                if (app.isConnected && app.isLiPoMonitorEnabled && app.raceState != null && !app.raceState.isStarted) {
                     AppState.getInstance().sendBtCommand("R*Y");
                 }
                 sendEmptyMessageDelayed(0, BATTERY_CHECK_INTERVAL);
             }
         };
+
+        mBatteryNotifyHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                AppState app = AppState.getInstance();
+                if (app.isConnected && app.isLiPoMonitorEnabled) {
+                    if (batteryPercentage <= 10) {
+                        speakMessage("Device battery critical");
+                    } else if (batteryPercentage <= 20){
+                        speakMessage("Device battery low");
+                    }
+                }
+                sendEmptyMessageDelayed(0, BATTERY_WARN_INTERVAL);
+            }
+        };
+
         raceState = new RaceState(false, DEFAULT_MIN_LAP_TIME, DEFAULT_LAPS_TO_GO);
     }
 
@@ -361,13 +384,15 @@ public class AppState {
     }
 
     public void onConnected() {
+        isConnected = true;
         sendBtCommand("N0");
-        mBatteryMonitorHandler.sendEmptyMessageDelayed(0, 10);
         wereDevicesConfigured = false;
     }
 
     public void onDisconnected() {
+        isConnected = false;
         clearRssi();
+        clearVoltage();
         emitEvent(DataAction.DeviceRSSI);
     }
 
@@ -517,7 +542,7 @@ public class AppState {
             shouldSkipFirstLap = shouldSkip;
             emitEvent(DataAction.SkipFirstLap);
             AppPreferences.save(AppPreferences.SKIP_FIRST_LAP);
-        };
+        }
     }
 
     public void changeShouldSpeakLapTimes(boolean shouldSpeak) {
@@ -672,11 +697,24 @@ public class AppState {
             //also decide to apply preferences after all states are received
             AppPreferences.applyInAppPreferences();
 
+            restartBatteryMonitoringHandlers();
+
             if (!wereDevicesConfigured) {
                 AppPreferences.applyDeviceDependentPreferences();
                 wereDevicesConfigured = true;
             }
         }
+    }
+
+    public void suspendBatteryMonitoringHandlers() {
+        mBatteryMonitorHandler.removeMessages(0);
+        mBatteryNotifyHandler.removeMessages(0);
+    }
+
+    public void restartBatteryMonitoringHandlers() {
+        suspendBatteryMonitoringHandlers(); // this will remove pending messages to preserve messaging intervals
+        mBatteryMonitorHandler.sendEmptyMessageDelayed(0, 0);
+        mBatteryNotifyHandler.sendEmptyMessageDelayed(0, BATTERY_WARN_DELAY);
     }
 
     public void changeDeviceConfigStatus(int deviceId, boolean isConfigured) {
@@ -698,20 +736,60 @@ public class AppState {
         AppPreferences.save(AppPreferences.DEVICE_ENABLED);
     }
 
-    public void changeVoltage(int voltageReading) {
-        //calc voltage percents
-        double volts = (double)voltageReading*VOLTAGE_DIVIDER_CONSTANT/ARDUINO_ANALOG_PER_VOLT; //11 - voltage divider constant, 210 - analog value per Volt
-        int cellsCount = (int)(volts/VOLTAGE_LOW);
-        double cellVoltage = volts/cellsCount;
+    public void recalculateVoltage() {
+        if (!isLiPoMonitorEnabled) {
+            return;
+        }
+        //calc voltage and percentage
+        batteryVoltage = (double)lastVoltageReading * VOLTAGE_DIVIDER_CONSTANT * ARDUINO_VOLTAGE * (((double)batteryAdjustmentConst + 1000) / 1000) / ARDUINO_ANALOG_COUNTS;
+        int cellsCount = (int)(batteryVoltage/VOLTAGE_LOW);
+        double cellVoltage = batteryVoltage/cellsCount;
         int percent = (int)((cellVoltage - VOLTAGE_LOW) * 100 / (VOLTAGE_HIGH - VOLTAGE_LOW));
         percent = (percent > 130) ? 0 : (percent > 100) ? 100 : percent;
         batteryPercentage = percent;
-        if (percent <= 10) {
-            speakMessage("Device battery critical");
-        } else if (percent <= 20){
-            speakMessage("Device battery low");
+        emitEvent(DataAction.BatteryVoltage);
+    }
+
+    public void changeVoltage(int voltageReading) {
+        if (!isLiPoMonitorEnabled) {
+            return;
         }
-        emitEvent(DataAction.BatteryPercentage);
+        lastVoltageReading = voltageReading;
+        recalculateVoltage();
+    }
+
+    public void clearVoltage() {
+        lastVoltageReading = 0;
+        recalculateVoltage();
+    }
+
+    public void changeAdjustmentConst(int adjConst) {
+        if (!isLiPoMonitorEnabled) {
+            return;
+        }
+        if (adjConst < -100 || adjConst > 100) {
+            return;
+        }
+        if (adjConst == batteryAdjustmentConst) {
+            return;
+        }
+        batteryAdjustmentConst = adjConst;
+        emitEvent(DataAction.VoltageAdjustmentConst);
+        AppPreferences.save(AppPreferences.LIPO_ADJUSTMENT_CONST);
+        recalculateVoltage();
+    }
+
+    public void changeEnableLiPoMonitor(boolean isEnabled) {
+        if (isLiPoMonitorEnabled != isEnabled) {
+            isLiPoMonitorEnabled = isEnabled;
+            emitEvent(DataAction.LiPoMonitorEnable);
+            AppPreferences.save(AppPreferences.LIPO_MONITOR_ENABLED);
+            if (isEnabled) {
+                restartBatteryMonitoringHandlers();
+            } else {
+                suspendBatteryMonitoringHandlers();
+            }
+        }
     }
 }
 

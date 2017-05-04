@@ -1,5 +1,8 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.view.View;
+import android.view.ViewGroup;
+
 /**
  * Created by Andrey_Voroshkov on 1/29/2017.
  */
@@ -152,4 +155,17 @@ public class Utils {
         }
         return result;
     }
+
+    public static void enableDisableView(View view, boolean enabled) {
+        view.setEnabled(enabled);
+
+        if ( view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup)view;
+
+            for ( int i = 0 ; i < group.getChildCount() ; i++ ) {
+                enableDisableView(group.getChildAt(i), enabled);
+            }
+        }
+    }
+
 }
