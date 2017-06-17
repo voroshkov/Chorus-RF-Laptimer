@@ -74,6 +74,26 @@ namespace chorusgui
     }
 
     [Serializable]
+    public class Settings
+    {
+        public int SerialBaud { get; set; }
+        public string SerialPortName { get; set; }
+        public int SerialBaudIndex { get; set; }
+        public int MinimalLapTime { get; set; }
+        public int QualificationRuns { get; set; }
+        public int TimeToPrepare { get; set; }
+        public Boolean SkipFirstLap { get; set; }
+        public Boolean DoubleOut { get; set; }
+        public Boolean RaceMode { get; set; }
+        public int NumberofTime { get; set; }
+        public Boolean VoltageMonitoring { get; set; }
+        public int VoltageMonitorDevice { get; set; }
+        public int NumberOfContendersForQualification { get; set; }
+        public int QualificationRaces { get; set; }
+        public int NumberOfContendersForRace { get; set; }
+    }
+
+    [Serializable]
     public class PilotCollection : ObservableCollection<Pilot>
     {
     }
@@ -83,43 +103,48 @@ namespace chorusgui
         System.Timers.Timer aTimer = new System.Timers.Timer();
         System.Timers.Timer VoltageMonitorTimer = new System.Timers.Timer();
         SerialPort mySerialPort;
-        public int SerialBaud;
-        public string SerialPortName;
-        public int SerialBaudIndex;
         string readbuffer;
         int TimerCalibration = 1000;
         int DeviceCount;
-        int MinimalLapTime;
-        int QualificationRuns;
-        int TimeToPrepare;
         Boolean IsRaceActive;
 
         private PilotCollection Pilots;
+        public Settings settings = new Settings();
 
         ChorusDeviceClass[] ChorusDevices;
 
         void LoadSettings()
         {
-            //TODO
+            XmlSerializer serializer = new XmlSerializer(typeof(Settings));
+            try
+            {
+                using (FileStream stream = new FileStream("settings.xml", FileMode.Open))
+                {
+                    settings = (Settings)serializer.Deserialize(stream);
+                }
+            }
+            catch (FileNotFoundException) {
+                settings.SerialBaudIndex = 2;
+                settings.MinimalLapTime = 5;
+                settings.QualificationRuns = 1;
+                settings.TimeToPrepare = 5;
+                //TODO more default settings???
+            }
             DeviceCount = 0;
-            SerialBaudIndex = 2;
             readbuffer = "";
-            MinimalLapTime = 5;
-            QualificationRuns = 1;
-            TimeToPrepare = 5;
-            MinimalLapTimeLabel.Content = MinimalLapTime + " seconds";
-            TimeToPrepareLabel.Content = TimeToPrepare + " seconds";
+            MinimalLapTimeLabel.Content = settings.MinimalLapTime + " seconds";
+            TimeToPrepareLabel.Content = settings.TimeToPrepare + " seconds";
             IsRaceActive = false;
         }
 
         public ChorusGUI()
         {
             InitializeComponent();
-            Title = "Chorus Lap Timer @ " + SerialPortName + "(" + SerialBaud + " Baud)";
+            Title = "Chorus Lap Timer @ " + settings.SerialPortName + "(" + settings.SerialBaud + " Baud)";
             aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
             VoltageMonitorTimer.Elapsed += new ElapsedEventHandler(VoltageMonitorTimerEvent);
             LoadSettings();
-            QualificationRunsLabel.Content = QualificationRuns;
+            QualificationRunsLabel.Content = settings.QualificationRuns;
             Pilots = (PilotCollection)Resources["PilotCollection"];
             XmlSerializer serializer = new XmlSerializer(typeof(PilotCollection));
             try {
@@ -142,11 +167,16 @@ namespace chorusgui
             {
                 serializer.Serialize(stream, Pilots);
             }
+            serializer = new XmlSerializer(typeof(Settings));
+            using (FileStream stream = new FileStream("settings.xml", FileMode.Create))
+            {
+                serializer.Serialize(stream, settings);
+            }
         }
 
         void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            mySerialPort = new SerialPort(SerialPortName, SerialBaud, 0, 8, StopBits.One);
+            mySerialPort = new SerialPort(settings.SerialPortName, settings.SerialBaud, 0, 8, StopBits.One);
             mySerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             mySerialPort.Open();
             SendData("N0");
@@ -189,16 +219,16 @@ namespace chorusgui
             Button button = (Button)sender;
             if (button.Name[0] == 'D')
             {
-                if (MinimalLapTime > 0)
-                    MinimalLapTime--;
+                if (settings.MinimalLapTime > 0)
+                    settings.MinimalLapTime--;
             }
             else if (button.Name[0] == 'I')
             {
-                if (MinimalLapTime < 250)
-                    MinimalLapTime++;
+                if (settings.MinimalLapTime < 250)
+                    settings.MinimalLapTime++;
             }
-            SendData("R*L"+MinimalLapTime.ToString("X2"));
-            MinimalLapTimeLabel.Content = MinimalLapTime + " seconds";
+            SendData("R*L"+ settings.MinimalLapTime.ToString("X2"));
+            MinimalLapTimeLabel.Content = settings.MinimalLapTime + " seconds";
         }
 
         private void btn_QualificationRuns(object sender, RoutedEventArgs e)
@@ -206,15 +236,15 @@ namespace chorusgui
             Button button = (Button)sender;
             if (button.Name[0] == 'D')
             {
-                if (QualificationRuns > 1)
-                    QualificationRuns--;
+                if (settings.QualificationRuns > 1)
+                    settings.QualificationRuns--;
             }
             else if (button.Name[0] == 'I')
             {
-                if (QualificationRuns < 10)
-                    QualificationRuns++;
+                if (settings.QualificationRuns < 10)
+                    settings.QualificationRuns++;
             }
-            QualificationRunsLabel.Content = QualificationRuns;
+            QualificationRunsLabel.Content = settings.QualificationRuns;
         }
 
         private void btn_TimeToPrepare(object sender, RoutedEventArgs e)
@@ -222,15 +252,15 @@ namespace chorusgui
             Button button = (Button)sender;
             if (button.Name[0] == 'D')
             {
-                if (TimeToPrepare > 0)
-                    TimeToPrepare--;
+                if (settings.TimeToPrepare > 0)
+                    settings.TimeToPrepare--;
             }
             else if (button.Name[0] == 'I')
             {
-                if (TimeToPrepare < 120)
-                    TimeToPrepare++;
+                if (settings.TimeToPrepare < 120)
+                    settings.TimeToPrepare++;
             }
-            TimeToPrepareLabel.Content = TimeToPrepare + " seconds";
+            TimeToPrepareLabel.Content = settings.TimeToPrepare + " seconds";
         }
 
         private void device_btnClick(object sender, RoutedEventArgs e)
@@ -314,6 +344,7 @@ namespace chorusgui
                     switch (readbuffer[0])
                     {
                         case 'N':
+                            //TODO VERIFY SETTINGS!!!
                             if (readbuffer.Length < 2)
                                 break;
                             DeviceCount = readbuffer[1] - '0';
@@ -538,7 +569,7 @@ namespace chorusgui
                                 ChorusDevices[ii].grid = grid;
                             }
                             cbVoltageMonitoring.SelectedIndex = 0;
-                            SendData("R*L" + MinimalLapTime.ToString("X2"));
+                            SendData("R*L" + settings.MinimalLapTime.ToString("X2"));
                             //TODO CONFIG DEVICES WITH DEFAULT VALUES??? -> KEEP IN MIND R*A IS CAUSING PROBLEMS!!!
                             SendData("R"+(DeviceCount-1)+"A");
                             break;
@@ -594,9 +625,9 @@ namespace chorusgui
                                 case 'M': //Minimal Lap Time (1 byte, in seconds)
                                     ChorusDevices[device].MinimalLapTime = int.Parse(readbuffer.Substring(3), System.Globalization.NumberStyles.HexNumber);
                                     ChorusDevices[device].MinimalLapTimeLabel.Content = "Minimal Lap time: " + ChorusDevices[device].MinimalLapTime + " seconds";
-                                    if (ChorusDevices[device].MinimalLapTime != MinimalLapTime)
+                                    if (ChorusDevices[device].MinimalLapTime != settings.MinimalLapTime)
                                     {
-                                        SendData("R" + device + "N" + MinimalLapTime.ToString("X2"));
+                                        SendData("R" + device + "N" + settings.MinimalLapTime.ToString("X2"));
                                     }
                                     break;
                                 case 'P': //Device ist configured (half-byte, 1 = yes, 0 = no)
@@ -638,7 +669,7 @@ namespace chorusgui
                                     ChorusDevices[device].CurrentVoltageLabel.Content = "Current Cell Voltage: " + cellVoltage.ToString("0.00") + " Volt";
                                     if (device == cbVoltageMonitoring.SelectedIndex) 
                                         if (cbEnableVoltageMonitoring.IsChecked == true)
-                                            Title = "Chorus Lap Timer @ " + SerialPortName + "(" + SerialBaud + " Baud) Cell Voltage @ Device "+device+" :"+ cellVoltage.ToString("0.00") + " Volt";
+                                            Title = "Chorus Lap Timer @ " + settings.SerialPortName + "(" + settings.SerialBaud + " Baud) Cell Voltage @ Device "+device+" :"+ cellVoltage.ToString("0.00") + " Volt";
                                     break;
                                 case 'X': //All states corresponding to specified letters (see above) plus 'X' meaning the end of state transmission for each device
                                     if (device != 0)
@@ -708,7 +739,7 @@ namespace chorusgui
             {
                 cbVoltageMonitoring.IsEnabled = false;
                 VoltageMonitorTimer.Enabled = false;
-                Title = "Chorus Lap Timer @ " + SerialPortName + "(" + SerialBaud + " Baud)";
+                Title = "Chorus Lap Timer @ " + settings.SerialPortName + "(" + settings.SerialBaud + " Baud)";
             }
         }
 

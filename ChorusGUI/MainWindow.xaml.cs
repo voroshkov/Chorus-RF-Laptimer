@@ -38,15 +38,17 @@ namespace chorusgui
                 newBtn.Click += SelectPort;
                 sp.Children.Add(newBtn);
             }
-            comboBox.SelectedIndex = GUI.SerialBaudIndex;
+            if ((GUI.settings.SerialBaudIndex < 0) && (GUI.settings.SerialBaudIndex > comboBox.Items.Count))
+                GUI.settings.SerialBaudIndex = 2;
+            comboBox.SelectedIndex = GUI.settings.SerialBaudIndex;
             
         }
         private void SelectPort(object sender, RoutedEventArgs e)
         {
             string[] bauds = comboBox.Text.Split(' ');
             Button Btn = (Button)sender;
-            GUI.SerialBaud = int.Parse(bauds[0]);
-            GUI.SerialPortName = Btn.Name;
+            GUI.settings.SerialBaud = int.Parse(bauds[0]);
+            GUI.settings.SerialPortName = Btn.Name;
             GUI.Show();
             closedByUser = false;
             Close();
