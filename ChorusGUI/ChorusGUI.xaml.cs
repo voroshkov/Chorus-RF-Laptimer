@@ -19,6 +19,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Timers;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace chorusgui
 {
@@ -51,12 +53,29 @@ namespace chorusgui
         public Grid grid;
     }
 
+    [Serializable]
     public class Pilot
     {
+        private string _guid;
+        public string guid {
+            get {
+                if (_guid == null)
+                    _guid = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0,22);
+                return _guid;
+            }
+            set {
+                _guid = guid;
+            }
+        }
         public string Ranking { get; set; }
         public string Name { get; set; }
         public string BestLap { get; set; }
         public string BestRace { get; set; }
+    }
+
+    [Serializable]
+    public class PilotCollection : ObservableCollection<Pilot>
+    {
     }
 
     public partial class ChorusGUI : Window
@@ -64,8 +83,9 @@ namespace chorusgui
         System.Timers.Timer aTimer = new System.Timers.Timer();
         System.Timers.Timer VoltageMonitorTimer = new System.Timers.Timer();
         SerialPort mySerialPort;
-        int SerialBaud;
-        string SerialPortName;
+        public int SerialBaud;
+        public string SerialPortName;
+        public int SerialBaudIndex;
         string readbuffer;
         int TimerCalibration = 1000;
         int DeviceCount;
@@ -74,40 +94,61 @@ namespace chorusgui
         int TimeToPrepare;
         Boolean IsRaceActive;
 
+        private PilotCollection Pilots;
+
         ChorusDeviceClass[] ChorusDevices;
 
-        public ObservableCollection<Pilot> Pilots { get; set; }
-
-        public ChorusGUI()
+        void LoadSettings()
         {
-            InitializeComponent();
-            aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
-            VoltageMonitorTimer.Elapsed += new ElapsedEventHandler(VoltageMonitorTimerEvent);
-            SerialBaud = 9600;
+            //TODO
             DeviceCount = 0;
+            SerialBaudIndex = 2;
             readbuffer = "";
             MinimalLapTime = 5;
             QualificationRuns = 1;
             TimeToPrepare = 5;
             MinimalLapTimeLabel.Content = MinimalLapTime + " seconds";
             TimeToPrepareLabel.Content = TimeToPrepare + " seconds";
-            QualificationRunsLabel.Content = QualificationRuns;
             IsRaceActive = false;
-
-            Pilots = new ObservableCollection<Pilot>() { };
-            this.DataContext = Pilots;
         }
 
-
-
-        public void SetSerialPort(string port, int baud)
+        public ChorusGUI()
         {
-            SerialBaud = baud;
-            SerialPortName = port;
-            mySerialPort = new SerialPort(port, SerialBaud, 0, 8, StopBits.One);
+            InitializeComponent();
+            Title = "Chorus Lap Timer @ " + SerialPortName + "(" + SerialBaud + " Baud)";
+            aTimer.Elapsed += new ElapsedEventHandler(OnTimedEvent);
+            VoltageMonitorTimer.Elapsed += new ElapsedEventHandler(VoltageMonitorTimerEvent);
+            LoadSettings();
+            QualificationRunsLabel.Content = QualificationRuns;
+            Pilots = (PilotCollection)Resources["PilotCollection"];
+            XmlSerializer serializer = new XmlSerializer(typeof(PilotCollection));
+            try {
+                using (FileStream stream = new FileStream("pilots.xml", FileMode.Open))
+                {
+                    IEnumerable<Pilot> PilotData = (IEnumerable<Pilot>)serializer.Deserialize(stream);
+                    foreach (Pilot p in PilotData)
+                    {
+                        Pilots.Add(p);
+                    }
+                }
+            }
+            catch (FileNotFoundException) { }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(PilotCollection));
+            using (FileStream stream = new FileStream("pilots.xml", FileMode.Create))
+            {
+                serializer.Serialize(stream, Pilots);
+            }
+        }
+
+        void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            mySerialPort = new SerialPort(SerialPortName, SerialBaud, 0, 8, StopBits.One);
             mySerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             mySerialPort.Open();
-            Title = "Chorus Lap Timer @ " + port + "("+SerialBaud+" Baud)";
             SendData("N0");
         }
 
@@ -553,6 +594,10 @@ namespace chorusgui
                                 case 'M': //Minimal Lap Time (1 byte, in seconds)
                                     ChorusDevices[device].MinimalLapTime = int.Parse(readbuffer.Substring(3), System.Globalization.NumberStyles.HexNumber);
                                     ChorusDevices[device].MinimalLapTimeLabel.Content = "Minimal Lap time: " + ChorusDevices[device].MinimalLapTime + " seconds";
+                                    if (ChorusDevices[device].MinimalLapTime != MinimalLapTime)
+                                    {
+                                        SendData("R" + device + "N" + MinimalLapTime.ToString("X2"));
+                                    }
                                     break;
                                 case 'P': //Device ist configured (half-byte, 1 = yes, 0 = no)
                                     if (readbuffer[3] == '0')
@@ -619,7 +664,6 @@ namespace chorusgui
                 }
             }
         }
-
 
         #endregion
 
@@ -691,6 +735,7 @@ namespace chorusgui
                     SendData("R" + (tabcontrol.SelectedIndex - 2) + "Y");
             }
         }
+
 
         private void button_Click(object sender, RoutedEventArgs e)
         {

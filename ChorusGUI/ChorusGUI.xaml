@@ -5,7 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:chorusgui"
         mc:Ignorable="d"
-        Title="Chorus Lap Timer" Height="714.972" Width="809.25">
+        Title="Chorus Lap Timer" Height="714.972" Width="809.25"
+        Closing="Window_Closing"
+        Loaded="Window_Loaded">
+
+    <Window.Resources>
+        <local:PilotCollection x:Key="PilotCollection"/>
+        <CollectionViewSource x:Key="PilotCollectionViewSource" Source="{StaticResource PilotCollection}"/>
+    </Window.Resources>
+
     <TabControl x:Name="tabControl" Margin="0,0,2,2">
         <TabItem Header="Race">
             <Grid >
@@ -14,12 +22,13 @@
         </TabItem>
         <TabItem Header="Pilots">
             <Grid>
-                <DataGrid x:Name="Pilots_dataGrid" Margin="10" ItemsSource="{Binding}" AutoGenerateColumns="False">
+                <DataGrid x:Name="Pilots_dataGrid" Margin="10" ItemsSource="{Binding Source={StaticResource PilotCollectionViewSource}}" AutoGenerateColumns="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Ranking" IsReadOnly="True" Binding="{Binding Path=Ranking}"/>
                         <DataGridTextColumn Header="Pilot Name" Binding="{Binding Path=Name}"/>
                         <DataGridTextColumn Header="Best Lap" IsReadOnly="True" Binding="{Binding Path=BestLap}"/>
                         <DataGridTextColumn Header="Best Race" IsReadOnly="True" Binding="{Binding Path=BestRace}"/>
+                        <DataGridTextColumn Header="GUID" IsReadOnly="True" Binding="{Binding Path=guid}"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </Grid>

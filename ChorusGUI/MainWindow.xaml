@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:chorusgui"
         mc:Ignorable="d"
-        Title="Chorus GUI, Select COM Port" Height="377" Width="386" Background="White" ResizeMode="CanMinimize">
+        Title="Chorus GUI, Select COM Port" Height="377" Width="386" Background="White" ResizeMode="CanMinimize"
+        Closing="Window_Closing">
     <Grid>
         <Grid.Background>
             <ImageBrush ImageSource="logo.png"/>

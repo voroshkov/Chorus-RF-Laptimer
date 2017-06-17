@@ -15,11 +15,11 @@ using System.IO.Ports;
 
 namespace chorusgui
 {
-    /// <summary>
-    /// Interaction logic for Startup.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
+        ChorusGUI GUI = new ChorusGUI();
+
+        Boolean closedByUser = true;
         public MainWindow()
         {
             InitializeComponent();
@@ -31,7 +31,6 @@ namespace chorusgui
             }
             foreach (string port in ports)
             {
-
                 Button newBtn = new Button();
                 newBtn.Content = "Select Port: " + port;
                 newBtn.Name = port;
@@ -39,17 +38,24 @@ namespace chorusgui
                 newBtn.Click += SelectPort;
                 sp.Children.Add(newBtn);
             }
+            comboBox.SelectedIndex = GUI.SerialBaudIndex;
             
         }
         private void SelectPort(object sender, RoutedEventArgs e)
         {
-
             string[] bauds = comboBox.Text.Split(' ');
             Button Btn = (Button)sender;
-            ChorusGUI GUI = new ChorusGUI();
-            GUI.SetSerialPort(Btn.Name, int.Parse(bauds[0]));
+            GUI.SerialBaud = int.Parse(bauds[0]);
+            GUI.SerialPortName = Btn.Name;
             GUI.Show();
+            closedByUser = false;
             Close();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (closedByUser)
+                Application.Current.Shutdown();
         }
     }
 }
