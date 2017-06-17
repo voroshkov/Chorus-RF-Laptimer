@@ -1,4 +1,4 @@
-//TODO: editbox for number of races/time for race must not accept non numbers
+﻿//TODO: editbox for number of races/time for race must not accept non numbers
 //TODO: search for TODO
 
 using System;
