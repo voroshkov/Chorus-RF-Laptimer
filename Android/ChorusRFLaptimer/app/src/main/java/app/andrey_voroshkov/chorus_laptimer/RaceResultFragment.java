@@ -167,7 +167,6 @@ public class RaceResultFragment extends Fragment {
                     //stop race and start RSSI monitoring
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
-                    AppState.getInstance().speakMessage("Race is finished");
                     return true;
                 } else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
