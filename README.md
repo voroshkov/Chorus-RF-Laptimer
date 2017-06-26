@@ -14,6 +14,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 
 - Chorus RF Laptimer Facebook group: https://www.facebook.com/groups/ChorusRFLaptimer/
 - Chorus RF Laptimer discussion thread @ RC Groups: https://www.rcgroups.com/forums/showthread.php?2801815
+- PC GUI Interface project for Chorus RF Laptimer: https://github.com/anunique/ChorusGUI
 - Delta5 Race Timer Facebook group: https://www.facebook.com/groups/Delta5RaceTimer/
 
 ## Contents
