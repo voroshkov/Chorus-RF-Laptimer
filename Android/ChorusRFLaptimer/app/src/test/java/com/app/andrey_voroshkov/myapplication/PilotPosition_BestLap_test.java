@@ -194,7 +194,6 @@ public class PilotPosition_BestLap_test {
     public void getPilotPositionByBestLap_considers_disabled_pilots() throws Exception {
         AppState as = getFreshAppState();
         as.setNumberOfDevices(4);
-
         as.shouldSkipFirstLap = false;
         as.changeDeviceEnabled(1, false); //disable second device
 
@@ -223,4 +222,77 @@ public class PilotPosition_BestLap_test {
         pos = as.getPilotPositionByBestLap(3);
         assertEquals(3, pos);
     }
+
+    @Test
+    public void generateCSVReport_Test(){
+            AppState as = getFreshAppState();
+            as.setNumberOfDevices(4);
+            as.deviceStates.get(0).pilotName = "Pilot 1";
+            as.deviceStates.get(1).pilotName = "Pilot 2";
+            as.deviceStates.get(2).pilotName = "Pilot 3";
+            as.deviceStates.get(3).pilotName = "Pilot 4";
+            as.shouldSkipFirstLap = false;
+            as.raceState.lapsToGo = 3;
+
+            as.addLapResult(0, 0, 1);
+            as.addLapResult(0, 1, 20);
+            as.addLapResult(0, 2, 20);
+            as.addLapResult(0, 3, 30);
+            as.addLapResult(0, 4, 2);//skipped
+            as.addLapResult(0, 5, 1);//skipped
+
+            as.addLapResult(1, 0, 2);
+            as.addLapResult(1, 1, 15);
+            as.addLapResult(1, 2, 12);
+            as.addLapResult(1, 3, 10);
+            as.addLapResult(1, 4, 1);//skipped
+
+            as.addLapResult(2, 0, 1);
+            as.addLapResult(2, 1, 12);
+            as.addLapResult(2, 2, 10);
+            as.addLapResult(2, 3, 12);
+
+            as.addLapResult(3, 0, 1);
+            as.addLapResult(3, 1, 9);
+            as.addLapResult(3, 2, 10);
+            as.addLapResult(3, 3, 11);
+
+            as.generateCSVReportString();
+    }
+
+    @Test
+    public void generateCSVReport_Test_lapSkipFirstLap(){
+        AppState as = getFreshAppState();
+        as.setNumberOfDevices(4);
+        as.deviceStates.get(0).pilotName = "Pilot 1";
+        as.deviceStates.get(1).pilotName = "Pilot 2";
+        as.deviceStates.get(2).pilotName = "Pilot 3";
+        as.deviceStates.get(3).pilotName = "Pilot 4";
+        as.shouldSkipFirstLap = true;
+        as.raceState.lapsToGo = 3;
+
+        as.addLapResult(0, 0, 1);//skipped
+        as.addLapResult(1, 0, 2);//skipped
+        as.addLapResult(2, 0, 1); //skipped
+        as.addLapResult(3, 0, 1); //skipped
+        as.addLapResult(0, 1, 20);
+        as.addLapResult(1, 1, 15);
+        as.addLapResult(2, 1, 12);
+        as.addLapResult(3, 1, 9);
+        as.addLapResult(0, 2, 20);
+        as.addLapResult(1, 2, 12);
+        as.addLapResult(2, 2, 10);
+        as.addLapResult(3, 2, 10);
+        as.addLapResult(0, 3, 30);
+        as.addLapResult(1, 3, 10);
+        as.addLapResult(2, 3, 12);
+        as.addLapResult(3, 3, 11);
+        as.addLapResult(0, 4, 2);//skipped
+        as.addLapResult(1, 4, 1);//skipped
+        as.addLapResult(0, 5, 1);//skipped
+        as.generateCSVReportString();
+
+
+    }
+
 }
