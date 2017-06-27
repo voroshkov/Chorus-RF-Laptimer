@@ -122,8 +122,9 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
     private String createGroupViewText (int position, int laps, boolean isFinished) {
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
+        String freq = AppState.getInstance().getFrequencyText(position);
         DeviceState ds = AppState.getInstance().deviceStates.get(position);
-        return ds.pilotName + " (C " + ch + ", " + band + " band) Laps: " + (laps <= 0 ? "-" : laps) + (isFinished ? " FINISHED" : "");
+        return ds.pilotName + " (C " + ch + ", " + band + " band, " + freq +") Laps: " + (laps <= 0 ? "-" : laps) + (isFinished ? " FINISHED" : "");
     }
 
     @Override
