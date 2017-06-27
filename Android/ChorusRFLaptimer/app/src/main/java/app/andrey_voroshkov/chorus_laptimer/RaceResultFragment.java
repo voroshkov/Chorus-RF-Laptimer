@@ -1,6 +1,8 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -168,6 +170,7 @@ public class RaceResultFragment extends Fragment {
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
                     AppState.getInstance().speakMessage("Race is finished");
+                    showGenerateCSVDialog();
                     return true;
                 } else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
@@ -196,6 +199,30 @@ public class RaceResultFragment extends Fragment {
     public void resetRaceResults() {
         AppState.getInstance().resetRaceResults();
         useNewAdapter();
+    }
+
+    /**
+     * This function will pop up the csv dialog after race.
+     */
+    private void showGenerateCSVDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Would you like to generate a Race Result Report(CSV)?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK, so save the mSelectedItems results somewhere
+                        // or return them to the component that opened the dialog
+                        AppState.getInstance().generateCSVReport();
+                        return;
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        return;
+                    }
+                });
+
+        AlertDialog generateCSVDialog = builder.create();
+        generateCSVDialog.show();
     }
 
     public void updateButtons(View rootView) {

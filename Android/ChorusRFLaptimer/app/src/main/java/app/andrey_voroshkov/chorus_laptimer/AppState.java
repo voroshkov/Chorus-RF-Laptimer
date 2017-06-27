@@ -3,10 +3,16 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 
@@ -615,6 +621,84 @@ public class AppState {
         }
         currentState.isCalibrated = isCalibrated;
         emitEvent(DataAction.DeviceCalibrationStatus);
+    }
+
+    /**
+     * This function will generate the Report string which is to be written in the csv file
+     * @return
+     */
+    public String generateCSVReportString(){
+        ArrayList<ArrayList<LapResult>> raceResults = this.raceResults;
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("LAP,PILOT,TIME\n");
+
+        int numLaps = raceState.lapsToGo;
+
+        //startOfLapCount depends if it should skip First Lap.
+        int startOfLapCount = 0;
+        if(shouldSkipFirstLap){
+            startOfLapCount = 1;
+        }
+        //iterate per pilot
+        for(int i = 0; i < this.deviceStates.size(); i++){
+            ArrayList<LapResult> lapResult = raceResults.get(i);
+            String pilot = this.deviceStates.get(i).pilotName;
+            //iterate per lap of each pilot. till allowed number of laps.
+            for(int j = startOfLapCount; j <= numLaps; j++){
+                int lapCount = 0;
+                //if shouldSkipFirstLap, lapCount will start from 1
+                if(shouldSkipFirstLap){
+                    lapCount = j;
+                } else {
+                    lapCount = j+1;
+                }
+                LapResult lr = lapResult.get(j);
+                sb.append(lapCount+","+pilot+","+lr.getDisplayTime()+"\n");
+            }
+        }
+        System.out.println(sb.toString());
+        return sb.toString();
+    }
+
+    /**
+     * This function will generate the csv file report
+     */
+    public void generateCSVReport(){
+        String report = generateCSVReportString();
+        Calendar today = Calendar.getInstance();
+        String folderDateSuffix = today.get(Calendar.DAY_OF_MONTH)+""+
+                today.get(Calendar.MONTH)+""+
+                today.get(Calendar.YEAR)+"";
+
+        String path =
+                Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator + folderDateSuffix;
+        // Create the folder.
+        File folder = new File(path);
+        folder.mkdirs();
+
+        String fileNameDateSuffix =
+                today.get(Calendar.HOUR_OF_DAY)+""+
+                today.get(Calendar.MINUTE)+""+
+                today.get(Calendar.MILLISECOND);
+
+        // Create the file.
+        File file = new File(folder, "Race_"+fileNameDateSuffix+".csv");
+        try
+        {
+            file.createNewFile();
+            FileOutputStream fOut = new FileOutputStream(file);
+            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+            myOutWriter.append(report);
+            myOutWriter.close();
+            fOut.flush();
+            fOut.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public void changeDeviceCalibrationTime(int deviceId, int calibrationTime) {
