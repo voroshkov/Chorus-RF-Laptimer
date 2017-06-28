@@ -534,6 +534,9 @@ public class AppState {
         if (raceState.isStarted!= isStarted) {
             raceState.isStarted = isStarted;
             emitEvent(DataAction.RaceState);
+            if (!isStarted && isDevicesInitializationOver()) {
+                speakMessage("Race is finished");
+            }
         }
     }
 
