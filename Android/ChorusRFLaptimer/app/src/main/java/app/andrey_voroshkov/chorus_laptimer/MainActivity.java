@@ -166,6 +166,15 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * This function will cleanUp CSV Reports if it has been 2 weeks since file is last updated.
+     */
+    public void cleanUpCSVReports(){
+        path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer";
+        File file = new File(path);
+        file.lastModified();
+    }
+
     public void setup() {
         AppState.getInstance().bt = bt;
     }

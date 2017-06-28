@@ -668,20 +668,23 @@ public class AppState {
     /**
      * This function will generate the csv file report
      */
-    public void generateCSVReport(){
+    public boolean generateCSVReport(){
+        boolean result = false;
+        String fileName = null;
         String report = generateCSVReportString();
         Calendar today = Calendar.getInstance();
-        String folderDateSuffix = today.get(Calendar.DAY_OF_MONTH)+""+
+        String dateSuffix = today.get(Calendar.DAY_OF_MONTH)+""+
                 today.get(Calendar.MONTH)+""+
                 today.get(Calendar.YEAR)+"";
+        String path = null;
+        path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator;
 
-        String path =
-                Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator + folderDateSuffix;
         // Create the folder.
         File folder = new File(path);
         folder.mkdirs();
 
         String fileNameDateSuffix =
+                dateSuffix+"_"
                 today.get(Calendar.HOUR_OF_DAY)+""+
                 today.get(Calendar.MINUTE)+""+
                 today.get(Calendar.MILLISECOND);
@@ -697,6 +700,7 @@ public class AppState {
             myOutWriter.close();
             fOut.flush();
             fOut.close();
+            fileName = file.getPath()+file.getName();
         }
         catch (IOException e)
         {

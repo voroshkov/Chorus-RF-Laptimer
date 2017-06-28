@@ -169,8 +169,8 @@ public class RaceResultFragment extends Fragment {
                     //stop race and start RSSI monitoring
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
-                    //show generateCSVDialog
-                    showGenerateCSVDialog();
+                    //trigger csv report generation
+                    triggerCSVReportGeneration();
                     return true;
                 } else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
@@ -201,28 +201,12 @@ public class RaceResultFragment extends Fragment {
         useNewAdapter();
     }
 
-    /**
-     * This function will pop up the csv dialog after race.
-     */
-    private void showGenerateCSVDialog(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("Would you like to generate a Race Result Report(CSV)?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK, so save the mSelectedItems results somewhere
-                        // or return them to the component that opened the dialog
-                        AppState.getInstance().generateCSVReport();
-                        return;
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        return;
-                    }
-                });
-
-        AlertDialog generateCSVDialog = builder.create();
-        generateCSVDialog.show();
+    public void triggerCSVReportGeneration(){
+        String fileName = AppState.getInstance().generateCSVReport();
+        Context context = getApplicationContext();
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void updateButtons(View rootView) {
