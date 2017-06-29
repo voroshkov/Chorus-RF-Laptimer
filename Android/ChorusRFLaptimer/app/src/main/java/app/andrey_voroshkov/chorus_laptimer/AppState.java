@@ -538,6 +538,7 @@ public class AppState {
             emitEvent(DataAction.RaceState);
             if (!isStarted && isDevicesInitializationOver()) {
                 speakMessage("Race is finished");
+
             }
         }
     }
@@ -688,7 +689,7 @@ public class AppState {
                 folder.mkdirs();
             }
 
-            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyHHmmss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd_HHmmss");
             //dateSuffix Format will be like this: 280617104304
             String dateSuffix = sdf.format(today);
 

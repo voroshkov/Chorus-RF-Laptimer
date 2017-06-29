@@ -171,6 +171,8 @@ public class RaceResultFragment extends Fragment {
                     //stop race and start RSSI monitoring
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
+                    return true;
+                } else if(!isStarted && AppState.getInstance().isDevicesInitializationOver()){
                     //trigger csv report generation
                     triggerCSVReportGeneration();
                     return true;
