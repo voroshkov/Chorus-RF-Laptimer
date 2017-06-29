@@ -132,8 +132,8 @@ public class AppState {
 
     public void addListener(IDataListener listener) {
         mListeners.add(listener);
-    } 
-    
+    }
+
     private void emitEvent(DataAction eventName) {
         for (IDataListener listener: mListeners) {
             listener.onDataChange(eventName);
@@ -551,7 +551,7 @@ public class AppState {
     }
 
     private void triggerCSVReportGeneration(){
-        String fileName = AppState.getInstance().generateCSVReport();
+        String fileName = generateCSVReport();
         //if fileName = null, saving of file was not successful (HD space is low)
         if(fileName != null){
             int duration = Toast.LENGTH_SHORT;
@@ -696,9 +696,7 @@ public class AppState {
         boolean result = false;
         String fileName = null;
 
-        //check first if there's available space
-        if(checkAvailableSpace()){
-            //generate CSVReport String - to be written i csv file
+        //generate CSVReport String - to be written i csv file
             String report = generateCSVReportString();
             Calendar today = Calendar.getInstance();
 
@@ -731,9 +729,9 @@ public class AppState {
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+               return null;
             }
-        }
+
 
         return fileName;
     }
