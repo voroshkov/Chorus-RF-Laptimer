@@ -2,6 +2,7 @@ package app.andrey_voroshkov.chorus_laptimer;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.Toast;
 
 import app.andrey_voroshkov.chorus_laptimer.R;
 
@@ -203,10 +205,13 @@ public class RaceResultFragment extends Fragment {
 
     public void triggerCSVReportGeneration(){
         String fileName = AppState.getInstance().generateCSVReport();
-        Context context = getApplicationContext();
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
-        toast.show();
+        //if fileName = null, saving of file was not successful (HD space is low)
+        if(fileName != null){
+            Context context = getContext();
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 
     public void updateButtons(View rootView) {

@@ -6,11 +6,13 @@ import android.media.ToneGenerator;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.StatFs;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -668,44 +670,60 @@ public class AppState {
     /**
      * This function will generate the csv file report
      */
-    public boolean generateCSVReport(){
+    public String generateCSVReport(){
         boolean result = false;
         String fileName = null;
-        String report = generateCSVReportString();
-        Calendar today = Calendar.getInstance();
-        String dateSuffix = today.get(Calendar.DAY_OF_MONTH)+""+
-                today.get(Calendar.MONTH)+""+
-                today.get(Calendar.YEAR)+"";
-        String path = null;
-        path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator;
 
-        // Create the folder.
-        File folder = new File(path);
-        folder.mkdirs();
+        //check first if there's available space
+        if(checkAvailableSpace()){
+            //generate CSVReport String - to be written i csv file
+            String report = generateCSVReportString();
+            Calendar today = Calendar.getInstance();
 
-        String fileNameDateSuffix =
-                dateSuffix+"_"
-                today.get(Calendar.HOUR_OF_DAY)+""+
-                today.get(Calendar.MINUTE)+""+
-                today.get(Calendar.MILLISECOND);
+            String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator;
 
-        // Create the file.
-        File file = new File(folder, "Race_"+fileNameDateSuffix+".csv");
-        try
-        {
-            file.createNewFile();
-            FileOutputStream fOut = new FileOutputStream(file);
-            OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
-            myOutWriter.append(report);
-            myOutWriter.close();
-            fOut.flush();
-            fOut.close();
-            fileName = file.getPath()+file.getName();
+            // Create the folder.
+            File folder = new File(path);
+            if(!folder.exists()){
+                folder.mkdirs();
+            }
+
+            SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyHHmmss");
+            //dateSuffix Format will be like this: 280617104304
+            String dateSuffix = sdf.format(today);
+
+            // Create the file.
+            // File name will look like this: Race_290617104304
+            File file = new File(folder, "Race_"+dateSuffix+".csv");
+            try
+            {
+                file.createNewFile();
+                FileOutputStream fOut = new FileOutputStream(file);
+                OutputStreamWriter myOutWriter = new OutputStreamWriter(fOut);
+                myOutWriter.append(report);
+                myOutWriter.close();
+                fOut.flush();
+                fOut.close();
+                //set fileName for toast in RaceResultFragment
+                fileName = file.getPath()+file.getName();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
+
+        return fileName;
+    }
+
+    private boolean checkAvailableSpace(){
+        boolean isFree = false;
+        File externalStorageDir = Environment.getExternalStorageDirectory();
+        long mbyteSize = externalStorageDir.getFreeSpace() / 1048576;
+        if(mbyteSize > 30){
+            isFree = true;
         }
+        return isFree;
     }
 
     public void changeDeviceCalibrationTime(int deviceId, int calibrationTime) {
