@@ -172,11 +172,7 @@ public class RaceResultFragment extends Fragment {
                     AppState.getInstance().sendBtCommand("R*r");
                     AppState.getInstance().sendBtCommand("R*V");
                     return true;
-                } else if(!isStarted && AppState.getInstance().isDevicesInitializationOver()){
-                    //trigger csv report generation
-                    triggerCSVReportGeneration();
-                    return true;
-                } else if (mIsStartingRace) {
+                }  else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
                     mIsStartingRace = false;
                     mRaceStartingHandler.removeCallbacksAndMessages(null);
@@ -203,22 +199,6 @@ public class RaceResultFragment extends Fragment {
     public void resetRaceResults() {
         AppState.getInstance().resetRaceResults();
         useNewAdapter();
-    }
-
-    public void triggerCSVReportGeneration(){
-        String fileName = AppState.getInstance().generateCSVReport();
-        //if fileName = null, saving of file was not successful (HD space is low)
-        if(fileName != null){
-            Context context = getContext();
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
-            toast.show();
-        } else {
-            Context context = getContext();
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, "Failed to generate Report. Please Allocate Free space", Toast.LENGTH_SHORT);
-            toast.show();
-        }
     }
 
     public void updateButtons(View rootView) {

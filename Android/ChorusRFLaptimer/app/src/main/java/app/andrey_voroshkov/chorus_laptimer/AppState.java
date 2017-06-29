@@ -1,5 +1,6 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -7,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StatFs;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -82,6 +84,7 @@ public class AppState {
     public int batteryAdjustmentConst = 1;
     public boolean isLiPoMonitorEnabled = true;
     public boolean isConnected = false;
+    public Context context = null;
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
@@ -121,6 +124,10 @@ public class AppState {
         };
 
         raceState = new RaceState(false, DEFAULT_MIN_LAP_TIME, DEFAULT_LAPS_TO_GO);
+    }
+
+    public void setContext (Context context){
+        context = this.context;
     }
 
     public void addListener(IDataListener listener) {
@@ -538,8 +545,22 @@ public class AppState {
             emitEvent(DataAction.RaceState);
             if (!isStarted && isDevicesInitializationOver()) {
                 speakMessage("Race is finished");
-
+                triggerCSVReportGeneration();
             }
+        }
+    }
+
+    private void triggerCSVReportGeneration(){
+        String fileName = AppState.getInstance().generateCSVReport();
+        //if fileName = null, saving of file was not successful (HD space is low)
+        if(fileName != null){
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, "Failed to generate Report. Please Allocate Free space", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
