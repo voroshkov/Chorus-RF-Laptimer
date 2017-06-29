@@ -211,6 +211,11 @@ public class RaceResultFragment extends Fragment {
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
             toast.show();
+        } else {
+            Context context = getContext();
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(context, "Failed to generate Report. Please Allocate Free space", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 

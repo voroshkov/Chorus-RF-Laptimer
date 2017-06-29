@@ -693,8 +693,8 @@ public class AppState {
             String dateSuffix = sdf.format(today);
 
             // Create the file.
-            // File name will look like this: Race_290617104304
-            File file = new File(folder, "Race_"+dateSuffix+".csv");
+            // File name will look like this: RaceResults_290617104304
+            File file = new File(folder, "RaceResults_"+dateSuffix+".csv");
             try
             {
                 file.createNewFile();
