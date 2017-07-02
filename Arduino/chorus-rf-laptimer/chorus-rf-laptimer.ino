@@ -242,6 +242,8 @@ void setup() {
         pinMode(serialTimerPin, OUTPUT);
         pinMode(loopTimerPin, OUTPUT);
     );
+
+    Serial.write("X*\n");
 }
 // ----------------------------------------------------------------------------
 void loop() {
