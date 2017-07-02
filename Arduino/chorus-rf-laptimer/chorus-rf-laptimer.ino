@@ -533,7 +533,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 break;
             case CONTROL_SET_THRESHOLD_VALUE:
-                rssiThreshold = HEX_TO_UINT16(controlData[1], controlData[2], controlData[3]);
+                rssiThreshold = HEX_TO_UINT16(controlData[1], controlData[2], controlData[3], controlData[4]);
                 isConfigured = 1;
                 addToSendQueue(SEND_THRESHOLD);
                 break;
