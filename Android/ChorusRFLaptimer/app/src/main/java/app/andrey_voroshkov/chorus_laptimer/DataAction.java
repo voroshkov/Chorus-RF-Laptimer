@@ -25,5 +25,7 @@ public enum DataAction {
     PreparationTime,
     PilotEnabledDisabled,
     SPECIAL_DevicePilot_EditUpdate,
-    BatteryPercentage
-};
+    BatteryVoltage,
+    VoltageAdjustmentConst,
+    LiPoMonitorEnable
+}
