@@ -117,8 +117,8 @@ public class AppState {
 
     public void addListener(IDataListener listener) {
         mListeners.add(listener);
-    } 
-    
+    }
+
     private void emitEvent(DataAction eventName) {
         for (IDataListener listener: mListeners) {
             listener.onDataChange(eventName);
@@ -530,6 +530,7 @@ public class AppState {
             emitEvent(DataAction.RaceState);
             if (!isStarted && isDevicesInitializationOver()) {
                 speakMessage("Race is finished");
+                emitEvent(DataAction.RaceIsFinished);
             }
         }
     }

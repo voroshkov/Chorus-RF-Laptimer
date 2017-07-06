@@ -3,6 +3,7 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -113,6 +119,8 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
         AppPreferences.applyAll();
 
+        //this will cleanup csv reports after 2 weeks (14 days)
+        cleanUpCSVReports();
     }
 
     public void onDestroy() {
@@ -164,6 +172,35 @@ public class MainActivity extends AppCompatActivity {
                 setup();
             }
         }
+    }
+
+    /**
+     * This function will cleanUp CSV Reports if it has been 2 weeks since file is last updated.
+     */
+    public void cleanUpCSVReports(){
+        //use ChorusLapTimer directory
+        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator;
+        File file = new File(path);
+
+        //get date today
+        Calendar calToday = Calendar.getInstance();
+        long todayMillis = calToday.getTimeInMillis();
+
+        //iterate from files inside the ChorusLapTimer directory
+        if(file.list() != null){
+            for(int i = 0; i < file.list().length; i++){
+                File currFile = file.listFiles()[i];
+                //check difference of file.lastModified compared to date today
+                long diff = todayMillis - currFile.lastModified();
+                //convert difference to number of days
+                long numDays = TimeUnit.MILLISECONDS.toDays(diff);
+                //if number of days are 14(2 weeks), delete the file
+                if(numDays > 14){
+                    currFile.delete();
+                }
+            }
+        }
+
     }
 
     public void setup() {

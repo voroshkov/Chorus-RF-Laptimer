@@ -194,7 +194,6 @@ public class PilotPosition_BestLap_test {
     public void getPilotPositionByBestLap_considers_disabled_pilots() throws Exception {
         AppState as = getFreshAppState();
         as.setNumberOfDevices(4);
-
         as.shouldSkipFirstLap = false;
         as.changeDeviceEnabled(1, false); //disable second device
 
@@ -223,4 +222,7 @@ public class PilotPosition_BestLap_test {
         pos = as.getPilotPositionByBestLap(3);
         assertEquals(3, pos);
     }
+
+
+
 }

@@ -16,6 +16,7 @@ public enum DataAction {
     SoundEnable,
     DeviceCalibrationStatus,
     DeviceCalibrationValue,
+    RaceIsFinished,
     DeviceBand,
     SkipFirstLap,
     RSSImonitorState,
