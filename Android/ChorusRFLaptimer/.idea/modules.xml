@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ChorusRFLaptimer.iml" filepath="$PROJECT_DIR$/ChorusRFLaptimer.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bluetoothSPP/bluetoothspp.iml" filepath="$PROJECT_DIR$/bluetoothSPP/bluetoothspp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bluetoothSPP/bluetoothSPP.iml" filepath="$PROJECT_DIR$/bluetoothSPP/bluetoothSPP.iml" />
     </modules>
   </component>
 </project>

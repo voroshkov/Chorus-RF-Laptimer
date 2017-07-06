@@ -31,6 +31,13 @@ public class Utils {
         return String.format("%d : %02d . %03d", m, s, msec);
     }
 
+    public static String convertMsToReportTime(int ms) {
+        int m = (int)Math.floor(ms/1000/60);
+        int s = (int)Math.floor(ms/1000)-m*60;
+        int msec = ms-(int)Math.floor(ms/1000)*1000;
+        return String.format("%d:%02d.%03d", m, s, msec);
+    }
+
     public static String convertMsToSpeakableTime(int ms) {
         int m = (int)Math.floor(ms/1000/60);
         int s = (int)Math.floor(ms/1000)-m*60;

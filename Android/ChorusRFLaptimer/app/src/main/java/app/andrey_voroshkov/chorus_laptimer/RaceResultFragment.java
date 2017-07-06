@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -244,12 +244,10 @@ public class RaceResultFragment extends Fragment {
         String fileName = generateCSVReport();
         //if fileName = null, saving of file was not successful (HD space is low)
         if(fileName != null){
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(getContext(), "Report generated at: "+fileName, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getContext(), "Report saved as: " + fileName, Toast.LENGTH_SHORT);
             toast.show();
         } else {
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(getContext(), "Failed to generate Report. Please Allocate Free space", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getContext(), "Failed to create report. Check if there is enough space.", Toast.LENGTH_SHORT);
             toast.show();
         }
     }
@@ -275,7 +273,7 @@ public class RaceResultFragment extends Fragment {
         }
         //iterate per pilot
         for(int i = 0; i < AppState.getInstance().deviceStates.size(); i++){
-            ArrayList<LapResult> lapResult = raceResults.get(i);
+            ArrayList<LapResult> pilotResults = raceResults.get(i);
             String pilot = AppState.getInstance().deviceStates.get(i).pilotName;
             //iterate per lap of each pilot. till allowed number of laps.
             for(int j = startOfLapCount; j <= numLaps; j++){
@@ -284,10 +282,12 @@ public class RaceResultFragment extends Fragment {
                 if(shouldSkipFirstLap){
                     lapCount = j;
                 } else {
-                    lapCount = j+1;
+                    lapCount = j + 1;
                 }
-                LapResult lr = lapResult.get(j);
-                sb.append(lapCount+","+pilot+","+lr.getDisplayTime()+"\n");
+                if (pilotResults.size() > j) {
+                    LapResult lapResult = pilotResults.get(j);
+                    sb.append(lapCount + "," + pilot + "," + Utils.convertMsToReportTime(lapResult.getMs()) + "\n");
+                }
             }
         }
         System.out.println(sb.toString());
@@ -298,14 +298,13 @@ public class RaceResultFragment extends Fragment {
      * This function will generate the csv file report
      */
     private String generateCSVReport(){
-        boolean result = false;
-        String fileName = null;
+        String fileName;
 
-        //generate CSVReport String - to be written i csv file
+        //generate CSVReport String - to be written in csv file
         String report = generateCSVReportString();
-        Calendar today = Calendar.getInstance();
+        Date today = new Date();
 
-        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator;
+        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer Reports" + File.separator;
 
         // Create the folder.
         File folder = new File(path);
@@ -313,13 +312,13 @@ public class RaceResultFragment extends Fragment {
             folder.mkdirs();
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyMMdd_HHmmss");
-        //dateSuffix Format will be like this: 280617104304
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        //dateSuffix Format will be like this: 20170214_104304
         String dateSuffix = sdf.format(today);
 
         // Create the file.
-        // File name will look like this: RaceResults_290617104304
-        File file = new File(folder, "RaceResults_"+dateSuffix+".csv");
+        // File name will look like this: Race_20170214_104304
+        File file = new File(folder, "Race_" + dateSuffix + ".csv");
         try
         {
             file.createNewFile();
@@ -330,13 +329,12 @@ public class RaceResultFragment extends Fragment {
             fOut.flush();
             fOut.close();
             //set fileName for toast in RaceResultFragment
-            fileName = file.getPath()+file.getName();
+            fileName = file.getPath() + file.getName();
         }
         catch (IOException e)
         {
             return null;
         }
-
 
         return fileName;
     }
