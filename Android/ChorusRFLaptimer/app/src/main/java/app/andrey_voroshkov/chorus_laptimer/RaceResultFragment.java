@@ -85,6 +85,9 @@ public class RaceResultFragment extends Fragment {
                         }
                         updateButtons(rootView);
                         break;
+                    case RaceIsFinished:
+                        triggerCSVReportGeneration();
+                        break;
                     case DeviceThreshold:
                         updateButtons(rootView);
                         break;
@@ -232,6 +235,20 @@ public class RaceResultFragment extends Fragment {
                 btnRace.setEnabled(false);
                 btnRace.setText("Set all thresholds before Race");
             }
+        }
+    }
+
+    private void triggerCSVReportGeneration(){
+        String fileName = AppState.getInstance().generateCSVReport();
+        //if fileName = null, saving of file was not successful (HD space is low)
+        if(fileName != null){
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(getContext(), "Report generated at: "+fileName, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            int duration = Toast.LENGTH_SHORT;
+            Toast toast = Toast.makeText(getContext(), "Failed to generate Report. Please Allocate Free space", Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 }

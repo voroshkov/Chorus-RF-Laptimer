@@ -119,9 +119,6 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
         AppPreferences.applyAll();
 
-        //set AppState context
-        AppState.getInstance().setContext(getApplicationContext());
-
         //this will cleanup csv reports after 2 weeks (14 days)
         cleanUpCSVReports();
     }

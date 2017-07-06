@@ -545,22 +545,8 @@ public class AppState {
             emitEvent(DataAction.RaceState);
             if (!isStarted && isDevicesInitializationOver()) {
                 speakMessage("Race is finished");
-                triggerCSVReportGeneration();
+                emitEvent(DataAction.RaceIsFinished);
             }
-        }
-    }
-
-    private void triggerCSVReportGeneration(){
-        String fileName = generateCSVReport();
-        //if fileName = null, saving of file was not successful (HD space is low)
-        if(fileName != null){
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, "Report generated at: "+fileName, Toast.LENGTH_SHORT);
-            toast.show();
-        } else {
-            int duration = Toast.LENGTH_SHORT;
-            Toast toast = Toast.makeText(context, "Failed to generate Report. Please Allocate Free space", Toast.LENGTH_SHORT);
-            toast.show();
         }
     }
 
