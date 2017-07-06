@@ -73,36 +73,6 @@ public class ChannelsListAdapter extends BaseAdapter {
             viewHolder.btnIncBand = (Button) convertView.findViewById(R.id.btnIncBand);
             viewHolder.rssiBar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
 
-            viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
-
-            viewHolder.btnDecCh.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "c");
-                }
-            });
-
-            viewHolder.btnIncCh.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "C");
-                }
-            });
-
-            viewHolder.btnDecBand.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "b");
-                }
-            });
-
-            viewHolder.btnIncBand.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "B");
-                }
-            });
-
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -111,6 +81,36 @@ public class ChannelsListAdapter extends BaseAdapter {
         viewHolder.txtDeviceLabel.setText("Device #" + (position + 1));
         viewHolder.txtChannel.setText(AppState.getInstance().getChannelText(position));
         viewHolder.txtBand.setText(AppState.getInstance().getBandText(position));
+
+        viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
+
+        viewHolder.btnDecCh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "c");
+            }
+        });
+
+        viewHolder.btnIncCh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "C");
+            }
+        });
+
+        viewHolder.btnDecBand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "b");
+            }
+        });
+
+        viewHolder.btnIncBand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "B");
+            }
+        });
 
         return convertView;
     }

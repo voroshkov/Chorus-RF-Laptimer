@@ -41,9 +41,26 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         Button btnSetThr;
         ProgressBar rssiBar;
         CheckBox isPilotEnabled;
+        LinearLayout innerGroup;
+        TextWatcher edPilotTextWatcher;
     }
 
+    private TextWatcher createTextWatcher(final int position) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                AppState.getInstance().changeDevicePilot(position, s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        };
+    }
     @Override
     public int getCount() {
         return mDeviceStates != null ? mDeviceStates.size() : 0;
@@ -61,7 +78,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+        final ViewHolder viewHolder;
         final String deviceId = String.format("%X", position);
 
         if (convertView == null) {
@@ -76,59 +93,29 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.btnSetThr = (Button) convertView.findViewById(R.id.btnCapture);
             viewHolder.rssiBar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
             viewHolder.isPilotEnabled = (CheckBox) convertView.findViewById(R.id.checkIsPilotEnabled);
-
-            viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
-
-            viewHolder.btnDecThr.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "t");
-                }
-            });
-
-            viewHolder.btnIncThr.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "T");
-                }
-            });
-
-            viewHolder.btnSetThr.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AppState.getInstance().sendBtCommand("R" + deviceId + "S");
-                }
-            });
-
-            viewHolder.edPilotName.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    AppState.getInstance().changeDevicePilot(position, s.toString());
-                }
-
-                @Override
-                public void afterTextChanged(Editable s) {
-                }
-            });
-
-            final LinearLayout innerGroup = (LinearLayout) convertView.findViewById(R.id.innerGroupLayout);
-
-            viewHolder.isPilotEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Utils.enableDisableView(innerGroup, isChecked);
-                    AppState.getInstance().changeDeviceEnabled(position, isChecked);
-                }
-            });
-
+            viewHolder.innerGroup = (LinearLayout) convertView.findViewById(R.id.innerGroupLayout);
+            viewHolder.edPilotTextWatcher = createTextWatcher(position);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
+            //here we have to reset the text watcher to avoid constantly adding new ones
+            viewHolder.edPilotName.removeTextChangedListener(viewHolder.edPilotTextWatcher);
+            viewHolder.edPilotTextWatcher = createTextWatcher(position);
+            convertView.setTag(viewHolder);
         }
+
+        //this listener should be initialized prior to changing text in edPilotName
+        viewHolder.edPilotName.addTextChangedListener(viewHolder.edPilotTextWatcher);
+
+        //this listener should be initialized prior to changing the isPilotEnabled checkbox
+        viewHolder.isPilotEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Utils.enableDisableView(viewHolder.innerGroup, isChecked);
+                AppState.getInstance().changeDeviceEnabled(position, isChecked);
+            }
+        });
+
 
         DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
@@ -145,10 +132,31 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.btnSetThr.setText("Clear");
         }
 
-        String pilotNameFromEdit = viewHolder.edPilotName.getText().toString();
-        if (pilotNameFromEdit.equals("") && !ds.pilotName.equals("")) {
-            viewHolder.edPilotName.setText(ds.pilotName, TextView.BufferType.EDITABLE);
-        }
+        viewHolder.edPilotName.setText(ds.pilotName, TextView.BufferType.EDITABLE);
+
+        viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
+
+        viewHolder.btnDecThr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "t");
+            }
+        });
+
+        viewHolder.btnIncThr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "T");
+            }
+        });
+
+        viewHolder.btnSetThr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "S");
+            }
+        });
+
         return convertView;
     }
 }
