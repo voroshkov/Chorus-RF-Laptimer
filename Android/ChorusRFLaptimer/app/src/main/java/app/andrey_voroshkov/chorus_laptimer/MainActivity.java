@@ -190,17 +190,20 @@ public class MainActivity extends AppCompatActivity {
         long todayMillis = calToday.getTimeInMillis();
 
         //iterate from files inside the ChorusLapTimer directory
-        for(int i = 0; i < file.list().length; i++){
-            File currFile = file.listFiles()[i];
-            //check difference of file.lastModified compared to date today
-            long diff = todayMillis - currFile.lastModified();
-            //convert difference to number of days
-            long numDays = TimeUnit.MILLISECONDS.toDays(diff);
-            //if number of days are 14(2 weeks), delete the file
-            if(numDays > 14){
-                currFile.delete();
+        if(file.list() != null){
+            for(int i = 0; i < file.list().length; i++){
+                File currFile = file.listFiles()[i];
+                //check difference of file.lastModified compared to date today
+                long diff = todayMillis - currFile.lastModified();
+                //convert difference to number of days
+                long numDays = TimeUnit.MILLISECONDS.toDays(diff);
+                //if number of days are 14(2 weeks), delete the file
+                if(numDays > 14){
+                    currFile.delete();
+                }
             }
         }
+
     }
 
     public void setup() {
