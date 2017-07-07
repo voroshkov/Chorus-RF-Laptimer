@@ -179,10 +179,12 @@ public class MainActivity extends AppCompatActivity {
      */
     public void cleanUpCSVReports(){
         //use ChorusLapTimer directory
-        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer"+File.separator;
+        //TODO: use single method for path generation here and upon report generation to use the same path
+        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer" + File.separator;
         File file = new File(path);
 
         //get date today
+        //TODO: check if it really works with Calendar, or use Date?
         Calendar calToday = Calendar.getInstance();
         long todayMillis = calToday.getTimeInMillis();
 
@@ -196,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 long numDays = TimeUnit.MILLISECONDS.toDays(diff);
                 //if number of days are 14(2 weeks), delete the file
                 if(numDays > 14){
+                    //TODO: add exception handling here
                     currFile.delete();
                 }
             }

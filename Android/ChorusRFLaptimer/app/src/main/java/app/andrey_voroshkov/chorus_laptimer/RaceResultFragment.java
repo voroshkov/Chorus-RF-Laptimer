@@ -317,8 +317,8 @@ public class RaceResultFragment extends Fragment {
         String dateSuffix = sdf.format(today);
 
         // Create the file.
-        // File name will look like this: Race_20170214_104304
-        File file = new File(folder, "Race_" + dateSuffix + ".csv");
+        // File name will look like this: race_20170214_104304
+        File file = new File(folder, "race_" + dateSuffix + ".csv");
         try
         {
             file.createNewFile();
@@ -329,7 +329,7 @@ public class RaceResultFragment extends Fragment {
             fOut.flush();
             fOut.close();
             //set fileName for toast in RaceResultFragment
-            fileName = file.getPath() + file.getName();
+            fileName = file.getPath();
         }
         catch (IOException e)
         {
