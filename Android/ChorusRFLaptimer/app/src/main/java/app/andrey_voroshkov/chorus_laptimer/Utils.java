@@ -175,4 +175,25 @@ public class Utils {
         }
     }
 
+    /**
+     * This function will remove all the commas in the string then return the new string.
+     * @param name
+     * @return name without commas.
+     */
+    public static String removeCommas(String name){
+        String result = null;
+        if(name != null && name.contains(",")){
+            String[] splitName = name.split(",");
+            StringBuilder sBuilder = new StringBuilder();
+            for(int i = 0; i < splitName.length; i++){
+                sBuilder.append(splitName[i]);
+            }
+            result = sBuilder.toString();
+
+        } else {
+            result = name;
+        }
+        return result;
+    }
+
 }
