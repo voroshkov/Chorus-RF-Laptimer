@@ -458,7 +458,9 @@ public class AppState {
 
         if (!currentState.pilotName.equals(pilot)) {
             //don't allow pilot names with comma because it will break CSV report
-            pilot = Utils.removeCommas(pilot);
+            if(pilot.contains(",")){
+                pilot = pilot.replace(",", "");
+            }
             currentState.pilotName = pilot;
             emitEvent(DataAction.DevicePilot);
             AppPreferences.save(AppPreferences.DEVICE_PILOTS);
