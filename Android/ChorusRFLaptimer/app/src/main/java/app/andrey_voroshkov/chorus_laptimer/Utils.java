@@ -1,7 +1,10 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.io.File;
 
 /**
  * Created by Andrey_Voroshkov on 1/29/2017.
@@ -173,6 +176,10 @@ public class Utils {
                 enableDisableView(group.getChildAt(i), enabled);
             }
         }
+    }
+
+    public static String getReportPath(){
+        return Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer Reports" + File.separator;
     }
 
 }

@@ -2,7 +2,6 @@ package app.andrey_voroshkov.chorus_laptimer;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
@@ -304,7 +303,7 @@ public class RaceResultFragment extends Fragment {
         String report = generateCSVReportString();
         Date today = new Date();
 
-        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer Reports" + File.separator;
+        String path = Utils.getReportPath();
 
         // Create the folder.
         File folder = new File(path);

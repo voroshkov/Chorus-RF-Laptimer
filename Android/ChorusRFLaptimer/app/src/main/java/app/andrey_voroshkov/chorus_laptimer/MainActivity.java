@@ -3,20 +3,17 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
-import android.os.Environment;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -179,8 +176,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void cleanUpCSVReports(){
         //use ChorusLapTimer directory
-        //TODO: use single method for path generation here and upon report generation to use the same path
-        String path = Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer" + File.separator;
+        String path = Utils.getReportPath();
         File file = new File(path);
 
         //get date today
@@ -198,8 +194,13 @@ public class MainActivity extends AppCompatActivity {
                 long numDays = TimeUnit.MILLISECONDS.toDays(diff);
                 //if number of days are 14(2 weeks), delete the file
                 if(numDays > 14){
-                    //TODO: add exception handling here
-                    currFile.delete();
+                    try{
+                        currFile.delete();
+                    } catch (Exception e){
+                        continue;
+                    }
+
+
                 }
             }
         }
