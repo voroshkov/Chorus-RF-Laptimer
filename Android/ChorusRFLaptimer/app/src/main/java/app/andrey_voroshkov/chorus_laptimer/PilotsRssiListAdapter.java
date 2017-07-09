@@ -120,10 +120,11 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
+        String freq = AppState.getInstance().getFrequencyText(position);
         Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
-        viewHolder.txtChannelLabel.setText("Channel: #" + ch + " (" + band + ")");
+        viewHolder.txtChannelLabel.setText("Channel: #" + ch + " (" + band + " band)" + " " + freq);
         viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         if (ds.threshold == 0) {
