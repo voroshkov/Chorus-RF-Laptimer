@@ -1,7 +1,10 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
+
+import java.io.File;
 
 /**
  * Created by Andrey_Voroshkov on 1/29/2017.
@@ -29,6 +32,13 @@ public class Utils {
         int s = (int)Math.floor(ms/1000)-m*60;
         int msec = ms-(int)Math.floor(ms/1000)*1000;
         return String.format("%d : %02d . %03d", m, s, msec);
+    }
+
+    public static String convertMsToReportTime(int ms) {
+        int m = (int)Math.floor(ms/1000/60);
+        int s = (int)Math.floor(ms/1000)-m*60;
+        int msec = ms-(int)Math.floor(ms/1000)*1000;
+        return String.format("%d:%02d.%03d", m, s, msec);
     }
 
     public static String convertMsToSpeakableTime(int ms) {
@@ -166,6 +176,10 @@ public class Utils {
                 enableDisableView(group.getChildAt(i), enabled);
             }
         }
+    }
+
+    public static String getReportPath(){
+        return Environment.getExternalStorageDirectory() + File.separator  + "ChorusRFLaptimer Reports" + File.separator;
     }
 
 }

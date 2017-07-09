@@ -28,6 +28,7 @@ public class ChannelsListAdapter extends BaseAdapter {
 
     static class ViewHolder {
         TextView txtChannel;
+        TextView txtFreq;
         Button btnDecCh;
         Button btnIncCh;
 
@@ -66,6 +67,7 @@ public class ChannelsListAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             viewHolder.txtDeviceLabel = (TextView) convertView.findViewById(R.id.txtDeviceLabel);
             viewHolder.txtChannel = (TextView) convertView.findViewById(R.id.txtChannel);
+            viewHolder.txtFreq = (TextView) convertView.findViewById(R.id.txtFreq);
             viewHolder.btnDecCh = (Button) convertView.findViewById(R.id.btnDecChannel);
             viewHolder.btnIncCh = (Button) convertView.findViewById(R.id.btnIncChannel);
             viewHolder.txtBand = (TextView) convertView.findViewById(R.id.txtBand);
@@ -80,6 +82,7 @@ public class ChannelsListAdapter extends BaseAdapter {
 
         viewHolder.txtDeviceLabel.setText("Device #" + (position + 1));
         viewHolder.txtChannel.setText(AppState.getInstance().getChannelText(position));
+        viewHolder.txtFreq.setText(AppState.getInstance().getFrequencyText(position));
         viewHolder.txtBand.setText(AppState.getInstance().getBandText(position));
 
         viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
