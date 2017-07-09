@@ -173,7 +173,7 @@ uint8_t isSendQueueFull = 0;
 //----- Lap timings--------------------------------
 uint32_t lastMilliseconds = 0;
 #define MIN_MIN_LAP_TIME 1 //seconds
-#define MAX_MIN_LAP_TIME 60 //seconds
+#define MAX_MIN_LAP_TIME 255 //seconds
 uint8_t minLapTime = 5; //seconds
 #define MAX_LAPS 100
 uint32_t lapTimes[MAX_LAPS];
@@ -539,6 +539,22 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 addToSendQueue(SEND_THRESHOLD);
                 break;
+            case CONTROL_SET_SKIP_LAP0: // set valid first lap
+                shouldSkipFirstLap = TO_BYTE(controlData[1]);
+                addToSendQueue(SEND_LAP0_STATE);
+                playClickTones();
+                isConfigured = 1;
+                break;
+            case CONTROL_SET_SOUND: // set sound
+                isSoundEnabled = TO_BYTE(controlData[1]);
+                if (!isSoundEnabled) {
+                    noTone(buzzerPin);
+                }
+                addToSendQueue(SEND_SOUND_STATE);
+                playClickTones();
+                isConfigured = 1;
+                break;
+
         }
     } else {
         switch (controlByte) {
@@ -621,15 +637,6 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 addToSendQueue(SEND_THRESHOLD);
                 isConfigured = 1;
                 break;
-            case CONTROL_SET_SOUND: // set sound
-                isSoundEnabled = !isSoundEnabled;
-                if (!isSoundEnabled) {
-                    noTone(buzzerPin);
-                }
-                addToSendQueue(SEND_SOUND_STATE);
-                playClickTones();
-                isConfigured = 1;
-                break;
             case CONTROL_MONITOR_ON: // start RSSI monitor
                 rssiMonitor = 1;
                 rssiMonitorDelayExpiration = 0;
@@ -642,12 +649,6 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 addToSendQueue(SEND_MONITOR_STATE);
                 // don't play tones here because it suppresses race tone when used simultaneously
                 // playClickTones();
-                break;
-            case CONTROL_SET_SKIP_LAP0: // set valid first lap
-                shouldSkipFirstLap = !shouldSkipFirstLap;
-                addToSendQueue(SEND_LAP0_STATE);
-                playClickTones();
-                isConfigured = 1;
                 break;
             case CONTROL_GET_VOLTAGE: //get battery voltage
                 voltage = readVoltage();
