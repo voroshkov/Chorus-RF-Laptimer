@@ -10,134 +10,146 @@
         android:layout_height="10dp" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
-                android:text="Device #1"
+                android:id="@+id/txtDeviceLabel"
                 android:layout_width="70dp"
                 android:layout_height="40dp"
-                android:layout_weight = "0"
-                android:id="@+id/txtDeviceLabel"
+                android:layout_weight="0"
                 android:gravity="center_vertical"
-                android:textStyle="normal|bold"
-                android:textAllCaps="false" />
+                android:text="Device #1"
+                android:textAllCaps="false"
+                android:textStyle="normal|bold" />
 
             <ProgressBar
+                android:id="@+id/rssiBar"
                 style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight = "1"
-                android:id="@+id/rssiBar"
                 android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:max="350"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:progress="256"
-                android:max="350" />
+                android:progress="256" />
 
             <TextView
-                android:layout_width="50dp"
-                android:layout_weight = "0"
                 android:id="@+id/txtRssi"
-                android:text="234"
-                android:gravity="center_vertical|center_horizontal"
+                android:layout_width="50dp"
+                android:layout_height="40dp"
                 android:layout_gravity="center_horizontal"
-                android:layout_height="40dp" />
+                android:layout_weight="0"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="234" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:weightSum="2">
 
             <TextView
-                android:text="RF Band "
+                android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/textView4"
-                android:layout_weight="1"
-                android:gravity="center_vertical" />
+                android:layout_weight="1.2"
+                android:gravity="center_vertical"
+                android:text="RF Band " />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.8"
+                android:orientation="horizontal">
 
                 <Button
-                    android:text="\u25C0"
+                    android:id="@+id/btnDecBand"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:id="@+id/btnDecBand"
+                    android:text="\u25C0"
                     android:textStyle="normal|bold" />
 
 
                 <TextView
+                    android:id="@+id/txtBand"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/txtBand"
                     android:layout_weight="1"
-                    android:text="Race"
                     android:gravity="center_vertical|center_horizontal"
+                    android:text="Race"
                     android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                 <Button
-                    android:text="\u25B6"
+                    android:id="@+id/btnIncBand"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:id="@+id/btnIncBand"
+                    android:text="\u25B6"
                     android:textStyle="normal|bold" />
 
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
             <TextView
-                android:text="Channel #"
+                android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/textView2"
-                android:layout_weight="1"
-                android:gravity="center_vertical" />
+                android:layout_weight="1.2"
+                android:gravity="center_vertical"
+                android:text="Channel #" />
 
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.8"
+                android:orientation="horizontal">
 
                 <Button
-                    android:text="\u25C0"
+                    android:id="@+id/btnDecChannel"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:id="@+id/btnDecChannel"
+                    android:text="\u25C0"
                     android:textStyle="normal|bold" />
 
 
                 <TextView
+                    android:id="@+id/txtChannel"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:id="@+id/txtChannel"
-                    android:layout_weight="1"
-                    android:text="1"
+                    android:layout_weight="0.5"
                     android:gravity="center_vertical|center_horizontal"
+                    android:text="1"
                     android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
+                <TextView
+                    android:id="@+id/txtFreq"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:gravity="center_vertical|center_horizontal"
+                    android:text="5620Mhz"
+                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+
                 <Button
-                    android:text="\u25B6"
+                    android:id="@+id/btnIncChannel"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:id="@+id/btnIncChannel"
+                    android:text="\u25B6"
                     android:textStyle="normal|bold" />
 
             </LinearLayout>
