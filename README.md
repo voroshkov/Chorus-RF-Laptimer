@@ -39,6 +39,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
         - [App User Guide](#app-user-guide)
 - [Setup and Usage Guide](#setup-and-usage-guide)
 - [Troubleshooting](#troubleshooting)
+- [Contributors](#contributors)
 - [Contacts](#contacts)
 
 <!-- /MarkdownTOC -->
@@ -235,6 +236,16 @@ If the app connects to Bluetooth module but doesn't seem to communicate with the
 2. Bluetooth module baud rate must correspond to Arduino's: 115200 baud
 3. Loopback jumper must be in place.
 4. Wiring :)
+
+<a name="contributors"></a>
+## Contributors
+
+Big thanks to all contributors to this project:
+
+Android app:
+- Louis Plett (highway11) - voice speaking
+- Ray Erik Rabe (raveerk) - CSV reports generation
+- evgen48 - display frequencies in MHz
 
 <a name="contacts"></a>
 ## Contacts
