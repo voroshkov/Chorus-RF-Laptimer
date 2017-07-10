@@ -36,7 +36,7 @@ uint8_t HEX_TO_BYTE (uint8_t hi, uint8_t lo) {
 }
 
 int16_t HEX_TO_UINT16 (uint8_t v4, uint8_t v3, uint8_t v2, uint8_t v1) {
-    return TO_BYTE(v4)*4096+TO_BYTE(v3)*256+TO_BYTE(v2)*16+TO_BYTE(v1);
+    return HEX_TO_BYTE(v4 << 12, v3 << 8) + HEX_TO_BYTE(v2 << 4, v1);
 }
 
 int32_t HEX_TO_SIGNED_LONG (uint8_t * buf) {
