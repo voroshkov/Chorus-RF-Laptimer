@@ -770,7 +770,7 @@ void setChannel(uint8_t channel) {
 }
 // ----------------------------------------------------------------------------
 void incBand() {
-    if (bandIndex < 5) {
+    if (bandIndex < 7) {
         bandIndex++;
     }
     setChannelModule(channelIndex, bandIndex);
