@@ -770,7 +770,7 @@ void setChannel(uint8_t channel) {
 }
 // ----------------------------------------------------------------------------
 void incBand() {
-    if (bandIndex < 7) {
+    if (bandIndex < MAX_BAND) {
         bandIndex++;
     }
     setChannelModule(channelIndex, bandIndex);
@@ -786,7 +786,7 @@ void decBand() {
 }
 // ----------------------------------------------------------------------------
 void setBand(uint8_t band) {
-    if (band >= 0 && band <= 5) {
+    if (band >= 0 && band <= MAX_BAND) {
         bandIndex = band;
         setChannelModule(channelIndex, bandIndex);
         wait_rssi_ready();
