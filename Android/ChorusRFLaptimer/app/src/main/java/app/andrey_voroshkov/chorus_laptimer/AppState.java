@@ -843,7 +843,6 @@ public class AppState {
                 LapResult lr = deviceResults.get(i);
                 if(lr.getMs() > lapTime){
                     isFastest = true;
-                    System.out.println("NEW FASTEST LAP");
                 } else {
                     isFastest = false;
                 }
