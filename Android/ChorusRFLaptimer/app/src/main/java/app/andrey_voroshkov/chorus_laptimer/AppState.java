@@ -607,6 +607,11 @@ public class AppState {
             return;
         }
         int lapsCount = deviceResults.size();
+
+        boolean isFastest = false;
+        //check if the current Lap is the fastest lap.
+        isFastest = isFastestLap(deviceResults,lapTime,lapNumber);
+
         if (lapNumber >= lapsCount) {
             for (int i = lapsCount; i <= lapNumber; i++) {
                 deviceResults.add(new LapResult());
@@ -626,6 +631,9 @@ public class AppState {
                         textToSay = textToSay + " finished";
                     } else if (getIsFinished(deviceId)) {
                         textToSay = textToSay + " already finished";
+                    } else if(isFastest){
+                        //text to speak will be: "Pilot 1. New Best Time. Lap 2. XXX"
+                        textToSay = textToSay + " New Best Time ";
                     }
                     textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumber) + ". " + Utils.convertMsToSpeakableTime(lapTime));
                 }
@@ -818,6 +826,30 @@ public class AppState {
                 suspendBatteryMonitoringHandlers();
             }
         }
+    }
+
+    /**
+     * This function will check if the following lapTime is faster than previously posted lapTimes.
+     * @param deviceResults
+     * @param lapTime
+     * @return
+     */
+    private boolean isFastestLap(ArrayList<LapResult> deviceResults, int lapTime,int lapCount){
+        boolean isFastest = false;
+        int startIndex = this.shouldSkipFirstLap ? 1 : 0;
+        //only check fastest lap if it's 2nd lap onwards
+        if(lapCount >= startIndex+1){
+            for(int i = startIndex; i < deviceResults.size(); i++){
+                LapResult lr = deviceResults.get(i);
+                if(lr.getMs() > lapTime){
+                    isFastest = true;
+                    System.out.println("NEW FASTEST LAP");
+                } else {
+                    isFastest = false;
+                }
+            }
+        }
+        return isFastest;
     }
 }
 
