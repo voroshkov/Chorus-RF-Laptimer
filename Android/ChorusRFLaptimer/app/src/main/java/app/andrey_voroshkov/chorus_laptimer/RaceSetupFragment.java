@@ -75,6 +75,9 @@ public class RaceSetupFragment extends Fragment {
                     case SpeakLapTimes:
                         updateSpeakLapTimesCheckbox(rootView);
                         break;
+                    case AlertNewLapTime:
+                        updateAlertLapTimeCheckbox(rootView);
+                        break;
                     case SpeakMessages:
                         updateSpeakMessagesCheckbox(rootView);
                         break;
@@ -104,6 +107,7 @@ public class RaceSetupFragment extends Fragment {
         Button btnIncAdjust = (Button) rootView.findViewById(R.id.btnIncAdjustmentConst);
         TextView txtVoltage = (TextView) rootView.findViewById(R.id.txtVoltage);
         LinearLayout layoutVoltage = (LinearLayout) rootView.findViewById(R.id.layoutVoltage);
+        CheckBox chkAlertNewBestLap = (CheckBox) rootView.findViewById(R.id.chkAlertNewBestTime);
 
         btnDecAdjust.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,6 +206,13 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
+        chkAlertNewBestLap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AppState.getInstance().changeAlertNewBestLapTime(isChecked);
+            }
+        });
+
         chkSpeakMessages.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -275,6 +286,11 @@ public class RaceSetupFragment extends Fragment {
     private void updateSpeakLapTimesCheckbox(View rootView) {
         CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
         chkSpeakLapTimes.setChecked(AppState.getInstance().shouldSpeakLapTimes);
+    }
+
+    private void updateAlertLapTimeCheckbox(View rootView) {
+        CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkAlertNewBestTime);
+        chkSpeakLapTimes.setChecked(AppState.getInstance().alertNewLapTime);
     }
 
     private void updateSpeakMessagesCheckbox(View rootView) {

@@ -25,7 +25,7 @@ public class AppPreferences {
     public static final String DEVICE_ENABLED = "device_enabled";
     public static final String LIPO_MONITOR_ENABLED = "lipo_mon_enabled";
     public static final String LIPO_ADJUSTMENT_CONST = "lipo_adjust_const";
-
+    public static final String ALERT_NEW_LAP_TIME = "alert_new_lap_time";
 
     public String[] mBands;
     public String[] mChannels;
@@ -138,6 +138,9 @@ public class AppPreferences {
                 break;
             case LIPO_ADJUSTMENT_CONST:
                 editor.putInt(LIPO_ADJUSTMENT_CONST, app.batteryAdjustmentConst);
+                break;
+            case ALERT_NEW_LAP_TIME:
+                editor.putBoolean(ALERT_NEW_LAP_TIME, app.alertNewLapTime);
                 break;
         }
         editor.apply();

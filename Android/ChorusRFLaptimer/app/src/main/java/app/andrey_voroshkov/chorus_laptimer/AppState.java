@@ -60,6 +60,7 @@ public class AppState {
     public int numberOfDevices = 0;
     public boolean isDeviceSoundEnabled = false;
     public boolean shouldSpeakLapTimes = true;
+    public boolean alertNewLapTime = true;
     public boolean shouldSpeakMessages = true;
     public boolean shouldSkipFirstLap = true;
     public boolean wereDevicesConfigured = false;
@@ -849,6 +850,14 @@ public class AppState {
             }
         }
         return isFastest;
+    }
+
+    public void changeAlertNewBestLapTime(boolean isChecked) {
+        if (alertNewLapTime != isChecked) {
+            alertNewLapTime = isChecked;
+            emitEvent(DataAction.AlertNewLapTime);
+            AppPreferences.save(AppPreferences.ALERT_NEW_LAP_TIME);
+        }
     }
 }
 
