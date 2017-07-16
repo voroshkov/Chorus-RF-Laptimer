@@ -1,4 +1,4 @@
-/**
+ /**
  * DIY RF Laptimer by Andrey Voroshkov (bshep)
  * SPI driver based on fs_skyrf_58g-main.c by Simon Chambers
  * fast ADC reading code is by "jmknapp" from Arduino forum
@@ -59,7 +59,8 @@ uint8_t MODULE_ID_HEX = '0';
 #include "rx5808spi.h"
 #include "sounds.h"
 
-#define BAUDRATE 115200
+//#define BAUDRATE 115200
+#define BAUDRATE 9600
 
 const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 };
 
@@ -204,7 +205,7 @@ uint8_t lastLapsNotSent = 0;
 uint16_t rssiMonitorDelayExpiration = 0;
 
 //----- read/write bufs ---------------------------
-#define READ_BUFFER_SIZE 20
+#define READ_BUFFER_SIZE 200
 uint8_t readBuf[READ_BUFFER_SIZE];
 uint8_t proxyBuf[READ_BUFFER_SIZE];
 uint8_t readBufFilledBytes = 0;
@@ -255,6 +256,7 @@ void loop() {
         if(rssi > rssiThreshold) { // rssi above the threshold - drone is near
             if (allowEdgeGeneration) {  // we haven't fired event for this drone proximity case yet
                 allowEdgeGeneration = 0;
+                //allowEdgeGeneration = 1;
                 gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
 
                 uint32_t now = millis();
@@ -770,7 +772,7 @@ void setChannel(uint8_t channel) {
 }
 // ----------------------------------------------------------------------------
 void incBand() {
-    if (bandIndex < MAX_BAND) {
+    if (bandIndex < 5) {
         bandIndex++;
     }
     setChannelModule(channelIndex, bandIndex);
@@ -786,7 +788,7 @@ void decBand() {
 }
 // ----------------------------------------------------------------------------
 void setBand(uint8_t band) {
-    if (band >= 0 && band <= MAX_BAND) {
+    if (band >= 0 && band <= 5) {
         bandIndex = band;
         setChannelModule(channelIndex, bandIndex);
         wait_rssi_ready();
