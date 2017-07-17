@@ -52,7 +52,7 @@ uint8_t MODULE_ID_HEX = '0';
 
 #include <avr/pgmspace.h>
 
-#define BAUDRATE 9600
+#define BAUDRATE 115200
 
 const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 };
 
