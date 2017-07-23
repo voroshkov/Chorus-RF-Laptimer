@@ -37,7 +37,7 @@ TODO: when implement send queue, there's possible optimization:
     remove already existing items from queue
 */
 
-// #define DEBUG
+ #define DEBUG
 
 #ifdef DEBUG
     #define DEBUG_CODE(x) do { x } while(0)
@@ -231,6 +231,19 @@ void setup() {
     setChannelModule(channelIndex, bandIndex);
     wait_rssi_ready();
     Serial.begin(BAUDRATE);
+    Serial.print("AT");               // Check if Bluetooth module set to proper baudrate
+    Serial.setTimeout(3000);
+    String input2 = Serial.readString();
+    if (input2 != "OK"){              // If not set serial port to 9600 Baud (Bluetooth adapter default rate)
+      //Serial.print("Changing Baud");   // For Debug Only
+      Serial.end();
+      Serial.begin(9600);
+      Serial.print("AT+BAUD8");       // Send command to configure for 115200bps
+      delay(1000);
+      Serial.end();
+      Serial.begin(BAUDRATE);       // Restart serial port at specified baud rate
+    }
+    //Serial.print("Continuing");   // For Debug Only
 
     initFastADC();
 
