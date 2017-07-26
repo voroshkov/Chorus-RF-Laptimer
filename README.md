@@ -123,6 +123,8 @@ Parts may be connected directly without using any additional components:
 
 **UPDATE:** powering RX5808 from Arduino's VCC was a bad idea - Pro Mini's linear regulator might not be able to provide enough power for RX, so use raw 5V power instead.
 
+**UPDATE #2:** powering Arduino via RAW pin is also a bad idea if you use external stabilized 5V power supply - Arduino's internal voltage regulator might significantly drop voltage thus making LiPo monitor calculations wrong. Supply 5V power to VCC pin instead (as shown on the updated wiring diagram).
+
 Note the resistor divider for LiPo Battery monitoring. Although just one of the Solo devices in a Chorus should be connected to LiPo battery for monitoring, but make sure to have A0 Arduino pins on all other Solo devices connected to Ground (via 1K resistor) or just solder the resistors on each Solo device according to schematic.
 
 <img src="docs/img/wiring_solo.png" alt="Wiring Solo schematic" width="400">
