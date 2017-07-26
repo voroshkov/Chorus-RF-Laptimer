@@ -29,7 +29,6 @@ SOFTWARE.
 
 // Pin definitions
 
-#define baudpin 2
 #define led 13
 #define spiDataPin 10
 #define slaveSelectPin 11
