@@ -52,6 +52,8 @@ uint8_t MODULE_ID_HEX = '0';
 
 #include <avr/pgmspace.h>
 
+#define BAUDRATE 115200
+
 const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 };
 
 // number of analog rssi reads to average for the current check.
@@ -214,9 +216,6 @@ uint8_t proxyBufDataSize = 0;
 
 // ----------------------------------------------------------------------------
 void setup() {
-    // initialize digital pin 2 as an input.
-    pinMode(baudpin, INPUT);
-    
     // initialize digital pin 13 LED as an output.
     pinMode(led, OUTPUT);
     digitalHigh(led);
@@ -235,14 +234,7 @@ void setup() {
     // faster boot up times :)
     setChannelModule(channelIndex, bandIndex, 0);
     
-    if (digitalRead(baudpin) == HIGH)
-    {
-            Serial.begin(9600);
-    }
-    else
-    {
-      Serial.begin(115200);    
-    }
+    Serial.begin(BAUDRATE);
 
     initFastADC();
 
