@@ -35,11 +35,18 @@ uint8_t HEX_TO_BYTE (uint8_t hi, uint8_t lo) {
     return TO_BYTE(hi)*16+TO_BYTE(lo);
 }
 
+uint16_t HEX_TO_UINT16 (uint8_t * buf) {
+    uint16_t temp = 0;
+    for (int i = 0; i < 4; i++) {
+        temp += TO_BYTE(buf[4-1-i])*(uint16_t)1<<(i*4);
+    }
+    return temp;
+}
+
 int32_t HEX_TO_SIGNED_LONG (uint8_t * buf) {
-    #define LEN 8
     int32_t temp = 0;
-    for (int i = 0; i < LEN; i++) {
-        temp += TO_BYTE(buf[LEN-1-i])*(int32_t)1<<(i*4);
+    for (int i = 0; i < 8; i++) {
+        temp += TO_BYTE(buf[8-1-i])*(int32_t)1<<(i*4);
     }
     return temp;
 }
