@@ -67,15 +67,15 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_END_RACE        'r'
 #define CONTROL_DEC_MIN_LAP     'm'
 #define CONTROL_INC_MIN_LAP     'M'
-#define CONTROL_DEC_CHANNEL     'c' //keeping because of compatiblity
-#define CONTROL_INC_CHANNEL     'C' //keeping because of compatiblity
+#define CONTROL_DEC_CHANNEL     'c'
+#define CONTROL_INC_CHANNEL     'C'
 #define CONTROL_DEC_THRESHOLD   't'
 #define CONTROL_INC_THRESHOLD   'T'
-#define CONTROL_SET_THRESHOLD   'S' //it either triggers or sets an uint16
+#define CONTROL_SET_THRESHOLD   'S' // it either triggers or sets an uint16 depending on command length
 #define CONTROL_SET_SOUND       'D'
 #define CONTROL_DATA_REQUEST    'A'
-#define CONTROL_INC_BAND        'B' //keeping because of compatiblity
-#define CONTROL_DEC_BAND        'b' //keeping because of compatiblity
+#define CONTROL_INC_BAND        'B'
+#define CONTROL_DEC_BAND        'b'
 #define CONTROL_START_CALIBRATE 'I'
 #define CONTROL_END_CALIBRATE   'i'
 #define CONTROL_MONITOR_ON      'V'
@@ -232,8 +232,8 @@ void setup() {
 
     // set the channel as soon as we can
     // faster boot up times :)
-    setChannelModule(channelIndex, bandIndex, 0);
-    
+    frequency = setChannelModule(channelIndex, bandIndex);
+
     Serial.begin(BAUDRATE);
 
     initFastADC();
@@ -543,12 +543,12 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 break;
             case CONTROL_SET_THRESHOLD: // set threshold
-                setThreshold(HEX_TO_UINT16(&controlData[1]));
+                setThresholdValue(HEX_TO_UINT16(&controlData[1]));
                 addToSendQueue(SEND_THRESHOLD);
                 isConfigured = 1;
                 break;
             case CONTROL_SET_FREQUENCY: // set frequency
-                setChannelModule(0, 0, HEX_TO_UINT16(&controlData[1]));
+                setChannelModuleFrequency(HEX_TO_UINT16(&controlData[1]));
                 addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
@@ -634,7 +634,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 break;
             case CONTROL_SET_THRESHOLD: // set threshold
-                setThreshold(0);
+                setOrDropThreshold();
                 addToSendQueue(SEND_THRESHOLD);
                 isConfigured = 1;
                 break;
@@ -774,20 +774,20 @@ void incChannel() {
     if (channelIndex < 7) {
         channelIndex++;
     }
-    setChannelModule(channelIndex, bandIndex, 0);
+    frequency = setChannelModule(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void decChannel() {
     if (channelIndex > 0) {
         channelIndex--;
     }
-    setChannelModule(channelIndex, bandIndex, 0);
+    frequency = setChannelModule(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void setChannel(uint8_t channel) {
     if (channel >= 0 && channel <= 7) {
         channelIndex = channel;
-        setChannelModule(channelIndex, bandIndex, 0);
+        frequency = setChannelModule(channelIndex, bandIndex);
     }
 }
 // ----------------------------------------------------------------------------
@@ -795,20 +795,20 @@ void incBand() {
     if (bandIndex < MAX_BAND) {
         bandIndex++;
     }
-    setChannelModule(channelIndex, bandIndex, 0);
+    frequency = setChannelModule(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void decBand() {
     if (bandIndex > 0) {
         bandIndex--;
     }
-    setChannelModule(channelIndex, bandIndex, 0);
+    frequency = setChannelModule(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void setBand(uint8_t band) {
     if (band >= 0 && band <= MAX_BAND) {
         bandIndex = band;
-        setChannelModule(channelIndex, bandIndex, 0);
+        frequency = setChannelModule(channelIndex, bandIndex);
     }
 }
 // ----------------------------------------------------------------------------
@@ -824,32 +824,33 @@ void decThreshold() {
     }
 }
 // ----------------------------------------------------------------------------
-void setThreshold(uint16_t threshold) {
-    if (threshold != 0)
-    {
-      rssiThreshold = threshold;
-      playSetThresholdTones();
+void setOrDropThreshold() {
+    if (rssiThreshold == 0) {
+        uint16_t median;
+        for(uint8_t i=0; i < THRESHOLD_ARRAY_SIZE; i++) {
+            rssiThresholdArray[i] = getFilteredRSSI();
+        }
+        sortArray(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
+        median = getMedian(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
+        if (median > MAGIC_THRESHOLD_REDUCE_CONSTANT) {
+            rssiThreshold = median - MAGIC_THRESHOLD_REDUCE_CONSTANT;
+            playSetThresholdTones();
+        }
     }
     else {
-      if (rssiThreshold == 0) {
-          uint16_t median;
-          for(uint8_t i=0; i < THRESHOLD_ARRAY_SIZE; i++) {
-              rssiThresholdArray[i] = getFilteredRSSI();
-          }
-          sortArray(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
-          median = getMedian(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
-          if (median > MAGIC_THRESHOLD_REDUCE_CONSTANT) {
-              rssiThreshold = median - MAGIC_THRESHOLD_REDUCE_CONSTANT;
-              playSetThresholdTones();
-          }
-      }
-      else {
-          rssiThreshold = 0;
-          playClearThresholdTones();
-      }
+        rssiThreshold = 0;
+        playClearThresholdTones();
     }
 }
-
+// ----------------------------------------------------------------------------
+void setThresholdValue(uint16_t threshold) {
+    rssiThreshold = threshold;
+    if (threshold != 0) {
+        playSetThresholdTones();
+    } else {
+        playClearThresholdTones();
+    }
+}
 // ----------------------------------------------------------------------------
 uint16_t getFilteredRSSI() {
     rssiArr[0] = readRSSI();

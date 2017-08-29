@@ -75,17 +75,10 @@ void SERIAL_ENABLE_HIGH() {
     delayMicroseconds(1);
 }
 
-void setChannelModule(uint8_t channel, uint8_t band, uint16_t newfreq) {
+uint16_t setChannelModuleFrequency(uint16_t frequency) {
     uint8_t i;
     uint16_t channelData;
-    if (newfreq == 0)
-    {
-        frequency = pgm_read_word_near(channelFreqTable + channel + (8 * band));
-    }
-    else 
-    {
-        frequency = newfreq;
-    }
+
     channelData = frequency - 479;
     channelData /= 2;
     i = channelData % 32;
@@ -159,4 +152,11 @@ void setChannelModule(uint8_t channel, uint8_t band, uint16_t newfreq) {
     digitalLow(spiDataPin);
 
     delay(MIN_TUNE_TIME);
+
+    return frequency;
+}
+
+uint16_t setChannelModule(uint8_t channel, uint8_t band) {
+    uint16_t frequency = pgm_read_word_near(channelFreqTable + channel + (8 * band));
+    return setChannelModuleFrequency(frequency);
 }
