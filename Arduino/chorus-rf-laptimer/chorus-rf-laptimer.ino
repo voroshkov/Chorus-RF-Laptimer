@@ -83,7 +83,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_SET_SKIP_LAP0   'F'
 #define CONTROL_GET_VOLTAGE     'Y'
 // input control byte constants for uint16 "set value" commands
-#define CONTROL_SET_FREQUENCY   'O'
+#define CONTROL_SET_FREQUENCY   'Q'
 // input control byte constants for long "set value" commands
 #define CONTROL_SET_MIN_LAP     'L'
 #define CONTROL_SET_CHANNEL     'H'
@@ -105,7 +105,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_END_SEQUENCE   'X'
 #define RESPONSE_IS_CONFIGURED  'P'
 #define RESPONSE_VOLTAGE        'Y'
-#define RESPONSE_FREQUENCY      'O'
+#define RESPONSE_FREQUENCY      'Q'
 
 // send item byte constants
 // Must correspond to sequence of numbers used in "send data" switch statement
@@ -232,7 +232,7 @@ void setup() {
 
     // set the channel as soon as we can
     // faster boot up times :)
-    frequency = setChannelModule(channelIndex, bandIndex);
+    frequency = setModuleChannel(channelIndex, bandIndex);
 
     Serial.begin(BAUDRATE);
 
@@ -548,7 +548,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 break;
             case CONTROL_SET_FREQUENCY: // set frequency
-                setChannelModuleFrequency(HEX_TO_UINT16(&controlData[1]));
+                setModuleFrequency(HEX_TO_UINT16(&controlData[1]));
                 addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
@@ -774,20 +774,20 @@ void incChannel() {
     if (channelIndex < 7) {
         channelIndex++;
     }
-    frequency = setChannelModule(channelIndex, bandIndex);
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void decChannel() {
     if (channelIndex > 0) {
         channelIndex--;
     }
-    frequency = setChannelModule(channelIndex, bandIndex);
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void setChannel(uint8_t channel) {
     if (channel >= 0 && channel <= 7) {
         channelIndex = channel;
-        frequency = setChannelModule(channelIndex, bandIndex);
+        frequency = setModuleChannel(channelIndex, bandIndex);
     }
 }
 // ----------------------------------------------------------------------------
@@ -795,20 +795,20 @@ void incBand() {
     if (bandIndex < MAX_BAND) {
         bandIndex++;
     }
-    frequency = setChannelModule(channelIndex, bandIndex);
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void decBand() {
     if (bandIndex > 0) {
         bandIndex--;
     }
-    frequency = setChannelModule(channelIndex, bandIndex);
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void setBand(uint8_t band) {
     if (band >= 0 && band <= MAX_BAND) {
         bandIndex = band;
-        frequency = setChannelModule(channelIndex, bandIndex);
+        frequency = setModuleChannel(channelIndex, bandIndex);
     }
 }
 // ----------------------------------------------------------------------------

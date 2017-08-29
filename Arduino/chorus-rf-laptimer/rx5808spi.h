@@ -75,7 +75,7 @@ void SERIAL_ENABLE_HIGH() {
     delayMicroseconds(1);
 }
 
-uint16_t setChannelModuleFrequency(uint16_t frequency) {
+uint16_t setModuleFrequency(uint16_t frequency) {
     uint8_t i;
     uint16_t channelData;
 
@@ -156,7 +156,7 @@ uint16_t setChannelModuleFrequency(uint16_t frequency) {
     return frequency;
 }
 
-uint16_t setChannelModule(uint8_t channel, uint8_t band) {
+uint16_t setModuleChannel(uint8_t channel, uint8_t band) {
     uint16_t frequency = pgm_read_word_near(channelFreqTable + channel + (8 * band));
-    return setChannelModuleFrequency(frequency);
+    return setModuleFrequency(frequency);
 }
