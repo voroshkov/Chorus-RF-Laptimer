@@ -15,8 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import app.andrey_voroshkov.chorus_laptimer.R;
-
 import java.util.ArrayList;
 
 /**
@@ -32,7 +30,10 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         mContext = context;
     }
 
+    public static final int RSSI_LONG_STEP = 30;
+
     static class ViewHolder {
+        View spacePilotColor;
         EditText edPilotName;
         TextView txtChannelLabel;
         TextView txtThresh;
@@ -95,6 +96,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.isPilotEnabled = (CheckBox) convertView.findViewById(R.id.checkIsPilotEnabled);
             viewHolder.innerGroup = (LinearLayout) convertView.findViewById(R.id.innerGroupLayout);
             viewHolder.edPilotTextWatcher = createTextWatcher(position);
+            viewHolder.spacePilotColor = convertView.findViewById(R.id.pilotColorStrip);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -116,12 +118,13 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             }
         });
 
-
-        DeviceState ds = AppState.getInstance().deviceStates.get(position);
+        final DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
         String freq = AppState.getInstance().getFrequencyText(position);
         Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
+
+        viewHolder.spacePilotColor.setBackgroundColor(Utils.getBackgroundColorItem(position));
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
         viewHolder.txtChannelLabel.setText("Channel: #" + ch + " (" + band + " band)" + " " + freq);
@@ -144,6 +147,18 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             }
         });
 
+        viewHolder.btnDecThr.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int newThresh = ds.threshold - RSSI_LONG_STEP;
+                if (newThresh < 0) {
+                    newThresh = 0;
+                }
+                AppState.getInstance().sendBtCommand("R" + deviceId + "S" + String.format("%04X", newThresh));
+                return true;
+            }
+        });
+
         viewHolder.btnIncThr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,10 +166,23 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             }
         });
 
-        viewHolder.btnSetThr.setOnClickListener(new View.OnClickListener() {
+        viewHolder.btnIncThr.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
+            public boolean onLongClick(View v) {
+                int newThresh = ds.threshold + RSSI_LONG_STEP;
+                if (newThresh > AppState.MAX_RSSI) {
+                    newThresh = AppState.MAX_RSSI;
+                }
+                AppState.getInstance().sendBtCommand("R" + deviceId + "S" + String.format("%04X", newThresh));
+                return true;
+            }
+        });
+
+        viewHolder.btnSetThr.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
                 AppState.getInstance().sendBtCommand("R" + deviceId + "S");
+                return false;
             }
         });
 

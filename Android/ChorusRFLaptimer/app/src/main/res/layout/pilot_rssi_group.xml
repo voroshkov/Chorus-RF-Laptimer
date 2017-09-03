@@ -3,9 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/channelGrpLayout">
+    android:id="@+id/pilotGrpLayout">
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="2dp" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="9dp"
+        android:id="@+id/pilotColorStrip"/>
 
     <LinearLayout
         android:orientation="vertical"
@@ -142,15 +149,32 @@
                         android:progress="256"
                         android:max="350" />
                 </LinearLayout>
-
-                <Button
-                    android:text="Capture"
+                <LinearLayout
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:id="@+id/btnCapture"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:layout_weight="1"
-                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <Space
+                        android:text="-"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp" />
+
+                    <Button
+                        android:text="Clear"
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:id="@+id/btnCapture"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                        android:layout_weight="1"
+                        android:textColor="?android:attr/textColorPrimaryNoDisable" />
+
+                    <Space
+                        android:text="+"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp" />
+
+                </LinearLayout>
 
             </LinearLayout>
         </LinearLayout>

@@ -116,6 +116,9 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
             textBestLap.setText("-");
         }
 
+        View colorStrip = convertView.findViewById(R.id.resultColorStrip);
+        colorStrip.setBackgroundColor(Utils.getBackgroundColorItem(groupPosition));
+
         return convertView;
     }
 

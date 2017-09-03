@@ -23,6 +23,7 @@ public class AppPreferences {
     public static final String DEVICE_CHANNELS = "device_channels";
     public static final String DEVICE_PILOTS = "device_pilots";
     public static final String DEVICE_ENABLED = "device_enabled";
+    public static final String DEVICE_THRESHOLDS = "device_thresholds";
     public static final String LIPO_MONITOR_ENABLED = "lipo_mon_enabled";
     public static final String LIPO_ADJUSTMENT_CONST = "lipo_adjust_const";
 
@@ -31,6 +32,7 @@ public class AppPreferences {
     public String[] mChannels;
     public String[] mPilots;
     public String[] mDeviceEnabledStatuses;
+    public String[] mDeviceThresholds;
 
     private static AppPreferences instance = new AppPreferences();
 
@@ -43,6 +45,7 @@ public class AppPreferences {
         mChannels = getArrayFromStringPreference(DEVICE_CHANNELS);
         mPilots = getArrayFromStringPreference(DEVICE_PILOTS);
         mDeviceEnabledStatuses = getArrayFromStringPreference(DEVICE_ENABLED);
+        mDeviceThresholds = getArrayFromStringPreference(DEVICE_THRESHOLDS);
     }
 
     private static String[] getArrayFromStringPreference(String prefName) {
@@ -53,6 +56,8 @@ public class AppPreferences {
         return TextUtils.split(value, STRING_ITEMS_DELIMITER);
     }
 
+    // this function is needed to preserve preferencess of devices that are not currently available in chorus
+    // e.g. prefs were saved for 3 devices, then used with 1 device. When you're back with 3 - you'll have old prefs restored
     private static void AppendExtraItemsFromSavedArrayPreference(ArrayList<String> list, String[] savedPreferenceArr) {
         int currentCount = list.size();
         int savedCount = savedPreferenceArr.length;
@@ -133,6 +138,17 @@ public class AppPreferences {
                 String statuses = TextUtils.join(STRING_ITEMS_DELIMITER, statusesList);
                 editor.putString(DEVICE_ENABLED, statuses);
                 break;
+            case DEVICE_THRESHOLDS:
+                if (app.deviceStates == null) break;
+                ArrayList<String> thresholdsList = new ArrayList<>();
+                for(int i = 0; i < app.deviceStates.size(); i++) {
+                    thresholdsList.add(Integer.toString(app.deviceStates.get(i).threshold));
+                }
+                AppendExtraItemsFromSavedArrayPreference(thresholdsList, AppPreferences.getInstance().mDeviceThresholds);
+                String thresholds = TextUtils.join(STRING_ITEMS_DELIMITER, thresholdsList);
+                editor.putString(DEVICE_THRESHOLDS, thresholds);
+                break;
+
             case LIPO_MONITOR_ENABLED:
                 editor.putBoolean(LIPO_MONITOR_ENABLED, app.isLiPoMonitorEnabled);
                 break;
@@ -232,6 +248,22 @@ public class AppPreferences {
                     }
                 }
             }
+
+            String thresholds = app.preferences.getString(DEVICE_THRESHOLDS, "");
+            if (!thresholds.equals("")) {
+                String[] thresholdsArray = TextUtils.split(thresholds, STRING_ITEMS_DELIMITER);
+                int thresholdsCount = thresholdsArray.length;
+                //count backwards to send commands for last devices first to make sure that
+                // first devices don't delay propagation of commands to next devices
+                for(int i = app.deviceStates.size() - 1; i >= 0 ; i--) {
+                    if (i < thresholdsCount) {
+                        int prefThreshold = Integer.parseInt(thresholdsArray[i]);
+                        app.changeDeviceThreshold(i, prefThreshold);
+                        app.sendBtCommand("R" +  String.format("%X", i) + "S" + String.format("%04X", prefThreshold));
+                    }
+                }
+            }
+
         }
     }
 

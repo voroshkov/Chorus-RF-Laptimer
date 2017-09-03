@@ -3,7 +3,7 @@
     <color name="colorPrimary">#3f51b5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
-    <color name="colorWarn">#FFA000</color>
+    <color name="colorWarn">#ffa000</color>
     <color name="colorBatteryMonitor">#fcf7b7</color>
     <color name="colorRaceResultGroup">#8a000000</color>
     <color name="colorRaceResultGroupFinished">#ff4081</color>
