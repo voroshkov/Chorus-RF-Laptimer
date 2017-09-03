@@ -37,6 +37,8 @@ TODO: when implement send queue, there's possible optimization:
     remove already existing items from queue
 */
 
+#define API_VERSION 1 // version number to be increased with each API change (int16)
+
 // #define DEBUG
 
 #ifdef DEBUG
@@ -82,6 +84,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_MONITOR_OFF     'v'
 #define CONTROL_SET_SKIP_LAP0   'F'
 #define CONTROL_GET_VOLTAGE     'Y'
+#define CONTROL_GET_API_VERSION '#'
 // input control byte constants for uint16 "set value" commands
 #define CONTROL_SET_FREQUENCY   'Q'
 // input control byte constants for long "set value" commands
@@ -106,6 +109,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_IS_CONFIGURED  'P'
 #define RESPONSE_VOLTAGE        'Y'
 #define RESPONSE_FREQUENCY      'Q'
+#define RESPONSE_API_VERSION    '#'
 
 // send item byte constants
 // Must correspond to sequence of numbers used in "send data" switch statement
@@ -122,7 +126,8 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_LAP0_STATE     9
 #define SEND_IS_CONFIGURED  10
 #define SEND_FREQUENCY      11
-#define SEND_END_SEQUENCE   12
+#define SEND_API_VERSION    12
+#define SEND_END_SEQUENCE   13
 // following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES  100
 #define SEND_CALIBR_TIME    101
@@ -366,9 +371,14 @@ void loop() {
                     onItemSent();
                 }
                 break;
+            case 12: // SEND_API_VERSION
+                if (sendIntToSerial(RESPONSE_API_VERSION, API_VERSION)) {
+                    onItemSent();
+                }
+                break;
             // Below is a termination case, to notify that data for CONTROL_DATA_REQUEST is over.
             // Must be the last item in the sequence!
-            case 12: // SEND_END_SEQUENCE
+            case 13: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -548,7 +558,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 break;
             case CONTROL_SET_FREQUENCY: // set frequency
-                setModuleFrequency(HEX_TO_UINT16(&controlData[1]));
+                frequency = setModuleFrequency(HEX_TO_UINT16(&controlData[1]));
                 addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
@@ -672,6 +682,9 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 break;
             case CONTROL_DATA_REQUEST: // request all data
                 addToSendQueue(SEND_ALL_DEVICE_STATE);
+                break;
+            case CONTROL_GET_API_VERSION: //get API version
+                addToSendQueue(SEND_API_VERSION);
                 break;
         }
     }
