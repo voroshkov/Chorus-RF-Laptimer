@@ -27,6 +27,7 @@ public class ChannelsListAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
+        View spaceChannelColor;
         TextView txtChannel;
         TextView txtFreq;
         Button btnDecCh;
@@ -74,7 +75,7 @@ public class ChannelsListAdapter extends BaseAdapter {
             viewHolder.btnDecBand = (Button) convertView.findViewById(R.id.btnDecBand);
             viewHolder.btnIncBand = (Button) convertView.findViewById(R.id.btnIncBand);
             viewHolder.rssiBar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
-
+            viewHolder.spaceChannelColor = convertView.findViewById(R.id.channelColorStrip);
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
@@ -84,7 +85,7 @@ public class ChannelsListAdapter extends BaseAdapter {
         viewHolder.txtChannel.setText(AppState.getInstance().getChannelText(position));
         viewHolder.txtFreq.setText(AppState.getInstance().getFrequencyText(position));
         viewHolder.txtBand.setText(AppState.getInstance().getBandText(position));
-
+        viewHolder.spaceChannelColor.setBackgroundColor(Utils.getBackgroundColorItem(position));
         viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
 
         viewHolder.btnDecCh.setOnClickListener(new View.OnClickListener() {

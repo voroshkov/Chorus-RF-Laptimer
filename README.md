@@ -249,6 +249,9 @@ Android app:
 - Ray Erik Rabe (raveerk) - CSV reports generation
 - evgen48 - display frequencies in MHz
 
+Arduino app:
+- Daniel Müller (anunique) - arbitrary frequency setting, predefined Connex frequencies
+
 <a name="contacts"></a>
 ## Contacts
 - YouTube channel: https://www.youtube.com/user/voroshkov

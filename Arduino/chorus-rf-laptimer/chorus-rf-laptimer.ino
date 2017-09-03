@@ -37,6 +37,8 @@ TODO: when implement send queue, there's possible optimization:
     remove already existing items from queue
 */
 
+#define API_VERSION 1 // version number to be increased with each API change (int16)
+
 // #define DEBUG
 
 #ifdef DEBUG
@@ -51,20 +53,10 @@ uint8_t MODULE_ID_HEX = '0';
 #define SERIAL_DATA_DELIMITER '\n'
 
 #include <avr/pgmspace.h>
-#include "fastReadWrite.h"
-#include "fastADC.h"
-#include "pinAssignments.h"
-#include "channels.h"
-#include "sendSerialHex.h"
-#include "rx5808spi.h"
-#include "sounds.h"
 
 #define BAUDRATE 115200
 
 const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 };
-
-// rx5808 module needs >20ms to tune.
-#define MIN_TUNE_TIME 25
 
 // number of analog rssi reads to average for the current check.
 // single analog read with FASTADC defined (see below) takes ~20us on 16MHz arduino
@@ -81,7 +73,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_INC_CHANNEL     'C'
 #define CONTROL_DEC_THRESHOLD   't'
 #define CONTROL_INC_THRESHOLD   'T'
-#define CONTROL_SET_THRESHOLD   'S'
+#define CONTROL_SET_THRESHOLD   'S' // it either triggers or sets an uint16 depending on command length
 #define CONTROL_SET_SOUND       'D'
 #define CONTROL_DATA_REQUEST    'A'
 #define CONTROL_INC_BAND        'B'
@@ -92,6 +84,9 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_MONITOR_OFF     'v'
 #define CONTROL_SET_SKIP_LAP0   'F'
 #define CONTROL_GET_VOLTAGE     'Y'
+#define CONTROL_GET_API_VERSION '#'
+// input control byte constants for uint16 "set value" commands
+#define CONTROL_SET_FREQUENCY   'Q'
 // input control byte constants for long "set value" commands
 #define CONTROL_SET_MIN_LAP     'L'
 #define CONTROL_SET_CHANNEL     'H'
@@ -113,6 +108,8 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_END_SEQUENCE   'X'
 #define RESPONSE_IS_CONFIGURED  'P'
 #define RESPONSE_VOLTAGE        'Y'
+#define RESPONSE_FREQUENCY      'Q'
+#define RESPONSE_API_VERSION    '#'
 
 // send item byte constants
 // Must correspond to sequence of numbers used in "send data" switch statement
@@ -128,7 +125,9 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_MONITOR_STATE  8
 #define SEND_LAP0_STATE     9
 #define SEND_IS_CONFIGURED  10
-#define SEND_END_SEQUENCE   11
+#define SEND_FREQUENCY      11
+#define SEND_API_VERSION    12
+#define SEND_END_SEQUENCE   13
 // following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES  100
 #define SEND_CALIBR_TIME    101
@@ -140,7 +139,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 //----- RSSI --------------------------------------
 #define FILTER_ITERATIONS 5
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
-uint16_t rssiThreshold = 0;
+uint16_t rssiThreshold = 190;
 uint16_t rssi;
 
 #define RSSI_MAX 1024
@@ -202,6 +201,7 @@ uint8_t sendLastLapIndex = 0;
 uint8_t shouldSendSingleItem = 0;
 uint8_t lastLapsNotSent = 0;
 uint16_t rssiMonitorDelayExpiration = 0;
+uint16_t frequency = 0;
 
 //----- read/write bufs ---------------------------
 #define READ_BUFFER_SIZE 20
@@ -209,6 +209,15 @@ uint8_t readBuf[READ_BUFFER_SIZE];
 uint8_t proxyBuf[READ_BUFFER_SIZE];
 uint8_t readBufFilledBytes = 0;
 uint8_t proxyBufDataSize = 0;
+
+// ----------------------------------------------------------------------------
+#include "fastReadWrite.h"
+#include "fastADC.h"
+#include "pinAssignments.h"
+#include "channels.h"
+#include "sendSerialHex.h"
+#include "rx5808spi.h"
+#include "sounds.h"
 
 // ----------------------------------------------------------------------------
 void setup() {
@@ -228,8 +237,8 @@ void setup() {
 
     // set the channel as soon as we can
     // faster boot up times :)
-    setChannelModule(channelIndex, bandIndex);
-    wait_rssi_ready();
+    frequency = setModuleChannel(channelIndex, bandIndex);
+
     Serial.begin(BAUDRATE);
 
     initFastADC();
@@ -357,9 +366,19 @@ void loop() {
                     onItemSent();
                 }
                 break;
+            case 11: // SEND_FREQUENCY
+                if (sendIntToSerial(RESPONSE_FREQUENCY, frequency)) {
+                    onItemSent();
+                }
+                break;
+            case 12: // SEND_API_VERSION
+                if (sendIntToSerial(RESPONSE_API_VERSION, API_VERSION)) {
+                    onItemSent();
+                }
+                break;
             // Below is a termination case, to notify that data for CONTROL_DATA_REQUEST is over.
             // Must be the last item in the sequence!
-            case 11: // SEND_END_SEQUENCE
+            case 13: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -515,6 +534,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 setChannel(valueToSet);
                 playClickTones();
                 addToSendQueue(SEND_CHANNEL);
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
             case CONTROL_SET_BAND:
@@ -522,6 +542,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 setBand(valueToSet);
                 playClickTones();
                 addToSendQueue(SEND_BAND);
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
             case CONTROL_SET_MIN_LAP:
@@ -529,6 +550,16 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 setMinLap(valueToSet);
                 playClickTones();
                 addToSendQueue(SEND_MIN_LAP_TIME);
+                isConfigured = 1;
+                break;
+            case CONTROL_SET_THRESHOLD: // set threshold
+                setThresholdValue(HEX_TO_UINT16(&controlData[1]));
+                addToSendQueue(SEND_THRESHOLD);
+                isConfigured = 1;
+                break;
+            case CONTROL_SET_FREQUENCY: // set frequency
+                frequency = setModuleFrequency(HEX_TO_UINT16(&controlData[1]));
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
         }
@@ -576,24 +607,28 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 decChannel();
                 playClickTones();
                 addToSendQueue(SEND_CHANNEL);
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
             case CONTROL_INC_CHANNEL: // increase channel
                 incChannel();
                 playClickTones();
                 addToSendQueue(SEND_CHANNEL);
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
             case CONTROL_DEC_BAND: // decrease band
                 decBand();
                 playClickTones();
                 addToSendQueue(SEND_BAND);
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
             case CONTROL_INC_BAND: // increase channel
                 incBand();
                 playClickTones();
                 addToSendQueue(SEND_BAND);
+                addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
             case CONTROL_DEC_THRESHOLD: // decrease threshold
@@ -609,7 +644,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 isConfigured = 1;
                 break;
             case CONTROL_SET_THRESHOLD: // set threshold
-                setThreshold();
+                setOrDropThreshold();
                 addToSendQueue(SEND_THRESHOLD);
                 isConfigured = 1;
                 break;
@@ -647,6 +682,9 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 break;
             case CONTROL_DATA_REQUEST: // request all data
                 addToSendQueue(SEND_ALL_DEVICE_STATE);
+                break;
+            case CONTROL_GET_API_VERSION: //get API version
+                addToSendQueue(SEND_API_VERSION);
                 break;
         }
     }
@@ -749,47 +787,41 @@ void incChannel() {
     if (channelIndex < 7) {
         channelIndex++;
     }
-    setChannelModule(channelIndex, bandIndex);
-    wait_rssi_ready();
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void decChannel() {
     if (channelIndex > 0) {
         channelIndex--;
     }
-    setChannelModule(channelIndex, bandIndex);
-    wait_rssi_ready();
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void setChannel(uint8_t channel) {
     if (channel >= 0 && channel <= 7) {
         channelIndex = channel;
-        setChannelModule(channelIndex, bandIndex);
-        wait_rssi_ready();
+        frequency = setModuleChannel(channelIndex, bandIndex);
     }
 }
 // ----------------------------------------------------------------------------
 void incBand() {
-    if (bandIndex < 5) {
+    if (bandIndex < MAX_BAND) {
         bandIndex++;
     }
-    setChannelModule(channelIndex, bandIndex);
-    wait_rssi_ready();
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void decBand() {
     if (bandIndex > 0) {
         bandIndex--;
     }
-    setChannelModule(channelIndex, bandIndex);
-    wait_rssi_ready();
+    frequency = setModuleChannel(channelIndex, bandIndex);
 }
 // ----------------------------------------------------------------------------
 void setBand(uint8_t band) {
-    if (band >= 0 && band <= 5) {
+    if (band >= 0 && band <= MAX_BAND) {
         bandIndex = band;
-        setChannelModule(channelIndex, bandIndex);
-        wait_rssi_ready();
+        frequency = setModuleChannel(channelIndex, bandIndex);
     }
 }
 // ----------------------------------------------------------------------------
@@ -805,7 +837,7 @@ void decThreshold() {
     }
 }
 // ----------------------------------------------------------------------------
-void setThreshold() {
+void setOrDropThreshold() {
     if (rssiThreshold == 0) {
         uint16_t median;
         for(uint8_t i=0; i < THRESHOLD_ARRAY_SIZE; i++) {
@@ -820,6 +852,15 @@ void setThreshold() {
     }
     else {
         rssiThreshold = 0;
+        playClearThresholdTones();
+    }
+}
+// ----------------------------------------------------------------------------
+void setThresholdValue(uint16_t threshold) {
+    rssiThreshold = threshold;
+    if (threshold != 0) {
+        playSetThresholdTones();
+    } else {
         playClearThresholdTones();
     }
 }
@@ -857,10 +898,6 @@ void gen_rising_edge(int pin) {
     digitalHigh(pin); //this will open mosfet and pull the RasPi pin to GND
     delayMicroseconds(10);
     digitalLow(pin); // this will close mosfet and pull the RasPi pin to 3v3 -> Rising Edge
-}
-// ----------------------------------------------------------------------------
-void wait_rssi_ready() {
-    delay(MIN_TUNE_TIME);
 }
 // ----------------------------------------------------------------------------
 uint16_t readRSSI() {
