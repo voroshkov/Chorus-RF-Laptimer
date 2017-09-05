@@ -139,7 +139,12 @@ Schematic and PCB design in DipTrace format are available in the **DipTrace** fo
 
 <img src="docs/img/Schematic.png" alt="Schematic" width="400">
 
-<img src="docs/img/PCB.png" alt="Printed Circuit Board" width="200">
+<img src="docs/img/pcb_voroshkov.png" alt="Printed Circuit Board" width="200">
+
+**PCB by Joao Reis**:
+<img src="docs/img/pcb_reis.png" alt="PCB by Joao Reis" width="200">
+(Gerber format, SeedStudio compatible)
+[**Download zip.**](contributors/PCB/Joao_Reis_PCB_Project_v1.1.zip)
 
 <a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
