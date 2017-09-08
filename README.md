@@ -254,7 +254,7 @@ Android app:
 - evgen48 - display frequencies in MHz
 
 Arduino app:
-- Daniel Müller (anunique) - arbitrary frequency setting, predefined Connex frequencies
+- anunique - arbitrary frequency setting, predefined Connex frequencies
 
 <a name="contacts"></a>
 ## Contacts
