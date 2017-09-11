@@ -88,6 +88,7 @@ uint16_t setModuleFrequency(uint16_t frequency) {
     // bit bang out 25 bits of data
     // Order: A0-3, !R/W, D0-D19
     // A0=0, A1=0, A2=0, A3=1, RW=0, D0-19=0
+    cli();
     SERIAL_ENABLE_HIGH();
     delayMicroseconds(1);
     SERIAL_ENABLE_LOW();
@@ -150,9 +151,10 @@ uint16_t setModuleFrequency(uint16_t frequency) {
     digitalLow(slaveSelectPin);
     digitalLow(spiClockPin);
     digitalLow(spiDataPin);
-
+    sei();
+    
     delay(MIN_TUNE_TIME);
-
+    
     return frequency;
 }
 
