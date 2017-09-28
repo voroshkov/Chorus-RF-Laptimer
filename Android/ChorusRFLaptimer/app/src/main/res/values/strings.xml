@@ -47,6 +47,11 @@
     <string name="race_results">%1$s (C %2$s, %3$s band) Laps:  %4$s %5$s</string>
     <string name="race_announcement_finished">Race is finished</string>
     <string name="race_announcement_starting">Starting race in %d seconds</string>
+    <string name="race_lap_report">Lap %1$d.</string>
+    <string name="race_report_time_secs">%1$d point %2$s seconds</string>
+    <string name="race_report_time_mins">%1$d minutes %2$d point %3$s seconds</string>
+    <string name="race_pilot_finished">%1$s finished.</string>
+    <string name="race_pilot_already_finished">%1$s already finished.</string>
 
     <!-- Reports -->
     <string name="report_file_name">Report saved as: %s</string>
@@ -61,6 +66,7 @@
     <string name="bt_connection_failed">Connection failed</string>
     <string name="bt_connected_to">Connected to %s</string>
     <string name="bt_disconnected">Disconnected</string>
+    <string name="setup_speak_english_only">Speak Alound Only English</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Start Race (%1$d pilot)</item>

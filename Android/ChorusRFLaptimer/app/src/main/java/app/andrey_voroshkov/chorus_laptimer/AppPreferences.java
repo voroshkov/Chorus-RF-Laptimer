@@ -16,6 +16,7 @@ public class AppPreferences {
     public static final String SKIP_FIRST_LAP = "skip_first_lap";
     public static final String SPEAK_LAP_TIMES = "speak_lap_times";
     public static final String SPEAK_MESSAGES = "speak_messages";
+    public static final String SPEAK_ENGLISH_ONLY = "speak_english_only";
     public static final String LAPS_TO_GO = "laps_to_go";
     public static final String MIN_LAP_TIME = "min_lap_time";
     public static final String PREPARATION_TIME = "preparation_time";
@@ -82,6 +83,9 @@ public class AppPreferences {
                 break;
             case SPEAK_MESSAGES:
                 editor.putBoolean(SPEAK_MESSAGES, app.shouldSpeakMessages);
+                break;
+            case SPEAK_ENGLISH_ONLY:
+                editor.putBoolean(SPEAK_ENGLISH_ONLY, app.shouldSpeakEnglishOnly);
                 break;
             case LAPS_TO_GO:
                 if (app.raceState == null) break;
@@ -163,6 +167,7 @@ public class AppPreferences {
 
         app.changeShouldSpeakLapTimes(app.preferences.getBoolean(SPEAK_LAP_TIMES, true));
         app.changeShouldSpeakMessages(app.preferences.getBoolean(SPEAK_MESSAGES, true));
+        app.changeShouldSpeakEnglishOnly(app.preferences.getBoolean(SPEAK_ENGLISH_ONLY, false));
         app.changeTimeToPrepareForRace(app.preferences.getInt(PREPARATION_TIME, 5));
         app.changeRaceLaps(app.preferences.getInt(LAPS_TO_GO, 5));
         app.changeAdjustmentConst(app.preferences.getInt(LIPO_ADJUSTMENT_CONST, 0));

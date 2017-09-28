@@ -112,7 +112,8 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         initBluetooth();
-        AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext());
+        AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext(),
+                AppState.getInstance().shouldSpeakEnglishOnly);
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
         AppPreferences.applyAll();
 

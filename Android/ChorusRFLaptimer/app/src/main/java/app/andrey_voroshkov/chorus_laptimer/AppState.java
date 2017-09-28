@@ -62,6 +62,7 @@ public class AppState {
     public boolean isDeviceSoundEnabled = false;
     public boolean shouldSpeakLapTimes = true;
     public boolean shouldSpeakMessages = true;
+    public boolean shouldSpeakEnglishOnly = false;
     public boolean shouldSkipFirstLap = true;
     public boolean wereDevicesConfigured = false;
     public boolean isRssiMonitorOn = false;
@@ -603,6 +604,15 @@ public class AppState {
         }
     }
 
+    public void changeShouldSpeakEnglishOnly(boolean shouldSpeakEnglish) {
+        if (shouldSpeakEnglishOnly != shouldSpeakEnglish) {
+            shouldSpeakEnglishOnly = shouldSpeakEnglish;
+            emitEvent(DataAction.SpeakEnglishOnly);
+            AppPreferences.save(AppPreferences.SPEAK_ENGLISH_ONLY);
+        }
+        textSpeaker.useEnglishOnly(shouldSpeakEnglish);
+    }
+
     /*
         deviceId is zero-based
         lapNumber is zero-based
@@ -639,12 +649,15 @@ public class AppState {
                 if (this.shouldSkipFirstLap && lapNumber == 0) return; // don't speak the lap which is skipped
 
                 if (isJustFinished(deviceId)) {
-                    textToSay = textToSay + " finished";
+                    textSpeaker.speak(R.string.race_pilot_finished, textToSay);
                 } else if (getIsFinished(deviceId)) {
-                    textToSay = textToSay + " already finished";
+                    textSpeaker.speak(R.string.race_pilot_already_finished, textToSay);
                 }
+
                 int lapNumberToSpeak = this.shouldSkipFirstLap ? lapNumber : lapNumber + 1; // adjust to avoid lap number "zero"
-                textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumberToSpeak) + ". " + Utils.convertMsToSpeakableTime(lapTime));
+
+                textSpeaker.speak(R.string.race_lap_report, lapNumberToSpeak);
+                textSpeaker.speakMillisecondsInFriendlyTime(lapTime);
             }
         }
     }
