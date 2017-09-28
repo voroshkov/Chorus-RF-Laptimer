@@ -250,13 +250,13 @@ public class RaceSetupFragment extends Fragment {
 
     private void updateText(View rootView) {
         TextView txtMinLaps = (TextView) rootView.findViewById(R.id.txtMinLapTime);
-        txtMinLaps.setText(Integer.toString(AppState.getInstance().raceState.minLapTime) + " sec.");
+        txtMinLaps.setText(getString(R.string.setup_time, AppState.getInstance().raceState.minLapTime));
 
         TextView txtLaps = (TextView) rootView.findViewById(R.id.txtLaps);
         txtLaps.setText(Integer.toString(AppState.getInstance().raceState.lapsToGo));
 
         TextView txtPreparationTime = (TextView) rootView.findViewById(R.id.txtPreparationTime);
-        txtPreparationTime.setText(Integer.toString(AppState.getInstance().timeToPrepareForRace) + " sec.");
+        txtPreparationTime.setText(getString(R.string.setup_time, AppState.getInstance().timeToPrepareForRace));
 
         TextView txtAdjustmentConst = (TextView) rootView.findViewById(R.id.txtAdjustmentConst);
         txtAdjustmentConst.setText(Integer.toString(AppState.getInstance().batteryAdjustmentConst));

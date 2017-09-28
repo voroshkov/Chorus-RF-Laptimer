@@ -1,5 +1,6 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.content.res.Resources;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,8 +11,15 @@ import android.support.v4.app.FragmentPagerAdapter;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+    private Resources resources;
+
     public SectionsPagerAdapter(FragmentManager fm) {
         super(fm);
+    }
+
+    public SectionsPagerAdapter(FragmentManager fm, Resources resources) {
+        this(fm);
+        this.resources = resources;
     }
 
     @Override
@@ -29,23 +37,28 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 3 total pages.
+        // Show 4 total pages.
         return 4;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
+        String title = null;
         switch (position) {
             case 0:
-                return "Setup";
+                title = resources.getString(R.string.tab_setup);
+                break;
             case 1:
-                return "Freq";
+                title = resources.getString(R.string.tab_frequency);
+                break;
             case 2:
-                return "Pilots";
+                title = resources.getString(R.string.tab_pilots);
+                break;
             case 3:
-                return "Race";
+                title = resources.getString(R.string.tab_race);
+                break;
         }
-        return null;
+        return title;
     }
 }
 

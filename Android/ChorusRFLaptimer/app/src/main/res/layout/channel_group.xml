@@ -70,7 +70,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.2"
                 android:gravity="center_vertical"
-                android:text="RF Band " />
+                android:text="@string/freq_rf_band" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="Race"
+                    android:text="@string/freq_race"
                     android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                 <Button
@@ -116,7 +116,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1.2"
                 android:gravity="center_vertical"
-                android:text="Channel #" />
+                android:text="@string/freq_channel" />
 
             <LinearLayout
                 android:layout_width="match_parent"

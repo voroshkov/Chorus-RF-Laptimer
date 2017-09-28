@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Andrey_Voroshkov on 3/26/2017.
@@ -62,9 +63,7 @@ public class AppPreferences {
         int currentCount = list.size();
         int savedCount = savedPreferenceArr.length;
         if (currentCount < savedCount) {
-            for(int i = currentCount; i < savedCount; i++ ) {
-                list.add(savedPreferenceArr[i]);
-            }
+            list.addAll(Arrays.asList(savedPreferenceArr).subList(currentCount, savedCount));
         }
     }
 

@@ -65,22 +65,22 @@ public class MainActivity extends AppCompatActivity {
 
         bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
             public void onDeviceDisconnected() {
-                Toast.makeText(getApplicationContext(), "Disconnected", Toast.LENGTH_SHORT).show();
-                AppState.getInstance().speakMessage("Disconnected");
+                Toast.makeText(getApplicationContext(), getString(R.string.bt_disconnected), Toast.LENGTH_SHORT).show();
+                AppState.getInstance().speakMessage(R.string.bt_disconnected);
                 AppState.getInstance().onDisconnected();
                 toggleConnectionMenu(false);
             }
 
             public void onDeviceConnectionFailed() {
-                Toast.makeText(getApplicationContext(), "Connection failed", Toast.LENGTH_SHORT).show();
-                AppState.getInstance().speakMessage("Connection failed");
+                Toast.makeText(getApplicationContext(), getString(R.string.bt_connection_failed), Toast.LENGTH_SHORT).show();
+                AppState.getInstance().speakMessage(R.string.bt_connection_failed);
                 toggleConnectionMenu(false);
             }
 
             public void onDeviceConnected(String name, String address) {
-                String txt = "Connected to " + name;
+                String txt = getString(R.string.bt_connected_to, name);
                 Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
-                AppState.getInstance().speakMessage("Connected");
+                AppState.getInstance().speakMessage(R.string.bt_connected);
                 toggleConnectionMenu(true);
                 AppState.getInstance().onConnected();
             }
@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), getResources());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);

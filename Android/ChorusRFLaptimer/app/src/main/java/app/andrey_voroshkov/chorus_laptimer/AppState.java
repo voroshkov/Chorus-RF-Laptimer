@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.StringRes;
 
 import java.util.ArrayList;
 
@@ -103,9 +104,9 @@ public class AppState {
                 AppState app = AppState.getInstance();
                 if (app.isConnected && app.isLiPoMonitorEnabled) {
                     if (batteryPercentage <= 10) {
-                        speakMessage("Device battery critical");
+                        speakMessage(R.string.battery_status_critical);
                     } else if (batteryPercentage <= 20){
-                        speakMessage("Device battery low");
+                        speakMessage(R.string.battery_status_low);
                     }
                 }
                 sendEmptyMessageDelayed(0, BATTERY_WARN_INTERVAL);
@@ -432,6 +433,11 @@ public class AppState {
             textSpeaker.speak(msg);
         }
     }
+    public void speakMessage(@StringRes int msg) {
+        if (shouldSpeakMessages) {
+            textSpeaker.speak(msg);
+        }
+    }
     //---------------------------------------------------------------------
     public void setNumberOfDevices(int n) {
         if (n <= 0) return;
@@ -561,7 +567,7 @@ public class AppState {
             raceState.isStarted = isStarted;
             emitEvent(DataAction.RaceState);
             if (!isStarted && isDevicesInitializationOver()) {
-                speakMessage("Race is finished");
+                speakMessage(R.string.race_announcement_finished);
                 emitEvent(DataAction.RaceIsFinished);
             }
         }

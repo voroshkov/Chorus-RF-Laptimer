@@ -118,7 +118,7 @@ public class RaceResultFragment extends Fragment {
             public void onClick(View v) {
                 final ProgressDialog pd = new ProgressDialog(getContext());
                 pd.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-                pd.setMessage("Calibrating timers...");
+                pd.setMessage(getString(R.string.calibrate_timers));
                 pd.setMax(AppState.CALIBRATION_TIME_MS);
                 pd.setIndeterminate(false);
                 pd.setCancelable(false);
@@ -155,11 +155,11 @@ public class RaceResultFragment extends Fragment {
                     AppState.getInstance().sendBtCommand("R*v");
 
                     Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
-                    btnRace.setText("Starting...");
+                    btnRace.setText(R.string.starting_race);
                     mIsStartingRace = true;
                     int timeBeforeRace = AppState.getInstance().timeToPrepareForRace;
                     if (timeBeforeRace >= AppState.MIN_TIME_BEFORE_RACE_TO_SPEAK)
-                        AppState.getInstance().speakMessage("Starting race in " + Integer.toString(timeBeforeRace - 2) + " seconds");
+                        AppState.getInstance().speakMessage(getString(R.string.race_announcement_starting, timeBeforeRace - 2));
 
                     mRaceStartingHandler.sendEmptyMessage(timeBeforeRace);
                 }
@@ -217,24 +217,24 @@ public class RaceResultFragment extends Fragment {
         Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
         if (AppState.getInstance().raceState.isStarted) {
             btnRace.setEnabled(true);
-            btnRace.setText("Stop Race (Long Press)");
+            btnRace.setText(R.string.stop_race);
         } else {
             boolean areAllThrSet = AppState.getInstance().areAllThresholdsSet();
             int numberOfPilots = AppState.getInstance().getEnabledPilotsCount();
             if (!areAllCalibrated) {
                 btnRace.setEnabled(false);
-                btnRace.setText("Start Race");
+                btnRace.setText(R.string.start_race);
             } else if (areAllThrSet) {
                 if (numberOfPilots == 0) {
                     btnRace.setEnabled(false);
-                    btnRace.setText("Enable pilots to start Race");
+                    btnRace.setText(R.string.start_race_validation_pilots);
                 } else {
                     btnRace.setEnabled(true);
-                    btnRace.setText("Start Race (" + Integer.toString(numberOfPilots) + (numberOfPilots == 1 ? "pilot" : "pilots") +  ")");
+                    btnRace.setText(getResources().getQuantityString(R.plurals.pilots_in_race, numberOfPilots, numberOfPilots));
                 }
             } else {
                 btnRace.setEnabled(false);
-                btnRace.setText("Set all thresholds before Race");
+                btnRace.setText(R.string.start_race_validation_thresholds);
             }
         }
     }
@@ -243,10 +243,10 @@ public class RaceResultFragment extends Fragment {
         String fileName = generateCSVReport();
         //if fileName = null, saving of file was not successful (HD space is low)
         if(fileName != null){
-            Toast toast = Toast.makeText(getContext(), "Report saved as: " + fileName, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getContext(), getString(R.string.report_file_name) + fileName, Toast.LENGTH_SHORT);
             toast.show();
         } else {
-            Toast toast = Toast.makeText(getContext(), "Failed to create report. Check if there is enough space.", Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getContext(), R.string.report_failure, Toast.LENGTH_SHORT);
             toast.show();
         }
     }
