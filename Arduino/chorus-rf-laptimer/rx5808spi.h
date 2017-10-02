@@ -27,8 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// rx5808 module needs >20ms to tune.
-#define MIN_TUNE_TIME 25
+// rx5808 module needs >30ms to tune.
+#define MIN_TUNE_TIME 30
 
 void setupSPIpins() {
     // SPI pins for RX control
