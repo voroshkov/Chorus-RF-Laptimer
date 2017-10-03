@@ -17,6 +17,10 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 - PC GUI Interface project for Chorus RF Laptimer: https://github.com/anunique/ChorusGUI
 - Delta5 Race Timer Facebook group: https://www.facebook.com/groups/Delta5RaceTimer/
 
+## Add-ins/Extensions:
+
+- LED Finish Gate Module: https://github.com/voroshkov/Chorus-LED-Module
+
 ## Contents
 
 <!-- MarkdownTOC depth=0 bracket="round" autolink="true" autoanchor="true" -->
