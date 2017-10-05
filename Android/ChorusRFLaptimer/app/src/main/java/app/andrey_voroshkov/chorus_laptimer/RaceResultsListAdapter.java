@@ -10,8 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import app.andrey_voroshkov.chorus_laptimer.R;
-
 import java.util.ArrayList;
 
 /**
@@ -19,10 +17,13 @@ import java.util.ArrayList;
  */
 
 public class RaceResultsListAdapter extends BaseExpandableListAdapter {
+
+    private static final String MISSING_RESULTS_MARKER = "-";
+
     private ArrayList<ArrayList<LapResult>> mGroups;
     private Context mContext;
 
-    public RaceResultsListAdapter (Context context, ArrayList<ArrayList<LapResult>> groups){
+    public RaceResultsListAdapter(Context context, ArrayList<ArrayList<LapResult>> groups) {
         mContext = context;
         mGroups = groups;
     }
@@ -88,16 +89,16 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
 
         textGroup.setText(createGroupViewText(groupPosition, laps, isFinished));
         int colorId = isFinished ? R.color.colorRaceResultGroupFinished : R.color.colorRaceResultGroup;
-        int color = ContextCompat.getColor(mContext,colorId);
+        int color = ContextCompat.getColor(mContext, colorId);
         textGroup.setTextColor(color);
 
         TextView textPosition = (TextView) convertView.findViewById(R.id.textPosition);
         int positionByTime = AppState.getInstance().getPilotPositionByTotalTime(groupPosition);
-        textPosition.setText(positionByTime != -1 ? Integer.toString(positionByTime) : "-");
+        textPosition.setText(positionByTime != -1 ? Integer.toString(positionByTime) : MISSING_RESULTS_MARKER);
 
         TextView textPositionByBestLap = (TextView) convertView.findViewById(R.id.textPositionByBestLap);
         int positionByBestLap = AppState.getInstance().getPilotPositionByBestLap(groupPosition);
-        textPositionByBestLap.setText("Best lap position: " + (positionByBestLap != -1 ? Integer.toString(positionByBestLap) : "-"));
+        textPositionByBestLap.setText(mContext.getString(R.string.best_lap_position, positionByBestLap != -1 ? Integer.toString(positionByBestLap) : MISSING_RESULTS_MARKER));
 
         TextView textRaceTime = (TextView) convertView.findViewById(R.id.textTotalRaceTime);
         int raceTime = AppState.getInstance().getTotalRaceTime(groupPosition);
@@ -105,7 +106,7 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
 
         TextView textLastLap = (TextView) convertView.findViewById(R.id.textLastLap);
         LapResult last = AppState.getInstance().getLastLap(groupPosition);
-        textLastLap.setText(last != null ? last.getDisplayTime() : "-");
+        textLastLap.setText(last != null ? last.getDisplayTime() : MISSING_RESULTS_MARKER);
 
         TextView textBestLap = (TextView) convertView.findViewById(R.id.textBestLap);
         int bestLapId = AppState.getInstance().getBestLapId(groupPosition);
@@ -122,11 +123,13 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
         return convertView;
     }
 
-    private String createGroupViewText (int position, int laps, boolean isFinished) {
+    private String createGroupViewText(int position, int laps, boolean isFinished) {
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
         DeviceState ds = AppState.getInstance().deviceStates.get(position);
-        return ds.pilotName + " (C " + ch + ", " + band + " band) Laps: " + (laps <= 0 ? "-" : laps) + (isFinished ? " FINISHED" : "");
+        String finishedPart = isFinished ? mContext.getString(R.string.race_result_finished) : "";
+        String lapsValue =  laps <= 0 ? MISSING_RESULTS_MARKER : String.valueOf(laps);
+        return mContext.getString(R.string.race_results, ds.pilotName, ch, band, lapsValue, finishedPart);
     }
 
     @Override
@@ -145,7 +148,7 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
 
         convertView = inflater.inflate(R.layout.race_result_list_child, null);
 
-        Button button = (Button)convertView.findViewById(R.id.buttonChild);
+        Button button = (Button) convertView.findViewById(R.id.buttonChild);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -162,11 +165,11 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
 
         int lapNumber = shouldSkipFirstLap ? childPosition : childPosition + 1;
         TextView textChild = (TextView) convertView.findViewById(R.id.textChild);
-        textChild.setText("Lap # " + lapNumber + ":  " + mGroups.get(groupPosition).get(childPosition).getDisplayTime());
+        textChild.setText(mContext.getString(R.string.lap_result, lapNumber, mGroups.get(groupPosition).get(childPosition).getDisplayTime()));
 
         int bestLapId = AppState.getInstance().getBestLapId(groupPosition);
         int colorId = (childPosition == bestLapId) ? R.color.colorRaceResultChildBest : R.color.colorRaceResultChild;
-        int color = ContextCompat.getColor(mContext,colorId);
+        int color = ContextCompat.getColor(mContext, colorId);
         textChild.setTextColor(color);
 
         return convertView;

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="wrap_content"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -21,7 +22,7 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="LiPo Monitor"
+                android:text="@string/setup_lipo_monitor"
                 android:checked="true"
                 android:textColor="?attr/colorControlNormal" />
 
@@ -40,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:longClickable="true"
-                    android:text="0.00V"
+                    tools:text="0.00V"
                     android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                 <ProgressBar
@@ -81,7 +82,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:text="Adjust Voltage"
+                    android:text="@string/setup_adjust_voltage"
                     android:gravity="center_vertical"
                     android:textColor="?attr/colorControlNormal" />
             </LinearLayout>
@@ -96,7 +97,7 @@
                     android:id="@+id/btnDecAdjustmentConst"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="-"
+                    android:text="@string/minus_sign"
                     android:textStyle="normal|bold" />
 
                 <TextView
@@ -112,7 +113,7 @@
                     android:id="@+id/btnIncAdjustmentConst"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="+"
+                    android:text="@string/plus_sign"
                     android:textStyle="normal|bold" />
             </LinearLayout>
         </LinearLayout>
@@ -130,7 +131,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Laps To Go" />
+                android:text="@string/setup_nr_laps" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -142,12 +143,12 @@
                     android:id="@+id/btnDecLaps"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="-"
+                    android:text="@string/minus_sign"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:id="@+id/txtLaps"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
@@ -158,7 +159,7 @@
                     android:id="@+id/btnIncLaps"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="+"
+                    android:text="@string/plus_sign"
                     android:textStyle="normal|bold" />
             </LinearLayout>
         </LinearLayout>
@@ -175,7 +176,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Minimal Lap Time" />
+                android:text="@string/setup_min_lap_time" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -187,23 +188,23 @@
                     android:id="@+id/btnDecMinLapTime"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="-"
+                    android:text="@string/minus_sign"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:id="@+id/txtMinLapTime"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
-                    android:text="5 sec."
+                    tools:text="5 sec."
                     android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                 <Button
                     android:id="@+id/btnIncMinLapTime"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="+"
+                    android:text="@string/plus_sign"
                     android:textStyle="normal|bold" />
             </LinearLayout>
 
@@ -221,7 +222,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Skip First Lap" />
+                android:text="@string/setup_skip_first_lap" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -251,7 +252,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Time to Prepare for Race" />
+                android:text="@string/setup_time_to_prepare" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -263,12 +264,12 @@
                     android:id="@+id/btnDecPreparationTime"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="-"
+                    android:text="@string/minus_sign"
                     android:textStyle="normal|bold" />
 
                 <TextView
                     android:id="@+id/txtPreparationTime"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
@@ -279,7 +280,7 @@
                     android:id="@+id/btnIncPreparationTime"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:text="+"
+                    android:text="@string/plus_sign"
                     android:textStyle="normal|bold" />
             </LinearLayout>
 
@@ -297,7 +298,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Enable Device Sounds" />
+                android:text="@string/setup_enable_device_sounds" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -326,7 +327,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Speak Lap Times" />
+                android:text="@string/setup_speak_lap_times" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -356,7 +357,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:elevation="1dp"
-                android:text="Speak Messages" />
+                android:text="@string/setup_speak_messages" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -370,6 +371,38 @@
                     android:layout_width="wrap_content"
                     android:layout_height="50dp"
                     android:checked="true"
+                    android:gravity="center_vertical|center_horizontal" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:elevation="1dp"
+                android:text="@string/setup_speak_english_only" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/chkSpeakEnglishOnly"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:checked="false"
                     android:gravity="center_vertical|center_horizontal" />
             </LinearLayout>
 

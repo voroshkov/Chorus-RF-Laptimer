@@ -127,13 +127,13 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         viewHolder.spacePilotColor.setBackgroundColor(Utils.getBackgroundColorItem(position));
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
-        viewHolder.txtChannelLabel.setText("Channel: #" + ch + " (" + band + " band)" + " " + freq);
+        viewHolder.txtChannelLabel.setText(mContext.getString(R.string.channel_descriptor, ch, band, freq));
         viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         if (ds.threshold == 0) {
-            viewHolder.btnSetThr.setText("Set");
+            viewHolder.btnSetThr.setText(R.string.setup_set_threshold);
         } else {
-            viewHolder.btnSetThr.setText("Clear");
+            viewHolder.btnSetThr.setText(R.string.setup_clear_threshold);
         }
 
         viewHolder.edPilotName.setText(ds.pilotName, TextView.BufferType.EDITABLE);

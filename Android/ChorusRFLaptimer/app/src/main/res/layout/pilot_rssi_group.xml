@@ -32,8 +32,8 @@
                 android:text="" />
 
             <TextView
-                android:text="Channel: #1 (Race)"
-                android:layout_width="match_parent"
+                tools:text="Channel: #1 (Race)"
+                android:layout_width="0dp"
                 android:id="@+id/txtChannelLabel"
                 android:layout_weight="1"
                 android:gravity="center_vertical"
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent">
 
                 <TextView
-                    android:text="Pilot Name"
+                    android:text="@string/setup_pilot_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/textView1"
@@ -73,11 +73,11 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1">
 
                 <TextView
-                    android:text="RSSI Threshold"
+                    android:text="@string/setup_rssi_threshold"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/textView3"
@@ -91,14 +91,14 @@
                     android:layout_weight="1">
 
                     <Button
-                        android:text="-"
+                        android:text="@string/minus_sign"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:id="@+id/btnDecThresh"
                         android:textStyle="normal|bold" />
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:id="@+id/txtThreshold"
                         android:inputType="number"
@@ -108,7 +108,7 @@
                         android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                     <Button
-                        android:text="+"
+                        android:text="@string/plus_sign"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
                         android:id="@+id/btnIncThresh"
@@ -120,7 +120,8 @@
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:baselineAligned="false">
 
                 <LinearLayout
                     android:orientation="vertical"
@@ -156,12 +157,12 @@
                     android:layout_weight="1">
 
                     <Space
-                        android:text="-"
+                        android:text="@string/minus_sign"
                         android:layout_width="50dp"
                         android:layout_height="50dp" />
 
                     <Button
-                        android:text="Clear"
+                        android:text="@string/setup_clear_threshold"
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:id="@+id/btnCapture"
@@ -170,7 +171,7 @@
                         android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                     <Space
-                        android:text="+"
+                        android:text="@string/plus_sign"
                         android:layout_width="50dp"
                         android:layout_height="50dp" />
 

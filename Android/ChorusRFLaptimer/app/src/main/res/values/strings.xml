@@ -1,3 +1,78 @@
 <resources>
     <string name="app_name">Chorus RF Laptimer</string>
+    <!-- Tabs -->
+    <string name="tab_race">Race</string>
+    <string name="tab_pilots">Pilots</string>
+    <string name="tab_frequency">Freq</string>
+    <string name="tab_setup">Setup</string>
+
+    <!-- Setup -->
+    <string name="setup_pilot_name">Pilot Name</string>
+    <string name="setup_rssi_threshold">RSSI Threshold</string>
+    <string name="setup_clear_threshold">Clear</string>
+    <string name="setup_set_threshold">Set</string>
+    <string name="setup_calibrate_timers">Calibrate Timers</string>
+    <string name="device_number">Device #%d</string>
+    <string name="setup_time">%d sec.</string>
+    <string name="channel_descriptor">Channel: # %1$s (%2$s band) %3$s</string>
+    <string name="calibrate_timers">Calibrating timers…</string>
+    <string name="setup_lipo_monitor">LiPo Monitor</string>
+    <string name="setup_adjust_voltage">Adjust Voltage</string>
+    <string name="setup_nr_laps">Laps To Go</string>
+    <string name="setup_min_lap_time">Minimal Lap Time</string>
+    <string name="setup_skip_first_lap">Skip First Lap</string>
+    <string name="setup_time_to_prepare">Time to Prepare for Race</string>
+    <string name="setup_enable_device_sounds">Enable Device Sounds</string>
+    <string name="setup_speak_lap_times">Speak Lap Times</string>
+    <string name="setup_speak_messages">Speak Messages</string>
+    <string name="freq_channel">Channel #</string>
+    <string name="freq_race">Race</string>
+    <string name="freq_rf_band">RF Band</string>
+    <string name="plus_sign">+</string>
+    <string name="minus_sign">-</string>
+
+    <!-- Race -->
+    <string name="starting_race">Starting…</string>
+    <string name="stop_race">Stop Race (Long Press)</string>
+    <string name="start_race">Start Race</string>
+    <string name="start_race_validation_pilots">Enable pilots to start Race</string>
+    <string name="start_race_validation_thresholds">Set all thresholds before Race</string>
+    <string name="best_lap">Best Lap:</string>
+    <string name="best_lap_position">Best lap position: %s</string>
+    <string name="lap_result">Lap # %1$d:  %2$s</string>
+    <string name="last_lap">Last Lap:</string>
+    <string name="race_time">Race time: </string>
+    <string name="race_position">Position:</string>
+    <string name="race_result_finished">FINISHED</string>
+    <string name="race_results">%1$s (C %2$s, %3$s band) Laps:  %4$s %5$s</string>
+    <string name="race_announcement_finished">Race is finished</string>
+    <string name="race_announcement_starting">Starting race in %d seconds</string>
+    <string name="race_lap_report">Lap %1$d.</string>
+    <string name="race_report_time_secs">%1$d point %2$s seconds</string>
+    <string name="race_report_time_mins">%1$d minutes %2$d point %3$s seconds</string>
+    <string name="race_pilot_finished">%1$s finished.</string>
+    <string name="race_pilot_already_finished">%1$s already finished.</string>
+
+    <!-- Reports -->
+    <string name="report_file_name">Report saved as: %s</string>
+    <string name="report_failure">Failed to create report. Check if there is enough space.</string>
+
+    <!-- Voltage monitoring -->
+    <string name="battery_status_critical">Device battery critical</string>
+    <string name="battery_status_low">Device battery low</string>
+
+    <!-- Bluetooth -->
+    <string name="bt_connected">Connected</string>
+    <string name="bt_connection_failed">Connection failed</string>
+    <string name="bt_connected_to">Connected to %s</string>
+    <string name="bt_disconnected">Disconnected</string>
+    <string name="setup_speak_english_only">Speak Alound Only English</string>
+
+    <plurals name="pilots_in_race">
+        <item quantity="one">Start Race (%1$d pilot)</item>
+        <item quantity="two">Start Race (%1$d pilots)</item>
+        <item quantity="few">Start Race (%1$d pilots)</item>
+        <item quantity="many">Start Race (%1$d pilots)</item>
+        <item quantity="other">Start Race (%1$d pilots)</item>
+    </plurals>
 </resources>

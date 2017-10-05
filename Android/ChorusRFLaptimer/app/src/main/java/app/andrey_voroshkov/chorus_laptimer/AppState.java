@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.StringRes;
 
 import java.util.ArrayList;
 
@@ -61,6 +62,7 @@ public class AppState {
     public boolean isDeviceSoundEnabled = false;
     public boolean shouldSpeakLapTimes = true;
     public boolean shouldSpeakMessages = true;
+    public boolean shouldSpeakEnglishOnly = false;
     public boolean shouldSkipFirstLap = true;
     public boolean wereDevicesConfigured = false;
     public boolean isRssiMonitorOn = false;
@@ -103,9 +105,9 @@ public class AppState {
                 AppState app = AppState.getInstance();
                 if (app.isConnected && app.isLiPoMonitorEnabled) {
                     if (batteryPercentage <= 10) {
-                        speakMessage("Device battery critical");
+                        speakMessage(R.string.battery_status_critical);
                     } else if (batteryPercentage <= 20){
-                        speakMessage("Device battery low");
+                        speakMessage(R.string.battery_status_low);
                     }
                 }
                 sendEmptyMessageDelayed(0, BATTERY_WARN_INTERVAL);
@@ -432,6 +434,11 @@ public class AppState {
             textSpeaker.speak(msg);
         }
     }
+    public void speakMessage(@StringRes int msg) {
+        if (shouldSpeakMessages) {
+            textSpeaker.speak(msg);
+        }
+    }
     //---------------------------------------------------------------------
     public void setNumberOfDevices(int n) {
         if (n <= 0) return;
@@ -561,7 +568,7 @@ public class AppState {
             raceState.isStarted = isStarted;
             emitEvent(DataAction.RaceState);
             if (!isStarted && isDevicesInitializationOver()) {
-                speakMessage("Race is finished");
+                speakMessage(R.string.race_announcement_finished);
                 emitEvent(DataAction.RaceIsFinished);
             }
         }
@@ -595,6 +602,15 @@ public class AppState {
             emitEvent(DataAction.SpeakMessages);
             AppPreferences.save(AppPreferences.SPEAK_MESSAGES);
         }
+    }
+
+    public void changeShouldSpeakEnglishOnly(boolean shouldSpeakEnglish) {
+        if (shouldSpeakEnglishOnly != shouldSpeakEnglish) {
+            shouldSpeakEnglishOnly = shouldSpeakEnglish;
+            emitEvent(DataAction.SpeakEnglishOnly);
+            AppPreferences.save(AppPreferences.SPEAK_ENGLISH_ONLY);
+        }
+        textSpeaker.useEnglishOnly(shouldSpeakEnglish);
     }
 
     /*
@@ -633,12 +649,15 @@ public class AppState {
                 if (this.shouldSkipFirstLap && lapNumber == 0) return; // don't speak the lap which is skipped
 
                 if (isJustFinished(deviceId)) {
-                    textToSay = textToSay + " finished";
+                    textSpeaker.speak(R.string.race_pilot_finished, textToSay);
                 } else if (getIsFinished(deviceId)) {
-                    textToSay = textToSay + " already finished";
+                    textSpeaker.speak(R.string.race_pilot_already_finished, textToSay);
                 }
+
                 int lapNumberToSpeak = this.shouldSkipFirstLap ? lapNumber : lapNumber + 1; // adjust to avoid lap number "zero"
-                textSpeaker.speak(textToSay + ". Lap " + Integer.toString(lapNumberToSpeak) + ". " + Utils.convertMsToSpeakableTime(lapTime));
+
+                textSpeaker.speak(R.string.race_lap_report, lapNumberToSpeak);
+                textSpeaker.speakMillisecondsInFriendlyTime(lapTime);
             }
         }
     }

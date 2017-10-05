@@ -41,35 +41,11 @@ public class Utils {
         return String.format("%d:%02d.%03d", m, s, msec);
     }
 
-    public static String convertMsToSpeakableTime(int ms) {
-        int m = (int)Math.floor(ms/1000/60);
-        int s = (int)Math.floor(ms/1000)-m*60;
-        int msec = ms-(int)Math.floor(ms/1000)*1000;
-
-        //speak 2 higher digits of milliseconds separately, or single zero
-        String mills = String.format("%03d", msec);
-        mills = mills.substring(0, mills.length()-1);
-        if (mills.equals("00")) {
-            mills = "0";
-        }
-        mills = mills.replace(""," ").trim();
-
-        String seconds = Integer.toString(s);
-
-        String text = seconds + " point " + mills + " seconds";
-
-        //only add minutes if lap is longer than 1 minute
-        if (m > 0) {
-            text = Integer.toString(m) + " minutes " + text;
-        }
-        return text;
-    }
-
     public static String btDataChunkParser(String chunk) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
 
         if (chunk.length() < 2) {
-            return result;
+            return result.toString();
         }
         char dest = chunk.charAt(0);
         char module = chunk.charAt(1);
@@ -78,92 +54,92 @@ public class Utils {
             moduleId = Integer.parseInt(String.valueOf(module), 16);
         }
         if (dest == 'S') {
-            result += "Module: " + ((moduleId >= 0) ? moduleId : "ALL") + "; ";
+            result.append("Module: ").append((moduleId >= 0) ? moduleId : "ALL").append("; ");
             char dataType = chunk.charAt(2);
             switch (dataType) {
                 case 'C':
                     int channel = Integer.parseInt(chunk.substring(3,4), 16);
-                    result += "Channel: " + channel;
+                    result.append("Channel: ").append(channel);
                     AppState.getInstance().changeDeviceChannel(moduleId, channel);
                     break;
                 case 'R':
                     int race = Integer.parseInt(chunk.substring(3,4));
-                    result += "Race: " + ((race != 0) ? "started" : "stopped");
+                    result.append("Race: ").append(race != 0 ? "started" : "stopped");
                     AppState.getInstance().changeRaceState(race!=0);
                     break;
                 case 'M':
                     int minLapTime = Integer.parseInt(chunk.substring(3,5), 16);
-                    result += "Min Lap: " + minLapTime;
+                    result.append("Min Lap: ").append(minLapTime);
                     AppState.getInstance().changeRaceMinLapTime(minLapTime);
                     break;
                 case 'T':
                     int threshold = Integer.parseInt(chunk.substring(3,7), 16);
-                    result += "Threshold: " + threshold;
+                    result.append("Threshold: ").append(threshold);
                     AppState.getInstance().changeDeviceThreshold(moduleId, threshold);
                     break;
                 case 'S':
                     int rssi = Integer.parseInt(chunk.substring(3,7), 16);
-                    result += "RSSI: " + rssi;
+                    result.append("RSSI: ").append(rssi);
                     AppState.getInstance().changeDeviceRSSI(moduleId, rssi);
                     break;
                 case 'D':
                     int soundState = Integer.parseInt(chunk.substring(3,4));
-                    result += "Sound: " + ((soundState != 0) ? "enabled" : "disabled");
+                    result.append("Sound: ").append(soundState != 0 ? "enabled" : "disabled");
                     AppState.getInstance().changeDeviceSoundState(soundState!=0);
                     break;
                 case 'F':
                     int shouldSkipFirstLap = Integer.parseInt(chunk.substring(3,4));
-                    result += "Skip First Lap: " + ((shouldSkipFirstLap != 0) ? "enabled" : "disabled");
+                    result.append("Skip First Lap: ").append(shouldSkipFirstLap != 0 ? "enabled" : "disabled");
                     AppState.getInstance().changeSkipFirstLap(shouldSkipFirstLap!=0);
                     break;
                 case 'L':
                     int lapNo = Integer.parseInt(chunk.substring(3,5), 16);
                     int lapTime = Integer.parseInt(chunk.substring(5,13), 16);
-                    result += "Lap #" + lapNo + " : " + lapTime;
+                    result.append("Lap #").append(lapNo).append(" : ").append(lapTime);
                     AppState.getInstance().addLapResult(moduleId, lapNo, lapTime);
                     break;
                 case 'B':
                     int band = Integer.parseInt(chunk.substring(3,4), 16);
-                    result += "Band #" + band;
+                    result.append("Band #").append(band);
                     AppState.getInstance().changeDeviceBand(moduleId, band);
                     break;
                 case 'i':
                     int isCalibrated = Integer.parseInt(chunk.substring(3,4), 16);
-                    result += "Calibration: " + ((isCalibrated!= 0) ? "done" : "not performed");
+                    result.append("Calibration: ").append(isCalibrated!= 0 ? "done" : "not performed");
                     AppState.getInstance().changeCalibration(moduleId, (isCalibrated!=0));
                     break;
                 case 'I':
                     int calibrationTime = Integer.parseInt(chunk.substring(3,11), 16);
-                    result += "Calibration time: " + calibrationTime;
+                    result.append("Calibration time: ").append( calibrationTime);
                     AppState.getInstance().changeDeviceCalibrationTime(moduleId, calibrationTime);
                     break;
                 case 'V':
                     int isMonitorOn = Integer.parseInt(chunk.substring(3,4), 16);
-                    result += "RSSI Monitor: " + ((isMonitorOn!= 0) ? "on" : "off");
+                    result.append("RSSI Monitor: ").append(isMonitorOn!= 0 ? "on" : "off");
                     AppState.getInstance().changeRssiMonitorState(isMonitorOn!=0);
                     break;
                 case 'X':
-                    result += "EndOfSequence. Device# " + moduleId;
+                    result.append("EndOfSequence. Device# ").append(moduleId);
                     AppState.getInstance().receivedEndOfSequence(moduleId);
                     break;
                 case 'P':
                     int isDeviceConfigured = Integer.parseInt(chunk.substring(3,4), 16);
-                    result += "Device is configured: " + ((isDeviceConfigured!= 0) ? "yes" : "no");
+                    result.append("Device is configured: ").append(isDeviceConfigured!= 0 ? "yes" : "no");
                     AppState.getInstance().changeDeviceConfigStatus(moduleId, (isDeviceConfigured!=0));
                     break;
                 case 'Y':
                     int voltageReading = Integer.parseInt(chunk.substring(3,7), 16);
-                    result += "Voltage(abstract): " + voltageReading;
+                    result.append("Voltage(abstract): ").append( voltageReading);
                     AppState.getInstance().changeVoltage(voltageReading);
                     break;
             }
         } else if (dest == 'R') {
 
         } else if (dest == 'N') {
-            result += "ModulesCount: " + module;
+            result.append("ModulesCount: ").append(module);
             AppState.getInstance().setNumberOfDevices(moduleId);
         }
-        return result;
+        return result.toString();
     }
 
     public static void enableDisableView(View view, boolean enabled) {

@@ -6,21 +6,23 @@
     android:layout_height="wrap_content">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
         <View
             android:id="@+id/resultColorStrip"
             android:layout_width="match_parent"
             android:layout_height="7dp" />
+
         <TextView
             android:id="@+id/textGroupHeading"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:textStyle="bold"
+            android:gravity="center_vertical"
             android:paddingLeft="40dp"
             android:text="Text"
-            android:gravity="center_vertical" />
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -34,7 +36,7 @@
                 android:gravity="center_vertical"
                 android:paddingBottom="5dp"
                 android:paddingLeft="40dp"
-                android:text="Position:"
+                android:text="@string/race_position"
                 android:textColor="@color/colorPrimary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -50,10 +52,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:gravity="center_vertical"
-                    android:text="Text"
                     android:textColor="@color/colorPrimary"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:text="1" />
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -64,18 +66,18 @@
                         android:id="@+id/textLabel0"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Race time: "
                         android:gravity="center_vertical"
-                        android:textSize="12sp"/>
+                        android:text="@string/race_time"
+                        android:textSize="12sp" />
 
                     <TextView
                         android:id="@+id/textTotalRaceTime"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="Text"
+                        android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:textSize="12sp"
-                        android:layout_weight="1" />
+                        tools:text="2:12" />
                 </LinearLayout>
 
             </LinearLayout>
@@ -89,21 +91,21 @@
                 android:id="@+id/textLabel1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:text="Last Lap:"
+                android:layout_weight="3"
                 android:gravity="center_vertical"
                 android:paddingBottom="5dp"
-                android:textSize="12sp"
-                android:layout_weight="3" />
+                android:paddingLeft="40dp"
+                android:text="@string/last_lap"
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/textLastLap"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Text"
+                android:layout_weight="7"
                 android:gravity="center_vertical"
                 android:textSize="12sp"
-                android:layout_weight="7" />
+                tools:text="0:12" />
         </LinearLayout>
 
         <LinearLayout
@@ -114,13 +116,13 @@
                 android:id="@+id/textLabel2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingLeft="40dp"
-                android:text="Best Lap:"
-                android:gravity="center_vertical"
                 android:layout_weight="3"
+                android:gravity="center_vertical"
                 android:paddingBottom="10dp"
-                android:textSize="12sp"
-                android:textColor="@color/colorPrimary" />
+                android:paddingLeft="40dp"
+                android:text="@string/best_lap"
+                android:textColor="@color/colorPrimary"
+                android:textSize="12sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -131,11 +133,11 @@
                     android:id="@+id/textBestLap"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Text"
-                    android:gravity="center_vertical"
                     android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/colorPrimary"
                     android:textSize="12sp"
-                    android:textColor="@color/colorPrimary" />
+                    tools:text="1:15" />
 
                 <TextView
                     android:id="@+id/textPositionByBestLap"
@@ -143,7 +145,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Best lap position: -"
+                    android:text="@string/best_lap_position"
                     android:textColor="@color/colorPrimary"
                     android:textSize="12sp" />
 

@@ -63,7 +63,7 @@ public class ChannelsListAdapter extends BaseAdapter {
         final String deviceId = String.format("%X", position);
 
         if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = LayoutInflater.from(mContext);
             convertView = inflater.inflate(R.layout.channel_group, null);
             viewHolder = new ViewHolder();
             viewHolder.txtDeviceLabel = (TextView) convertView.findViewById(R.id.txtDeviceLabel);
@@ -81,7 +81,8 @@ public class ChannelsListAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        viewHolder.txtDeviceLabel.setText("Device #" + (position + 1));
+
+        viewHolder.txtDeviceLabel.setText(mContext.getString(R.string.device_number, position+1));
         viewHolder.txtChannel.setText(AppState.getInstance().getChannelText(position));
         viewHolder.txtFreq.setText(AppState.getInstance().getFrequencyText(position));
         viewHolder.txtBand.setText(AppState.getInstance().getBandText(position));

@@ -53,6 +53,7 @@ public class RaceSetupFragment extends Fragment {
         updateSoundCheckbox(rootView);
         updateSpeakLapTimesCheckbox(rootView);
         updateSpeakMessagesCheckbox(rootView);
+        updateSpeakEnglishOnlyCheckbox(rootView);
         updateLiPoMonitorCheckbox(rootView);
         updateBatteryProgressIndicator(rootView);
 
@@ -78,6 +79,9 @@ public class RaceSetupFragment extends Fragment {
                     case SpeakMessages:
                         updateSpeakMessagesCheckbox(rootView);
                         break;
+                    case SpeakEnglishOnly:
+                        updateSpeakEnglishOnlyCheckbox(rootView);
+                        break;
                     case BatteryVoltage:
                         updateBatteryProgressIndicator(rootView);
                         updateBatteryVoltageText(rootView);
@@ -98,6 +102,7 @@ public class RaceSetupFragment extends Fragment {
         CheckBox chkSkipFirstLap = (CheckBox) rootView.findViewById(R.id.chkSkipFirstLap);
         CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
         CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
+        CheckBox chkSpeakEnglishOnly = (CheckBox) rootView.findViewById(R.id.chkSpeakEnglishOnly);
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
         CheckBox chkLiPoMonitor = (CheckBox) rootView.findViewById(R.id.chkLiPoMonitor);
         Button btnDecAdjust = (Button) rootView.findViewById(R.id.btnDecAdjustmentConst);
@@ -209,6 +214,13 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
+        chkSpeakEnglishOnly.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                AppState.getInstance().changeShouldSpeakEnglishOnly(isChecked);
+            }
+        });
+
         chkLiPoMonitor.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -250,13 +262,13 @@ public class RaceSetupFragment extends Fragment {
 
     private void updateText(View rootView) {
         TextView txtMinLaps = (TextView) rootView.findViewById(R.id.txtMinLapTime);
-        txtMinLaps.setText(Integer.toString(AppState.getInstance().raceState.minLapTime) + " sec.");
+        txtMinLaps.setText(getString(R.string.setup_time, AppState.getInstance().raceState.minLapTime));
 
         TextView txtLaps = (TextView) rootView.findViewById(R.id.txtLaps);
         txtLaps.setText(Integer.toString(AppState.getInstance().raceState.lapsToGo));
 
         TextView txtPreparationTime = (TextView) rootView.findViewById(R.id.txtPreparationTime);
-        txtPreparationTime.setText(Integer.toString(AppState.getInstance().timeToPrepareForRace) + " sec.");
+        txtPreparationTime.setText(getString(R.string.setup_time, AppState.getInstance().timeToPrepareForRace));
 
         TextView txtAdjustmentConst = (TextView) rootView.findViewById(R.id.txtAdjustmentConst);
         txtAdjustmentConst.setText(Integer.toString(AppState.getInstance().batteryAdjustmentConst));
@@ -280,6 +292,11 @@ public class RaceSetupFragment extends Fragment {
     private void updateSpeakMessagesCheckbox(View rootView) {
         CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
         chkSpeakMessages.setChecked(AppState.getInstance().shouldSpeakMessages);
+    }
+
+    private void updateSpeakEnglishOnlyCheckbox(View rootView) {
+        CheckBox chkSpeakEnglishOnly = (CheckBox) rootView.findViewById(R.id.chkSpeakEnglishOnly);
+        chkSpeakEnglishOnly.setChecked(AppState.getInstance().shouldSpeakEnglishOnly);
     }
 
     private void updateLiPoMonitorCheckbox(View rootView) {
