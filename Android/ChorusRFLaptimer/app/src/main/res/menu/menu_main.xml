@@ -4,11 +4,11 @@
     tools:context="com.app.andrey_voroshkov.myapplication.com.example.andrey_voroshkov.chorus_laptimer.MainActivity">
     <item
         android:id="@+id/menuConnect"
-        android:title="Connect"
+        android:title="@string/menu_connect"
         app:showAsAction="never" />
     <item
         android:id="@+id/menuDisconnect"
-        android:title="Disconnect"
+        android:title="@string/menu_disconnect"
         android:visible="false"
         app:showAsAction="never" />
   </menu>

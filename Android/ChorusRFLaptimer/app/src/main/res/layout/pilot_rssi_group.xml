@@ -158,7 +158,7 @@
 
                     <Space
                         android:text="@string/minus_sign"
-                        android:layout_width="50dp"
+                        android:layout_width="45dp"
                         android:layout_height="50dp" />
 
                     <Button
@@ -172,7 +172,7 @@
 
                     <Space
                         android:text="@string/plus_sign"
-                        android:layout_width="50dp"
+                        android:layout_width="45dp"
                         android:layout_height="50dp" />
 
                 </LinearLayout>

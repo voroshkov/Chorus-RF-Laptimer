@@ -92,7 +92,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|center_horizontal"
-                    android:text="@string/freq_race"
+                    android:text="R"
                     android:textColor="?android:attr/textColorPrimaryNoDisable" />
 
                 <Button

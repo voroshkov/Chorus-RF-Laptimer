@@ -121,13 +121,15 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         final DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
-        String freq = AppState.getInstance().getFrequencyText(position);
         Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
+
+        String mhzString = mContext.getString(R.string.mhz_string);
+        String freq = AppState.getInstance().getFrequencyText(position) + " " + mhzString;
 
         viewHolder.spacePilotColor.setBackgroundColor(Utils.getBackgroundColorItem(position));
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
-        viewHolder.txtChannelLabel.setText(mContext.getString(R.string.channel_descriptor, ch, band, freq));
+        viewHolder.txtChannelLabel.setText(mContext.getString(R.string.channel_descriptor, band, ch, freq));
         viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         if (ds.threshold == 0) {

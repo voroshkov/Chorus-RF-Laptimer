@@ -21,7 +21,7 @@ public class AppState {
     public static final int MAX_RSSI = 315;
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
     public static final int CALIBRATION_TIME_MS = 10000;
-    public static final String bandNames [] = {"Race", "A", "B", "E", "F", "D", "Connex1", "Connex2"};
+    public static final String bandNames [] = {"R", "A", "B", "E", "F", "D", "Connex1", "Connex2"};
     public static final int DEFAULT_MIN_LAP_TIME = 5;
     public static final int DEFAULT_LAPS_TO_GO = 3;
 
@@ -345,9 +345,9 @@ public class AppState {
         DeviceState devState = deviceStates.get(deviceId);
         int tableIndex = devState.band * 8 + devState.channel;
         if (tableIndex < channelTable.length) {
-            return new Integer(channelTable[tableIndex]).toString() + "MHz";
+            return new Integer(channelTable[tableIndex]).toString();
         }
-        return "- MHz";
+        return "-";
     }
 
     public String getChannelText(int deviceId) {
@@ -644,14 +644,16 @@ public class AppState {
             //speak lap times if initialization is over
             if (shouldSpeakLapTimes) {
                 DeviceState currentState = deviceStates.get(deviceId);
-                String textToSay = currentState.pilotName;
+                String pilotName = currentState.pilotName;
 
                 if (this.shouldSkipFirstLap && lapNumber == 0) return; // don't speak the lap which is skipped
 
                 if (isJustFinished(deviceId)) {
-                    textSpeaker.speak(R.string.race_pilot_finished, textToSay);
+                    textSpeaker.speak(R.string.race_pilot_finished, pilotName);
                 } else if (getIsFinished(deviceId)) {
-                    textSpeaker.speak(R.string.race_pilot_already_finished, textToSay);
+                    textSpeaker.speak(R.string.race_pilot_already_finished, pilotName);
+                } else {
+                    textSpeaker.speak(pilotName);
                 }
 
                 int lapNumberToSpeak = this.shouldSkipFirstLap ? lapNumber : lapNumber + 1; // adjust to avoid lap number "zero"

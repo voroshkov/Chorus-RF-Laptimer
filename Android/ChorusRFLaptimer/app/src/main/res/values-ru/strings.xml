@@ -1,5 +1,10 @@
 <resources>
     <string name="app_name">Chorus RF Laptimer</string>
+
+    <!-- Menu -->
+    <string name="menu_connect">Подключиться</string>
+    <string name="menu_disconnect">Отключиться</string>
+
     <!-- Tabs -->
     <string name="tab_race">Гонка</string>
     <string name="tab_pilots">Пилоты</string>
@@ -9,69 +14,75 @@
     <!-- Setup -->
     <string name="setup_pilot_name">Имя пилота</string>
     <string name="setup_rssi_threshold">Порог RSSI</string>
-    <string name="setup_clear_threshold">Очистить</string>
-    <string name="setup_set_threshold">Set</string>
+    <string name="setup_clear_threshold">Сброс</string>
+    <string name="setup_set_threshold">Уст.</string>
     <string name="setup_calibrate_timers">Откалибровать таймеры</string>
-    <string name="device_number">Устройство #%d</string>
+    <string name="device_number">Модуль №%d</string>
     <string name="setup_time">%d сек.</string>
-    <string name="channel_descriptor">Каннал: # %1$s (%2$s бэнд) %3$s</string>
+    <string name="channel_descriptor">Канал: %1$s%2$s (%3$s)</string>
     <string name="calibrate_timers">Калибровка таймеров…</string>
-    <string name="setup_lipo_monitor">LiPo Монитор</string>
-    <string name="setup_adjust_voltage">Adjust Voltage</string>
+    <string name="setup_lipo_monitor">Монитор LiPo</string>
+    <string name="setup_adjust_voltage">Подстройка напряжения</string>
     <string name="setup_nr_laps">Всего кругов</string>
-    <string name="setup_min_lap_time">Мин. Время Круга</string>
-    <string name="setup_skip_first_lap">Пропустить Первый Круг</string>
-    <string name="setup_time_to_prepare">Время подготовки</string>
-    <string name="setup_enable_device_sounds">Включить Звуки Устройства</string>
-    <string name="setup_speak_lap_times">Диктовать Время Кругов</string>
-    <string name="setup_speak_messages">Диктовать Оповещения</string>
-    <string name="freq_channel">Каннал #</string>
-    <string name="freq_race">Race</string>
-    <string name="freq_rf_band">RF Бэнд</string>
+    <string name="setup_min_lap_time">Минимальный круг</string>
+    <string name="setup_skip_first_lap">Пропустить 1-й круг</string>
+    <string name="setup_time_to_prepare">Подготовка</string>
+    <string name="setup_enable_device_sounds">Звук на устройстве</string>
+    <string name="setup_speak_lap_times">Говорить время кругов</string>
+    <string name="setup_speak_messages">Говорить оповещения</string>
+    <string name="freq_channel">Канал №</string>
+    <string name="freq_rf_band">Диапазон</string>
     <string name="plus_sign">+</string>
     <string name="minus_sign">-</string>
+    <string name="mhz_string">МГц</string>
 
     <!-- Race -->
     <string name="starting_race">Начинаем…</string>
-    <string name="stop_race">Остановить Гонку (Долгое Нажатие)</string>
-    <string name="start_race">Начать Гонку</string>
+    <string name="stop_race">Остановить гонку (долгое нажатие)</string>
+    <string name="start_race">Начать гонку</string>
     <string name="start_race_validation_pilots">Настройте пилотов чтобы начать</string>
     <string name="start_race_validation_thresholds">Настройте пороги RSSI чтобы начать</string>
-    <string name="best_lap">Лучший Круг:</string>
-    <string name="best_lap_position">Место в лучшем круге: %s</string>
-    <string name="lap_result">Круг # %1$d:  %2$s</string>
-    <string name="last_lap">Последний Круг:</string>
+    <string name="best_lap">Лучший круг:</string>
+    <string name="best_lap_position">Место за лучший круг: %s</string>
+    <string name="lap_result">Круг %1$d:   %2$s</string>
+    <string name="last_lap">Последний круг:</string>
     <string name="race_time">Время гонки: </string>
     <string name="race_position">Позиция:</string>
-    <string name="race_result_finished">ЗАКОНЧИЛ</string>
-    <string name="race_results">%1$s (C %2$s, %3$s band) Кругов:  %4$s %5$s</string>
+    <string name="race_result_finished">ФИНИШИРОВАЛ</string>
+    <string name="race_results">%1$s (%2$s%3$s) Кругов: %4$s %5$s</string>
     <string name="race_announcement_finished">Гонка окончена</string>
-    <string name="race_announcement_starting">Начало гонки через %d секунд</string>
+    <string name="race_announcement_starting">Начало гонки через %d с.</string>
     <string name="race_lap_report">Круг %1$d.</string>
-    <string name="race_report_time_secs">%1$d целых и %2$s секунд</string>
-    <string name="race_report_time_mins">%1$d минута %2$d целых и %3$s секунд</string>
-    <string name="race_pilot_finished">%1$s финишировал.</string>
-    <string name="race_pilot_already_finished">%1$s уже финишировал.</string>
+    <string name="race_pilot_finished">%1$s финиш.</string>
+    <string name="race_pilot_already_finished">%1$s повторный финиш.</string>
+    <string name="seconds_short">с.</string>
 
     <!-- Reports -->
     <string name="report_file_name">Отчет сохранен как: %s</string>
-    <string name="report_failure">Ошибка при создание отчета. Проверьте если достаточно места на СД карте.</string>
+    <string name="report_failure">Ошибка при создании отчета. Проверьте достаточно ли места на SD карте.</string>
 
     <!-- Voltage monitoring -->
-    <string name="battery_status_critical">Критичный уровень батареи</string>
+    <string name="battery_status_critical">Критический уровень батареи</string>
     <string name="battery_status_low">Низкий уровень батареи</string>
 
     <!-- Bluetooth -->
-    <string name="bt_connected">Подключенно</string>
-    <string name="bt_connection_failed">Connection failed</string>
-    <string name="bt_connected_to">Подключенно к %s</string>
+    <string name="bt_connected">Подключено</string>
+    <string name="bt_connection_failed">Не подключено</string>
+    <string name="bt_connected_to">Подключено к %s</string>
     <string name="bt_disconnected">Соединение прервано</string>
-    <string name="setup_speak_english_only">Диктовать только на английском</string>
+    <string name="setup_speak_english_only">Говорить на английском</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Начать гонку (%1$d пилот)</item>
         <item quantity="few">Начать гонку (%1$d пилота)</item>
         <item quantity="many">Начать гонку (%1$d пилотов)</item>
         <item quantity="other">Начать гонку (%1$d пилотов)</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%1$d минута</item>
+        <item quantity="few">%1$d минуты</item>
+        <item quantity="many">%1$d минут</item>
+        <item quantity="other">%1$d минут</item>
     </plurals>
 </resources>

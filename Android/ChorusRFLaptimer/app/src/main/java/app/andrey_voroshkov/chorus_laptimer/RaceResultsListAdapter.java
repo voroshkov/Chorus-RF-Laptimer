@@ -129,7 +129,7 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
         DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String finishedPart = isFinished ? mContext.getString(R.string.race_result_finished) : "";
         String lapsValue =  laps <= 0 ? MISSING_RESULTS_MARKER : String.valueOf(laps);
-        return mContext.getString(R.string.race_results, ds.pilotName, ch, band, lapsValue, finishedPart);
+        return mContext.getString(R.string.race_results, ds.pilotName, band, ch, lapsValue, finishedPart);
     }
 
     @Override

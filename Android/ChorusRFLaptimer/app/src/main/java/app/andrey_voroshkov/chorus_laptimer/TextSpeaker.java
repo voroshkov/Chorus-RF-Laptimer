@@ -7,6 +7,7 @@ import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.StringRes;
 
+import java.text.DecimalFormatSymbols;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
     private boolean isInitialized = false;
     private Context originalContext;
     private Context contextInUse;
+    private String decimalSeparator = ".";
 
     public TextSpeaker(Context context, boolean useEnglishOnly) {
         tts = new TextToSpeech(context, this);
@@ -52,21 +54,20 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
         int msec = ms - (int) Math.floor(ms / 1000) * 1000;
 
         //speak 2 higher digits of milliseconds separately, or single zero
+        //UPDATE: rely on the speech engine to correctly pronounce decimals
         String mills = String.format("%03d", msec);
         mills = mills.substring(0, mills.length() - 1);
-        if (mills.equals("00")) {
-            mills = "0";
-        }
-        mills = mills.replace("", " ").trim();
 
-        String text;
+        String text = "";
+        String seconds = s + decimalSeparator + mills + contextInUse.getString(R.string.seconds_short);
 
         //only add minutes if lap is longer than 1 minute
         if (m > 0) {
-            text = contextInUse.getString(R.string.race_report_time_mins, m, s, mills);
-        } else {
-            text = contextInUse.getString(R.string.race_report_time_secs, s, mills);
+            String minutes = contextInUse.getResources().getQuantityString(R.plurals.minutes, m, m);
+            text = minutes + " ";
         }
+
+        text += seconds;
         speak(text);
     }
 
@@ -99,6 +100,8 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
                 }
             }
             tts.setLanguage(localeToSet);
+            DecimalFormatSymbols dfs = new DecimalFormatSymbols(localeToSet);
+            decimalSeparator = Character.toString(dfs.getDecimalSeparator());
             isInitialized = true;
         }
     }
@@ -125,8 +128,9 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
 
 
     public void useEnglishOnly(boolean shouldSpeakEnglish) {
+        // applying this unconditionally is necessary to apply prefs before the TTS engine is initialized
+        useEnglishOnly = shouldSpeakEnglish;
         if (isInitialized) {
-            useEnglishOnly = shouldSpeakEnglish;
             onInit(TextToSpeech.SUCCESS);
         }
     }
