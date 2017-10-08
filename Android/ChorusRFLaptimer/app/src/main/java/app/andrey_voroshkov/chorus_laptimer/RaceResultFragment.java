@@ -159,7 +159,7 @@ public class RaceResultFragment extends Fragment {
                     mIsStartingRace = true;
                     int timeBeforeRace = AppState.getInstance().timeToPrepareForRace;
                     if (timeBeforeRace >= AppState.MIN_TIME_BEFORE_RACE_TO_SPEAK)
-                        AppState.getInstance().speakMessage(getString(R.string.race_announcement_starting, timeBeforeRace - 2));
+                        AppState.getInstance().textSpeaker.speak(R.string.race_announcement_starting, timeBeforeRace - 2);
 
                     mRaceStartingHandler.sendEmptyMessage(timeBeforeRace);
                 }
