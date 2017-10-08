@@ -256,6 +256,7 @@ Android app:
 - Louis Plett (highway11) - voice speaking
 - Ray Erik Rabe (raveerk) - CSV reports generation
 - evgen48 - display frequencies in MHz
+- Gleb Godonoga (SidhNor) - internationalization support, Russian localization
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies
