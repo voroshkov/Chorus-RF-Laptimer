@@ -9,9 +9,12 @@
 This is a VTX Radio Frequency Lap Timing solution for drone racers - the evolution of a [Solo DIY RF Laptimer project](https://github.com/voroshkov/Solo-DIY-RF-Laptimer).
 Several updated Solo Laptimer devices connected together make up a Chorus Laptimer device which is capable of tracking several drones at once.
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
+## HOT NEWS !
+------------------------------------------------
+- If you'd like to take part in **iOS app testing**, fill the [google form](https://l.messenger.com/l.php?u=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F1FAIpQLSfCjH5jG3aokwXUiFyQcN0vXG9WW_69ma-Tan6bBtJ66oXn-w%2Fviewform&h=ATMTvEuW4jikO-7CUeyRraLkeH17ArfHqZ7qp-jubAIR1IdS7d2bDfuCYKLvbardj0_bRJ5wAlrWDuUb7Ss-UpYAkjBzvz3YkSGJqniAlJH3SmVQxxrwXlNOji7sPw3Yp1b7d8m4Kxo0ew) to add you to test flight account.
+------------------------------------------------
 
 ## Featured references:
-
 - Chorus RF Laptimer Facebook group: https://www.facebook.com/groups/ChorusRFLaptimer/
 - Chorus RF Laptimer discussion thread @ RC Groups: https://www.rcgroups.com/forums/showthread.php?2801815
 - PC GUI Interface project for Chorus RF Laptimer: https://github.com/anunique/ChorusGUI
