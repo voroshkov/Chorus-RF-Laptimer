@@ -5,7 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
+import app.andrey_voroshkov.chorus_laptimer.BTService;
 import app.andrey_voroshkov.chorus_laptimer.AppState;
 
 import static org.junit.Assert.assertEquals;
@@ -18,13 +18,13 @@ import static org.junit.Assert.assertEquals;
 @RunWith(MockitoJUnitRunner.class)
 public class PilotPosition_BestLap_test {
 
-    BluetoothSPP bt = Mockito.mock(BluetoothSPP.class);
+    BTService bt = Mockito.mock(BTService.class);
 
     AppState getFreshAppState() {
         Mockito.doNothing().when(bt).send("");
         AppState.Reset_Instance_TEST_ONLY();
         AppState as = AppState.getInstance();
-        as.bt = bt;
+        as.conn = bt;
         return as;
     }
 

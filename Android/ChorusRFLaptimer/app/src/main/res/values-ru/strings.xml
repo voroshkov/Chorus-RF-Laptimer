@@ -2,7 +2,8 @@
     <string name="app_name">Chorus RF Laptimer</string>
 
     <!-- Menu -->
-    <string name="menu_connect">Подключиться</string>
+    <string name="menu_bt_connect">Подключить по Bluetooth</string>
+    <string name="menu_udp_connect">Подключить по WiFi</string>
     <string name="menu_disconnect">Отключиться</string>
 
     <!-- Tabs -->
@@ -66,10 +67,10 @@
     <string name="battery_status_low">Низкий уровень батареи</string>
 
     <!-- Bluetooth -->
-    <string name="bt_connected">Подключено</string>
-    <string name="bt_connection_failed">Не подключено</string>
-    <string name="bt_connected_to">Подключено к %s</string>
-    <string name="bt_disconnected">Соединение прервано</string>
+    <string name="connected">Подключено</string>
+    <string name="connection_failed">Не подключено</string>
+    <string name="connected_to">Подключено к %s</string>
+    <string name="disconnected">Соединение прервано</string>
     <string name="setup_speak_english_only">Говорить на английском</string>
 
     <plurals name="pilots_in_race">

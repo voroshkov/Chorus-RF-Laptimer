@@ -1,13 +1,13 @@
 package com.app.andrey_voroshkov.myapplication;
 
+import android.content.SharedPreferences;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.lang.reflect.Method;
-
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
+import app.andrey_voroshkov.chorus_laptimer.BTService;
 import app.andrey_voroshkov.chorus_laptimer.AppState;
 
 import static org.junit.Assert.*;
@@ -20,13 +20,13 @@ import static org.junit.Assert.*;
 @RunWith(MockitoJUnitRunner.class)
 public class PilotPosition_TotalTime_test {
 
-    BluetoothSPP bt = Mockito.mock(BluetoothSPP.class);
+    BTService bt = Mockito.mock(BTService.class);
 
     AppState getFreshAppState() {
         Mockito.doNothing().when(bt).send("");
         AppState.Reset_Instance_TEST_ONLY();
         AppState as = AppState.getInstance();
-        as.bt = bt;
+        as.conn = bt;
         return as;
     }
 

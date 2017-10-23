@@ -256,31 +256,38 @@ public class RaceResultFragment extends Fragment {
      * @return
      */
     private String generateCSVReportString(){
-        ArrayList<ArrayList<LapResult>> raceResults = AppState.getInstance().raceResults;
+        AppState app = AppState.getInstance();
+        ArrayList<ArrayList<LapResult>> raceResults = app.raceResults;
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("LAP,PILOT,TIME\n");
+        sb.append("LAP,PILOT,CHANNEL,FREQUENCY,TIME,RECORDED AT\n");
 
-        int numLaps = AppState.getInstance().raceState.lapsToGo;
+        int numLaps = app.raceState.lapsToGo;
 
         //startOfLapCount depends if it should skip First Lap.
         int startOfLapCount = 0;
-        boolean shouldSkipFirstLap = AppState.getInstance().shouldSkipFirstLap;
+        boolean shouldSkipFirstLap = app.shouldSkipFirstLap;
         if(shouldSkipFirstLap){
             startOfLapCount = 1;
         }
         //iterate per pilot
-        for(int i = 0; i < AppState.getInstance().deviceStates.size(); i++){
+        for(int i = 0; i < app.deviceStates.size(); i++){
             ArrayList<LapResult> pilotResults = raceResults.get(i);
             int pilotLaps = pilotResults.size();
-            String pilot = AppState.getInstance().deviceStates.get(i).pilotName;
+            String pilot = app.deviceStates.get(i).pilotName;
+            String channel = app.getChannelText(i);
+            String band = app.getBandText(i);
+            String freq = app.getFrequencyText(i);
+
+
             //iterate per lap of each pilot. till allowed number of laps.
             for(int j = startOfLapCount; j < pilotLaps; j++){
                 //if shouldSkipFirstLap, lapCount will start from 1
                 int lapNumber = shouldSkipFirstLap ? j : j + 1;
                 LapResult lapResult = pilotResults.get(j);
-                sb.append(lapNumber + "," + pilot + "," + Utils.convertMsToReportTime(lapResult.getMs()) + "\n");
+                String recordTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ").format(lapResult.getRecordDate());
+                sb.append(lapNumber + "," + pilot + "," + band + channel + "," + freq+ "," + Utils.convertMsToReportTime(lapResult.getMs()) + "," + recordTime + "\n");
             }
         }
         System.out.println(sb.toString());

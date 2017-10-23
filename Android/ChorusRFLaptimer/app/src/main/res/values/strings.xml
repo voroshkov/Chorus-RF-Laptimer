@@ -2,8 +2,9 @@
     <string name="app_name">Chorus RF Laptimer</string>
 
     <!-- Menu -->
-    <string name="menu_connect">Connect</string>
-    <string name="menu_disconnect">Disonnect</string>
+`    <string name="menu_bt_connect">Connect via Bluetooth</string>
+    <string name="menu_udp_connect">Connect via WiFi</string>
+    <string name="menu_disconnect">Disconnect</string>
 
     <!-- Tabs -->
     <string name="tab_race">Race</string>
@@ -66,10 +67,10 @@
     <string name="battery_status_low">Device battery low</string>
 
     <!-- Bluetooth -->
-    <string name="bt_connected">Connected</string>
-    <string name="bt_connection_failed">Not connected</string>
-    <string name="bt_connected_to">Connected to %s</string>
-    <string name="bt_disconnected">Disconnected</string>
+    <string name="connected">Connected</string>
+    <string name="connection_failed">Not connected</string>
+    <string name="connected_to">Connected to %s</string>
+    <string name="disconnected">Disconnected</string>
     <string name="setup_speak_english_only">Speak in English</string>
 
     <plurals name="pilots_in_race">

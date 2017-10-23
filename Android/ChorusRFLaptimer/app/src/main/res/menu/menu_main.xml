@@ -3,11 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.app.andrey_voroshkov.myapplication.com.example.andrey_voroshkov.chorus_laptimer.MainActivity">
     <item
-        android:id="@+id/menuConnect"
-        android:title="@string/menu_connect"
+        android:id="@+id/menuBTConnect"
+        android:title="@string/menu_bt_connect"
         app:showAsAction="never" />
     <item
-        android:id="@+id/menuDisconnect"
+        android:id="@+id/menuBTDisconnect"
+        android:title="@string/menu_disconnect"
+        android:visible="false"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menuUDPConnect"
+        android:title="@string/menu_udp_connect"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menuUDPDisconnect"
         android:title="@string/menu_disconnect"
         android:visible="false"
         app:showAsAction="never" />

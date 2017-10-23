@@ -54,7 +54,7 @@ public class AppState {
         return instance;
     }
 
-    public BluetoothSPP bt;
+    public Connection conn = null;
     public TextSpeaker textSpeaker;
     public SharedPreferences preferences;
 
@@ -407,8 +407,8 @@ public class AppState {
     }
     //---------------------------------------------------------------------
     public void sendBtCommand(String cmd) {
-        if (bt == null) return;
-        bt.send(cmd + (char)DELIMITER);
+        if (conn == null) return;
+        conn.send(cmd + (char)DELIMITER);
     }
 
     public void onConnected() {
@@ -517,6 +517,8 @@ public class AppState {
     }
 
     public void changeDeviceRSSI(int deviceId, int rssi) {
+        if (!isConnected) return; // to prevent updating UI with remaining received values after disconnect
+
         DeviceState currentState = deviceStates.get(deviceId);
         if (currentState == null) {
             return;

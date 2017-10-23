@@ -3,9 +3,11 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,31 +19,105 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
 
 public class MainActivity extends AppCompatActivity {
 
     /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-
-    /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
     private Menu menu;
-    BluetoothSPP bt;
+    BTService bt;
+    UDPService udp;
+
+    public void onDisconnected() {
+        Toast.makeText(getApplicationContext(), getString(R.string.disconnected), Toast.LENGTH_SHORT).show();
+        AppState.getInstance().speakMessage(R.string.disconnected);
+        AppState.getInstance().onDisconnected();
+    }
+
+    public void onBTDisconnected() {
+        onDisconnected();
+        toggleConnectionMenu(false, true);
+    }
+
+    public void onUDPDisconnected() {
+        onDisconnected();
+        toggleConnectionMenu(false, false);
+    }
+
+    public void onConnectionFailed() {
+        Toast.makeText(getApplicationContext(), getString(R.string.connection_failed), Toast.LENGTH_SHORT).show();
+        AppState.getInstance().speakMessage(R.string.connection_failed);
+    }
+
+    public void onBTConnectionFailed() {
+        onConnectionFailed();
+//        toggleConnectionMenu(false, true);
+    }
+
+    public void onUDPConnectionFailed() {
+        onConnectionFailed();
+//        toggleConnectionMenu(false, false);
+    }
+
+    public void onConnected(String name) {
+        String txt = getString(R.string.connected_to, name);
+        Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
+        AppState.getInstance().speakMessage(R.string.connected);
+        AppState.getInstance().onConnected();
+    }
+
+    public void onBTConnected(String name) {
+        onConnected(name);
+        toggleConnectionMenu(true, true);
+    }
+
+    public void onUDPConnected(String name) {
+        onConnected(name);
+        toggleConnectionMenu(true, false);
+    }
+
+    public void onDataReceived(String message) {
+        String parsedMsg;
+        try {
+            parsedMsg = Utils.btDataChunkParser(message);
+        }
+        catch (Exception e) {
+            parsedMsg = e.toString();
+        }
+        // Toast.makeText(getApplicationContext(), parsedMsg, Toast.LENGTH_SHORT).show();
+    }
+
+    void initUDP() {
+        udp = new UDPService();
+        udp.setConnectionListener(new ConnectionListener() {
+            @Override
+            public void onConnected(String name) {
+                MainActivity.this.onUDPConnected(getGatewayIP());
+            }
+
+            @Override
+            public void onDisconnected() {
+                MainActivity.this.onUDPDisconnected();
+            }
+
+            @Override
+            public void onConnectionFailed(String errorMsg) {
+                MainActivity.this.onUDPConnectionFailed();
+            }
+
+            @Override
+            public void onDataReceived(String message) {
+                MainActivity.this.onDataReceived(message);
+            }
+        });
+    }
 
     void initBluetooth() {
-        bt = new BluetoothSPP(this, AppState.DELIMITER);
+        bt = new BTService(this, AppState.DELIMITER);
 
         if(!bt.isBluetoothAvailable()) {
             Toast.makeText(getApplicationContext()
@@ -50,46 +126,31 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String message) {
-                String parsedMsg;
-                try {
-                    parsedMsg = Utils.btDataChunkParser(message);
-                }
-                catch (Exception e) {
-                    parsedMsg = e.toString();
-                }
-//                Toast.makeText(getApplicationContext(), parsedMsg, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
-            public void onDeviceDisconnected() {
-                Toast.makeText(getApplicationContext(), getString(R.string.bt_disconnected), Toast.LENGTH_SHORT).show();
-                AppState.getInstance().speakMessage(R.string.bt_disconnected);
-                AppState.getInstance().onDisconnected();
-                toggleConnectionMenu(false);
+        bt.setConnectionListener(new ConnectionListener() {
+            public void onDisconnected() {
+                MainActivity.this.onBTDisconnected();
             }
 
-            public void onDeviceConnectionFailed() {
-                Toast.makeText(getApplicationContext(), getString(R.string.bt_connection_failed), Toast.LENGTH_SHORT).show();
-                AppState.getInstance().speakMessage(R.string.bt_connection_failed);
-                toggleConnectionMenu(false);
+            public void onConnectionFailed(String s) {
+                MainActivity.this.onBTConnectionFailed();            }
+
+            public void onConnected(String name) {
+                MainActivity.this.onBTConnected(name);
             }
 
-            public void onDeviceConnected(String name, String address) {
-                String txt = getString(R.string.bt_connected_to, name);
-                Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
-                AppState.getInstance().speakMessage(R.string.bt_connected);
-                toggleConnectionMenu(true);
-                AppState.getInstance().onConnected();
+            public void onDataReceived(String msg) {
+                MainActivity.this.onDataReceived(msg);
             }
         });
     }
 
-    void toggleConnectionMenu(boolean isConnected) {
-        menu.findItem(R.id.menuConnect).setVisible(!isConnected);
-        menu.findItem(R.id.menuDisconnect).setVisible(isConnected);
+    void toggleConnectionMenu(boolean isConnected, boolean isBluetooth) {
+        menu.findItem(R.id.menuBTConnect).setVisible(!isConnected);
+        menu.findItem(R.id.menuUDPConnect).setVisible(!isConnected);
+        boolean isBtConnected = isConnected && isBluetooth;
+        menu.findItem(R.id.menuBTDisconnect).setVisible(isBtConnected);
+        boolean isUdpConnected = isConnected && !isBluetooth;
+        menu.findItem(R.id.menuUDPDisconnect).setVisible(isUdpConnected);
     }
 
     @Override
@@ -101,7 +162,15 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), getResources());
+        /*
+      The {@link android.support.v4.view.PagerAdapter} that will provide
+      fragments for each of the sections. We use a
+      {@link FragmentPagerAdapter} derivative, which will keep every
+      loaded fragment in memory. If this becomes too memory intensive, it
+      may be best to switch to a
+      {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), getResources());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -112,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         initBluetooth();
+        initUDP();
         AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext(),
                 AppState.getInstance().shouldSpeakEnglishOnly);
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
@@ -147,29 +217,58 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == R.id.menuConnect) {
+        if(id == R.id.menuBTConnect) {
             bt.setDeviceTarget(BluetoothState.DEVICE_OTHER);
             Intent intent = new Intent(getApplicationContext(), DeviceList.class);
             startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
-        } else if(id == R.id.menuDisconnect) {
-            if(bt.getServiceState() == BluetoothState.STATE_CONNECTED)
+        } else if(id == R.id.menuBTDisconnect) {
+            if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
                 bt.disconnect();
+            }
+        } else if(id == R.id.menuUDPConnect) {
+            udp.connect(getGatewayIP(), 0);
+            useUDP();
+        } else if(id == R.id.menuUDPDisconnect) {
+            udp.disconnect();
+            AppState.getInstance().conn = null;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean checkIsWifiOnAndConnected() {
+        WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        if (!wifiMgr.isWifiEnabled()) return false;  // Wi-Fi adapter is OFF
+
+        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
+        return wifiInfo.getNetworkId() != -1; // if true, then connected to an access point
+    }
+
+    private String getGatewayIP() {
+        if (!checkIsWifiOnAndConnected()) return "0.0.0.0";
+
+        WifiManager wifi = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        DhcpInfo dhcp = wifi.getDhcpInfo();
+        int ip = dhcp.gateway;
+        return String.format("%d.%d.%d.%d",
+            (ip & 0xff),
+            (ip >> 8 & 0xff),
+            (ip >> 16 & 0xff),
+            (ip >> 24 & 0xff)
+        );
     }
 
     public void onStart() {
         super.onStart();
         if (!bt.isBluetoothEnabled()) {
-            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(intent, BluetoothState.REQUEST_ENABLE_BT);
+//            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(intent, BluetoothState.REQUEST_ENABLE_BT);
         } else {
             if(!bt.isServiceAvailable()) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
+                bt.runService();
+                useBT();
             }
         }
+
     }
 
     /**
@@ -203,11 +302,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
-
     }
 
-    public void setup() {
-        AppState.getInstance().bt = bt;
+    public void useBT() {
+        AppState.getInstance().conn = bt;
+    }
+
+    public void useUDP() {
+        AppState.getInstance().conn = udp;
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -216,9 +318,8 @@ public class MainActivity extends AppCompatActivity {
                 bt.connect(data);
         } else if(requestCode == BluetoothState.REQUEST_ENABLE_BT) {
             if(resultCode == Activity.RESULT_OK) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
+                bt.runService();
+                useBT();
             } else {
                 Toast.makeText(getApplicationContext()
                         , "Bluetooth was not enabled."
@@ -227,5 +328,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 }
