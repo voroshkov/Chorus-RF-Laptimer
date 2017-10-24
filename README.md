@@ -11,8 +11,8 @@ Several updated Solo Laptimer devices connected together make up a Chorus Laptim
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 ## HOT NEWS !
 ------------------------------------------------
-- WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection
-- Android app is now available on Google Play
+- WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
+- Android app is now available on Google Play only. The source code remains here.
 - If you'd like to take part in **iOS app testing**, fill the [google form](https://l.messenger.com/l.php?u=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F1FAIpQLSfCjH5jG3aokwXUiFyQcN0vXG9WW_69ma-Tan6bBtJ66oXn-w%2Fviewform&h=ATMTvEuW4jikO-7CUeyRraLkeH17ArfHqZ7qp-jubAIR1IdS7d2bDfuCYKLvbardj0_bRJ5wAlrWDuUb7Ss-UpYAkjBzvz3YkSGJqniAlJH3SmVQxxrwXlNOji7sPw3Yp1b7d8m4Kxo0ew) to add you to test flight account.
 ------------------------------------------------
 
@@ -24,6 +24,8 @@ If you feel like spending some money for the purspose - I'd also be very gratefu
 <img src="https://www.paypalobjects.com/webstatic/mktg/Logo/pp-logo-100px.png" alt="PayPal logo"/> - [PayPal Me](https://paypal.me/VOROSHKOV)
 
 <img src="https://en.bitcoin.it/w/images/en/c/cb/BC_Logotype.png" alt="Bitcoin logo" width=100/> - 1KHfQpKfSFZtc9c7b9ZPSsX3uqRcXgJuow
+
+Thanks for your support!
 
 ## Featured references:
 - Chorus RF Laptimer Facebook group: https://www.facebook.com/groups/ChorusRFLaptimer/
@@ -127,7 +129,7 @@ You might also like to change BT device name and default PIN (which is "1234") u
 
 <a name="wifi-module-setup"></a>
 ### WiFi module setup
-Geekcreit DT-06 modules by default operate as WiFi access point with IP 192.168.4.1. So open your browser, connect to http://192.168.4.1 and set up as follows:
+Geekcreit DT-06 modules by default operate as WiFi access point with IP **192.168.4.1**. So open your browser, connect to http://192.168.4.1 and set up as follows:
 
 **Don't forget to save each page after making the changes!**
 
@@ -143,7 +145,7 @@ On the Networks page you should select UDP Server and make sure the UDP port is 
 
 <img src="docs/img/esp_Networks.png" alt="Networks page setup">
 
-Make sure to restart the module to apply the changes. They'll remain until you reset the module to defaults.
+Make sure to restart the module to apply the changes. They'll remain until you "Restore" the module to defaults.
 
 <img src="docs/img/esp_Restart.png" alt="Restart module">
 
@@ -226,11 +228,11 @@ Use "⋮" menu to connect/disconnect to your Chorus device.
 
 <img src="docs/img/androidAppConnect.png" alt="Application connect" width="350">
 
-Connection is available via Bluetooth or via WiFi, depending on the connectivity module you use for your Chorus.
+Connection is available via Bluetooth or WiFi, depending on the connectivity module you use for your Chorus.
 
-Bluetooth connection assumes that Bluetooth is enabled and the Bluetooth module is paired with the phone.
+**Bluetooth** connection assumes that Bluetooth is enabled and the Bluetooth module is paired with the phone.
 
-WiFi connection assumes that the module operates in Access Point mode (AP), UDP server is up and running on port 9000, and you are connected directly to its WiFi network.
+**WiFi** connection assumes that the module operates in Access Point mode (AP), UDP server is up and running on port 9000, and you are connected directly to its WiFi network.
 
 Once connected to Chorus device, the app automatically detects a number of stacked Solo devices and shows corresponding controls.
 
