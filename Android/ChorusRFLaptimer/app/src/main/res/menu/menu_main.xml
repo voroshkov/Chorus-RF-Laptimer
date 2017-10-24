@@ -20,4 +20,4 @@
         android:title="@string/menu_disconnect"
         android:visible="false"
         app:showAsAction="never" />
-  </menu>
+</menu>
