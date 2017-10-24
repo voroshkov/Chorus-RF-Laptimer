@@ -2,7 +2,6 @@ package app.andrey_voroshkov.chorus_laptimer;
 
 import android.Manifest;
 import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
@@ -11,7 +10,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -24,10 +22,10 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
 
+public class MainActivity extends AppCompatActivity {
 
     private static final int REQUEST_WRITE_STORAGE_CODE = 315;
     /**
@@ -61,12 +59,10 @@ import app.akexorcist.bluetotohspp.library.DeviceList;
 
     public void onBTConnectionFailed() {
         onConnectionFailed();
-//        toggleConnectionMenu(false, true);
     }
 
     public void onUDPConnectionFailed() {
         onConnectionFailed();
-//        toggleConnectionMenu(false, false);
     }
 
     public void onConnected(String name) {

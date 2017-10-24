@@ -7,6 +7,8 @@ android {
     defaultConfig {
         versionCode 1
         versionName "1.0"
+        minSdkVersion 16
+        targetSdkVersion 25
     }
 
     sourceSets {
