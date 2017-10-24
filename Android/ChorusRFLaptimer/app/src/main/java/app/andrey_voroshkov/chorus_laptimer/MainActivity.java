@@ -1,11 +1,15 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,6 +27,8 @@ import app.akexorcist.bluetotohspp.library.DeviceList;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    private static final int REQUEST_WRITE_STORAGE_CODE = 315;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -43,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
     void initBluetooth() {
         bt = new BluetoothSPP(this, AppState.DELIMITER);
 
-        if(!bt.isBluetoothAvailable()) {
+        if (!bt.isBluetoothAvailable()) {
             Toast.makeText(getApplicationContext()
                     , "Bluetooth is not available"
                     , Toast.LENGTH_SHORT).show();
@@ -55,8 +61,7 @@ public class MainActivity extends AppCompatActivity {
                 String parsedMsg;
                 try {
                     parsedMsg = Utils.btDataChunkParser(message);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     parsedMsg = e.toString();
                 }
 //                Toast.makeText(getApplicationContext(), parsedMsg, Toast.LENGTH_SHORT).show();
@@ -117,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
         AppPreferences.applyAll();
 
+        //Ensure permissions permissions before any disk IO
+        ensurePermissions();
         //this will cleanup csv reports after 2 weeks (14 days)
         cleanUpCSVReports();
     }
@@ -147,12 +154,12 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == R.id.menuConnect) {
+        if (id == R.id.menuConnect) {
             bt.setDeviceTarget(BluetoothState.DEVICE_OTHER);
             Intent intent = new Intent(getApplicationContext(), DeviceList.class);
             startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
-        } else if(id == R.id.menuDisconnect) {
-            if(bt.getServiceState() == BluetoothState.STATE_CONNECTED)
+        } else if (id == R.id.menuDisconnect) {
+            if (bt.getServiceState() == BluetoothState.STATE_CONNECTED)
                 bt.disconnect();
         }
         return super.onOptionsItemSelected(item);
@@ -164,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, BluetoothState.REQUEST_ENABLE_BT);
         } else {
-            if(!bt.isServiceAvailable()) {
+            if (!bt.isServiceAvailable()) {
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER);
                 setup();
@@ -175,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This function will cleanUp CSV Reports if it has been 2 weeks since file is last updated.
      */
-    public void cleanUpCSVReports(){
+    public void cleanUpCSVReports() {
         //use ChorusLapTimer directory
         String path = Utils.getReportPath();
         File file = new File(path);
@@ -186,18 +193,18 @@ public class MainActivity extends AppCompatActivity {
         long todayMillis = calToday.getTimeInMillis();
 
         //iterate from files inside the ChorusLapTimer directory
-        if(file.list() != null){
-            for(int i = 0; i < file.list().length; i++){
+        if (file.list() != null) {
+            for (int i = 0; i < file.list().length; i++) {
                 File currFile = file.listFiles()[i];
                 //check difference of file.lastModified compared to date today
                 long diff = todayMillis - currFile.lastModified();
                 //convert difference to number of days
                 long numDays = TimeUnit.MILLISECONDS.toDays(diff);
                 //if number of days are 14(2 weeks), delete the file
-                if(numDays > 14){
-                    try{
+                if (numDays > 14) {
+                    try {
                         currFile.delete();
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         continue;
                     }
                 }
@@ -211,11 +218,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
-            if(resultCode == Activity.RESULT_OK)
+        if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
+            if (resultCode == Activity.RESULT_OK)
                 bt.connect(data);
-        } else if(requestCode == BluetoothState.REQUEST_ENABLE_BT) {
-            if(resultCode == Activity.RESULT_OK) {
+        } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_OK) {
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER);
                 setup();
@@ -228,4 +235,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void ensurePermissions() {
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_WRITE_STORAGE_CODE);
+        }
+    }
 }
