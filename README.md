@@ -109,7 +109,7 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
  - RX5808 (with SPI patch) (**N** items)
  - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
  - HC-06/HC-05 Bluetooth module (**1** item)
- - DT-06 Geekcreit WiFi module as an alternative to Bluetooth module (**1** item)
+ - DT-06 Geekcreit WiFi module as an alternative to Bluetooth module ([@Banggood](https://www.banggood.com/Geekcreit-DT-06-Wireless-WiFi-Serial-Port-Transparent-Transmission-Module-TTL-To-WiFi-p-1141047.html)) (**1** item)
  - 5V power supply (for example 2-4S LiPo with 5V BEC) (**1** item)
  - Piezo buzzer (5V, without built-in generator) - optional (**N** items)
  - 2 Resistors (1K and 10K) for LiPo Voltage monitoring - optional (**N** items)
@@ -314,4 +314,4 @@ Feel free to ask questions, suggest improvements, report your usage results.
 
 Happy flying!
 
-* Google Play and the Google Play logo are trademarks of Google LLC.
+/Google Play and the Google Play logo are trademarks of Google LLC./
