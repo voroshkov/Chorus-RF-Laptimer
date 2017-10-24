@@ -1,13 +1,18 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -19,11 +24,12 @@ import java.io.File;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
 
-public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_WRITE_STORAGE_CODE = 315;
     /**
      * The {@link ViewPager} that will host the section contents.
      */
@@ -163,13 +169,13 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         /*
-      The {@link android.support.v4.view.PagerAdapter} that will provide
-      fragments for each of the sections. We use a
-      {@link FragmentPagerAdapter} derivative, which will keep every
-      loaded fragment in memory. If this becomes too memory intensive, it
-      may be best to switch to a
-      {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+          The {@link android.support.v4.view.PagerAdapter} that will provide
+        fragments for each of the sections. We use a
+        {@link FragmentPagerAdapter} derivative, which will keep every
+        loaded fragment in memory. If this becomes too memory intensive, it
+        may be best to switch to a
+        {@link android.support.v4.app.FragmentStatePagerAdapter}.
+         */
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), getResources());
 
         // Set up the ViewPager with the sections adapter.
@@ -187,6 +193,8 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
         AppPreferences.applyAll();
 
+        //Ensure permissions permissions before any disk IO
+        ensurePermissions();
         //this will cleanup csv reports after 2 weeks (14 days)
         cleanUpCSVReports();
     }
@@ -274,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This function will cleanUp CSV Reports if it has been 2 weeks since file is last updated.
      */
-    public void cleanUpCSVReports(){
+    public void cleanUpCSVReports() {
         //use ChorusLapTimer directory
         String path = Utils.getReportPath();
         File file = new File(path);
@@ -293,10 +301,10 @@ public class MainActivity extends AppCompatActivity {
                 //convert difference to number of days
                 long numDays = TimeUnit.MILLISECONDS.toDays(diff);
                 //if number of days are 14(2 weeks), delete the file
-                if(numDays > 14){
-                    try{
+                if (numDays > 14) {
+                    try {
                         currFile.delete();
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         continue;
                     }
                 }
@@ -313,8 +321,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
-            if(resultCode == Activity.RESULT_OK)
+        if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
+            if (resultCode == Activity.RESULT_OK)
                 bt.connect(data);
         } else if(requestCode == BluetoothState.REQUEST_ENABLE_BT) {
             if(resultCode == Activity.RESULT_OK) {
@@ -326,6 +334,16 @@ public class MainActivity extends AppCompatActivity {
                         , Toast.LENGTH_SHORT).show();
                 finish();
             }
+        }
+    }
+
+    private void ensurePermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_WRITE_STORAGE_CODE);
         }
     }
 }
