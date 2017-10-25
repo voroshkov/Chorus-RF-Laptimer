@@ -41,4 +41,7 @@ SOFTWARE.
 #ifdef DEBUG
     #define loopTimerPin 4
     #define serialTimerPin 3
+    #define bufferBusyPin 7
+    #define sequencePin 6
+
 #endif

@@ -60,6 +60,7 @@ public class ChannelsSetupFragment extends Fragment {
                         updateResults();
                         break;
                     case DeviceRSSI:
+                    case Disconnect:
                         updateCurrentRSSI();
                         break;
                 }

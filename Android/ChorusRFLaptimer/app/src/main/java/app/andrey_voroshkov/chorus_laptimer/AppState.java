@@ -146,7 +146,7 @@ public class AppState {
             for(int i = count; i < numberOfDevices; i++) {
                 DeviceState ds = new DeviceState();
                 ds.threshold = 0;
-                ds.channel = i;
+                ds.channel = i%8;
                 ds.pilotName = "Pilot " + Integer.toString(i+1);
                 deviceStates.add(ds);
             }
@@ -419,11 +419,16 @@ public class AppState {
 
     public void onDisconnected() {
         isConnected = false;
+        conn = null;
         clearRssi();
         clearVoltage();
-        emitEvent(DataAction.DeviceRSSI);
+        emitEvent(DataAction.Disconnect);
     }
 
+    public void onBeforeDisconnect() {
+        sendBtCommand("R*v"); // turn off RSSI monitoring before disconnect
+        suspendBatteryMonitoringHandlers();
+    }
     //---------------------------------------------------------------------
     public void playTone(int tone, int duration) {
         mToneGenerator.startTone(tone, duration);

@@ -159,7 +159,7 @@ public class Utils {
     }
 
     public static final int bkColorPalette[] = {
-        0xFF4ECDC4, 0xFFC7F464, 0xFFFF6B6B, 0xFFC44D58, 0xFF3E4CB2, 0xFF049652, 0xFF6F8206, 0xFFF7C683, 0xFF6FDB7E, 0xFF556270
+        0xFF34b0a7, 0xFFC7F464, 0xFFFF6B6B, 0xFFC44D58, 0xFF4d60e3, 0xFF049652, 0xFF6F8206, 0xFFF7C683, 0xFF6FDB7E, 0xFF556270
     };
 
     public static int getBackgroundColorItem(int orderNumber) {

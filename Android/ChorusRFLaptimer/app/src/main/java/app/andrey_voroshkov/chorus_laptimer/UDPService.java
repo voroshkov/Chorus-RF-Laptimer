@@ -135,6 +135,7 @@ public class UDPService implements Connection{
             if (mIsConnected) return;
             try {
                 mChannel = DatagramChannel.open();
+                mChannel.configureBlocking(false);
                 mChannel.connect(new InetSocketAddress(mAddress, mPort));
 
                 if (mListenerThread == null) {

@@ -8,6 +8,8 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -221,20 +223,27 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        Handler delayedDisconnect = new Handler() {
+            public void handleMessage(Message msg) {
+                AppState.getInstance().conn.disconnect();
+            }
+        };
+
         if(id == R.id.menuBTConnect) {
             bt.setDeviceTarget(BluetoothState.DEVICE_OTHER);
             Intent intent = new Intent(getApplicationContext(), DeviceList.class);
             startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
         } else if(id == R.id.menuBTDisconnect) {
             if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
-                bt.disconnect();
+                AppState.getInstance().onBeforeDisconnect();
+                delayedDisconnect.sendEmptyMessageDelayed(0, 100);
             }
         } else if(id == R.id.menuUDPConnect) {
             udp.connect(getGatewayIP(), 0);
             useUDP();
         } else if(id == R.id.menuUDPDisconnect) {
-            udp.disconnect();
-            AppState.getInstance().conn = null;
+            AppState.getInstance().onBeforeDisconnect();
+            delayedDisconnect.sendEmptyMessageDelayed(0, 100);
         }
         return super.onOptionsItemSelected(item);
     }

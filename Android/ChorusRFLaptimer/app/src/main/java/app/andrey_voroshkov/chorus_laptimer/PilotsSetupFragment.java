@@ -63,6 +63,7 @@ public class PilotsSetupFragment extends Fragment {
                         updateResults();
                         break;
                     case DeviceRSSI:
+                    case Disconnect:
                         updateCurrentRSSI();
                         break;
                     case SPECIAL_DevicePilot_EditUpdate:
@@ -101,7 +102,6 @@ public class PilotsSetupFragment extends Fragment {
         ListView mListView = (ListView)mRootView.findViewById(R.id.lvPilots);
         int first = mListView.getFirstVisiblePosition();
         int last = mListView.getLastVisiblePosition();
-        int count = AppState.getInstance().deviceStates.size();
         for (int i = first; i <= last; i++) {
             View convertView = mListView.getChildAt(i - first);
             if (convertView != null) {

@@ -29,5 +29,6 @@ public enum DataAction {
     SPECIAL_DevicePilot_EditUpdate,
     BatteryVoltage,
     VoltageAdjustmentConst,
-    LiPoMonitorEnable
+    LiPoMonitorEnable,
+    Disconnect
 }

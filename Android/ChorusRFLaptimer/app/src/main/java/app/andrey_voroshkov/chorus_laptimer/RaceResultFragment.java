@@ -90,6 +90,7 @@ public class RaceResultFragment extends Fragment {
                         triggerCSVReportGeneration();
                         break;
                     case DeviceThreshold:
+                    case Disconnect:
                         updateButtons(rootView);
                         break;
                     case DeviceCalibrationStatus:
@@ -236,6 +237,11 @@ public class RaceResultFragment extends Fragment {
                 btnRace.setEnabled(false);
                 btnRace.setText(R.string.start_race_validation_thresholds);
             }
+        }
+
+        if (!AppState.getInstance().isConnected) {
+            btnRace.setEnabled(false);
+            btnCalibrate.setEnabled(false);
         }
     }
 
