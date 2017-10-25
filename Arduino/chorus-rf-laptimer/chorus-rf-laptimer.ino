@@ -32,12 +32,13 @@ TODO: Resolve problem:
     when CONTROL_DATA_REQUEST is being processed, i.e. all data items are sent in sequence,
     and either external or external logic decides to send an individual item,
     then the latter just breaks execution of CONTROL_DATA_REQUEST and data is not sent completely
+    This behavior should not occur in case of normal send queue processing.
 
-TODO: when implement send queue, there's possible optimization:
+TODO: there's possible optimization in send queue:
     remove already existing items from queue
 */
 
-#define API_VERSION 1 // version number to be increased with each API change (int16)
+#define API_VERSION 2 // version number to be increased with each API change (int16)
 
 // #define DEBUG
 
@@ -84,13 +85,15 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_MONITOR_OFF     'v'
 #define CONTROL_SET_SKIP_LAP0   'F'
 #define CONTROL_GET_VOLTAGE     'Y'
+#define CONTROL_GET_RSSI        'E'
 #define CONTROL_GET_API_VERSION '#'
-// input control byte constants for uint16 "set value" commands
-#define CONTROL_SET_FREQUENCY   'Q'
-// input control byte constants for long "set value" commands
+// input control byte constants for uint8 "set value" commands
 #define CONTROL_SET_MIN_LAP     'L'
 #define CONTROL_SET_CHANNEL     'H'
 #define CONTROL_SET_BAND        'N'
+// input control byte constants for uint16 "set value" commands
+#define CONTROL_SET_FREQUENCY   'Q'
+#define CONTROL_SET_MON_DELAY   'd'
 
 // output id byte constants
 #define RESPONSE_CHANNEL        'C'
@@ -109,6 +112,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_IS_CONFIGURED  'P'
 #define RESPONSE_VOLTAGE        'Y'
 #define RESPONSE_FREQUENCY      'Q'
+#define RESPONSE_MONITOR_DELAY  'd'
 #define RESPONSE_API_VERSION    '#'
 
 // send item byte constants
@@ -126,8 +130,9 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_LAP0_STATE     9
 #define SEND_IS_CONFIGURED  10
 #define SEND_FREQUENCY      11
-#define SEND_API_VERSION    12
-#define SEND_END_SEQUENCE   13
+#define SEND_MONITOR_DELAY  12
+#define SEND_API_VERSION    13
+#define SEND_END_SEQUENCE   14
 // following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES  100
 #define SEND_CALIBR_TIME    101
@@ -148,7 +153,9 @@ uint16_t rssi;
 #define THRESHOLD_ARRAY_SIZE  100
 uint16_t rssiThresholdArray[THRESHOLD_ARRAY_SIZE];
 
-#define MAX_RSSI_MONITOR_DELAY_CYCLES 1000 //each 100ms, if cycle takes 100us
+#define DEFAULT_RSSI_MONITOR_DELAY_CYCLES 1000 //each 100ms, if cycle takes 100us
+#define MIN_RSSI_MONITOR_DELAY_CYCLES 10 //each 1ms, if cycle takes 100us, to prevent loss of communication
+uint16_t rssiMonitorDelayCycles = DEFAULT_RSSI_MONITOR_DELAY_CYCLES;
 
 //----- Voltage monitoring -------------------------
 #define VOLTAGE_READS 3 //get average of VOLTAGE_READS readings
@@ -249,6 +256,8 @@ void setup() {
     DEBUG_CODE(
         pinMode(serialTimerPin, OUTPUT);
         pinMode(loopTimerPin, OUTPUT);
+        pinMode(bufferBusyPin, OUTPUT);
+        pinMode(sequencePin, OUTPUT);
     );
 }
 // ----------------------------------------------------------------------------
@@ -371,14 +380,19 @@ void loop() {
                     onItemSent();
                 }
                 break;
-            case 12: // SEND_API_VERSION
+            case 12: // SEND_MONITOR_DELAY
+                if (sendIntToSerial(RESPONSE_MONITOR_DELAY, rssiMonitorDelayCycles)) {
+                    onItemSent();
+                }
+                break;
+            case 13: // SEND_API_VERSION
                 if (sendIntToSerial(RESPONSE_API_VERSION, API_VERSION)) {
                     onItemSent();
                 }
                 break;
             // Below is a termination case, to notify that data for CONTROL_DATA_REQUEST is over.
             // Must be the last item in the sequence!
-            case 13: // SEND_END_SEQUENCE
+            case 14: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -440,7 +454,7 @@ void loop() {
 
     if (rssiMonitor) {
         rssiMonitorDelayExpiration++;
-        if (rssiMonitorDelayExpiration > MAX_RSSI_MONITOR_DELAY_CYCLES) {
+        if (rssiMonitorDelayExpiration >= rssiMonitorDelayCycles) {
             addToSendQueue(SEND_CURRENT_RSSI);
             rssiMonitorDelayExpiration = 0;
         }
@@ -562,6 +576,11 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 addToSendQueue(SEND_FREQUENCY);
                 isConfigured = 1;
                 break;
+            case CONTROL_SET_MON_DELAY: // set frequency
+                rssiMonitorDelayCycles = setRssiMonitorDelay(HEX_TO_UINT16(&controlData[1]));
+                addToSendQueue(SEND_MONITOR_DELAY);
+                isConfigured = 1;
+                break;
         }
     } else {
         switch (controlByte) {
@@ -590,6 +609,9 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 playEndRaceTones();
                 addToSendQueue(SEND_RACE_STATE);
                 isConfigured = 1;
+                break;
+            case CONTROL_GET_RSSI: // get current RSSI value
+                addToSendQueue(SEND_CURRENT_RSSI);
                 break;
             case CONTROL_DEC_MIN_LAP: // decrease minLapTime
                 decMinLap();
@@ -691,8 +713,11 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
 }
 // ----------------------------------------------------------------------------
 void readSerialDataChunk () {
+    // don't read anything if we have something not sent in proxyBuf
+    if (proxyBufDataSize != 0) return;
+
     uint8_t availBytes = Serial.available();
-    if (availBytes && proxyBufDataSize == 0) {
+    if (availBytes) {
         uint8_t freeBufBytes = READ_BUFFER_SIZE - readBufFilledBytes;
 
         //reset buffer if we couldn't find delimiter in its contents in prev step
@@ -705,7 +730,9 @@ void readSerialDataChunk () {
         uint8_t canGetBytes = availBytes > freeBufBytes ? freeBufBytes : availBytes;
         Serial.readBytes(&readBuf[readBufFilledBytes], canGetBytes);
         readBufFilledBytes += canGetBytes;
+    }
 
+    if (readBufFilledBytes) {
         //try finding a delimiter
         uint8_t foundIdx = 255;
         for (uint8_t i = 0; i < readBufFilledBytes; i++) {
@@ -716,7 +743,7 @@ void readSerialDataChunk () {
         }
 
         uint8_t shouldPassMsgFurther = 1;
-        //if delimiter found
+        //if delimiter found then process the command or send it further
         if (foundIdx < READ_BUFFER_SIZE) {
             switch (readBuf[0]) {
                 case 'R': //read data from module
@@ -761,6 +788,7 @@ void sendProxyDataChunk () {
     if (proxyBufDataSize && Serial.availableForWrite() > proxyBufDataSize) {
         Serial.write(proxyBuf, proxyBufDataSize);
         Serial.write(SERIAL_DATA_DELIMITER);
+
         proxyBufDataSize = 0;
     }
 }
@@ -863,6 +891,10 @@ void setThresholdValue(uint16_t threshold) {
     } else {
         playClearThresholdTones();
     }
+}
+// ----------------------------------------------------------------------------
+uint16_t setRssiMonitorDelay(uint16_t delay) {
+    return delay < MIN_RSSI_MONITOR_DELAY_CYCLES ? MIN_RSSI_MONITOR_DELAY_CYCLES : delay;
 }
 // ----------------------------------------------------------------------------
 uint16_t getFilteredRSSI() {
