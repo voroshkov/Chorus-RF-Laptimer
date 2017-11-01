@@ -11,9 +11,9 @@ Several updated Solo Laptimer devices connected together make up a Chorus Laptim
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 ## HOT NEWS !
 ------------------------------------------------
-- WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
-- Android app is now available on Google Play only. The source code remains here.
-- If you'd like to take part in **iOS app testing**, fill the [google form](https://l.messenger.com/l.php?u=https%3A%2F%2Fdocs.google.com%2Fforms%2Fd%2Fe%2F1FAIpQLSfCjH5jG3aokwXUiFyQcN0vXG9WW_69ma-Tan6bBtJ66oXn-w%2Fviewform&h=ATMTvEuW4jikO-7CUeyRraLkeH17ArfHqZ7qp-jubAIR1IdS7d2bDfuCYKLvbardj0_bRJ5wAlrWDuUb7Ss-UpYAkjBzvz3YkSGJqniAlJH3SmVQxxrwXlNOji7sPw3Yp1b7d8m4Kxo0ew) to add you to test flight account.
+- 2017-11: iOS app is live on AppStore: https://itunes.apple.com/app/id1296647206. All credits go to Lazar Djordjevic!
+- 2017-10: WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
+- 2017-10: Android app is now available on Google Play only. The source code remains here.
 ------------------------------------------------
 
 ## Support the project:
@@ -57,6 +57,7 @@ Thanks for your support!
 - [Software](#software)
     - [Arduino](#arduino)
     - [Android App](#android-app)
+    - [iOS App](#ios-app)
         - [App User Guide](#app-user-guide)
 - [Setup and Usage Guide](#setup-and-usage-guide)
 - [Troubleshooting](#troubleshooting)
@@ -218,8 +219,16 @@ The app is now available on Google Play.
 
 [![Get the app](docs/img/google-play-badge.png)](https://play.google.com/store/apps/details?id=app.andrey_voroshkov.chorus_laptimer&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
 
+<a name="ios-app"></a>
+### iOS App
+The app is available on App Store: https://itunes.apple.com/app/id1296647206
+
+Lazar Djordjevic is the creator of the iOS app.
+
 <a name="app-user-guide"></a>
 #### App User Guide
+Android app is used as the illustration for the guide.
+
 Application startup screen:
 
 <img src="docs/img/androidAppStartup.png" alt="Application startup screen" width="350">
@@ -303,6 +312,9 @@ Android app:
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
+
+iOS app:
+- Lazar Djordjevic (lazar89nis) - entire app implementation!
 
 <a name="contacts"></a>
 ## Contacts
