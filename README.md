@@ -109,7 +109,7 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
 ### Used parts:
  - RX5808 (with SPI patch) (**N** items)
  - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
- - HC-06/HC-05 Bluetooth module (**1** item)
+ - HC-06/HC-05 (HM-10 for iOS) Bluetooth module (**1** item)
  - DT-06 Geekcreit WiFi module as an alternative to Bluetooth module ([@Banggood](https://www.banggood.com/Geekcreit-DT-06-Wireless-WiFi-Serial-Port-Transparent-Transmission-Module-TTL-To-WiFi-p-1141047.html)) (**1** item)
  - 5V power supply (for example 2-4S LiPo with 5V BEC) (**1** item)
  - Piezo buzzer (5V, without built-in generator) - optional (**N** items)
@@ -222,9 +222,10 @@ The app is now available on Google Play.
 <a name="ios-app"></a>
 ### iOS App
 Lazar Djordjevic is the creator of the iOS app. Thanks, Lazar!
+
 The app is available on App Store.
 
-[![Get the iOS app](docs/img/appstore-badge.png)](https://itunes.apple.com/app/id1296647206)
+[![Get the iOS app](docs/img/appstore_badge.png)](https://itunes.apple.com/app/id1296647206)
 
 **Note for iOS users**: Apple devices don't work with HC-05/06 modules. You should use **HM-10** Bluetooth module instead. (Or wait for WiFi modules support in iOS version :))
 
