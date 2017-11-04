@@ -217,13 +217,16 @@ Download the project from Arduino folder, open **chorus-rf-laptimer.ino** file w
 ### Android App
 The app is now available on Google Play.
 
-[![Get the app](docs/img/google-play-badge.png)](https://play.google.com/store/apps/details?id=app.andrey_voroshkov.chorus_laptimer&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
+[![Get the Android app](docs/img/google-play-badge.png)](https://play.google.com/store/apps/details?id=app.andrey_voroshkov.chorus_laptimer&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1)
 
 <a name="ios-app"></a>
 ### iOS App
-The app is available on App Store: https://itunes.apple.com/app/id1296647206
+Lazar Djordjevic is the creator of the iOS app. Thanks, Lazar!
+The app is available on App Store.
 
-Lazar Djordjevic is the creator of the iOS app.
+[![Get the iOS app](docs/img/appstore-badge.png)](https://itunes.apple.com/app/id1296647206)
+
+**Note for iOS users**: Apple devices don't work with HC-05/06 modules. You should use **HM-10** Bluetooth module instead. (Or wait for WiFi modules support in iOS version :))
 
 <a name="app-user-guide"></a>
 #### App User Guide
