@@ -13,7 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Created by lplett on 3/16/2017.
+ * Created by lplett on 3/16/2017. Translated into Spanish by JLO FPV on 12/06/2017.
  */
 
 public class TextSpeaker implements TextToSpeech.OnInitListener {
@@ -23,6 +23,7 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
     static {
         SUPPORTED_LOCALES.put("en", Locale.US);
         SUPPORTED_LOCALES.put("ru", new Locale("ru"));
+        SUPPORTED_LOCALES.put("es", new Locale("es"));
     }
 
     private TextToSpeech tts;
