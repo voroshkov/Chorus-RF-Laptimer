@@ -1,0 +1,85 @@
+<resources>
+    <string name="app_name">Chorus RF Laptimer</string>
+
+    <!-- Menu -->
+`    <string name="menu_bt_connect">Conectar por BT</string>
+    <string name="menu_udp_connect">Conectar por WiFi</string>
+    <string name="menu_disconnect">Desconectar</string>
+
+    <!-- Tabs -->
+    <string name="tab_race">Race</string>
+    <string name="tab_pilots">Pilotos</string>
+    <string name="tab_frequency">Freq</string>
+    <string name="tab_setup">Ajustes</string>
+
+    <!-- Setup -->
+    <string name="setup_pilot_name">Nombre de Piloto</string>
+    <string name="setup_rssi_threshold">Umbral RSSI</string>
+    <string name="setup_clear_threshold">Limpiar</string>
+    <string name="setup_set_threshold">Asignar</string>
+    <string name="setup_calibrate_timers">Calibrar Timers</string>
+    <string name="device_number">Dispositivo #%d</string>
+    <string name="setup_time">%d sec.</string>
+    <string name="channel_descriptor">Canal: %1$s%2$s (%3$s)</string>
+    <string name="calibrate_timers">Calibrando timers…</string>
+    <string name="setup_lipo_monitor">LiPo Monitor</string>
+    <string name="setup_adjust_voltage">Ajuste Voltaje</string>
+    <string name="setup_nr_laps">Numero de Vueltas</string>
+    <string name="setup_min_lap_time">Tiempo Minimo Vuelta</string>
+    <string name="setup_skip_first_lap">Saltar Primera Vuelta</string>
+    <string name="setup_time_to_prepare">Tiempo Para Preparar la Carrera</string>
+    <string name="setup_enable_device_sounds">Activar Buzzer Chorus</string>
+    <string name="setup_speak_lap_times">Escuchar Tiempo de Vueltas</string>
+    <string name="setup_speak_messages">Escuchar Mensajes</string>
+    <string name="freq_channel">Canal #</string>
+    <string name="freq_rf_band">RF Band</string>
+    <string name="plus_sign">+</string>
+    <string name="minus_sign">-</string>
+    <string name="mhz_string">MHz</string>
+
+    <!-- Race -->
+    <string name="starting_race">Iniciando…</string>
+    <string name="stop_race">Parar Carrera (Long Press)</string>
+    <string name="start_race">Iniciar Carrera</string>
+    <string name="start_race_validation_pilots">Activar Pilotos para Iniciar Carrera</string>
+    <string name="start_race_validation_thresholds">Calibra todos los pilotos antes de la carrera</string>
+    <string name="best_lap">Mejor Vuelta:</string>
+    <string name="best_lap_position">Mejor Posicion de Vuelta: %s</string>
+    <string name="lap_result">Vuelta # %1$d:  %2$s</string>
+    <string name="last_lap">Ultima Vuelta:</string>
+    <string name="race_time">Tiempo de Carrera: </string>
+    <string name="race_position">Posicion:</string>
+    <string name="race_result_finished">TERMINADA</string>
+    <string name="race_results">%1$s (%2$s%3$s) Laps: %4$s %5$s</string>
+    <string name="race_announcement_finished">La Carrera ha Terminado</string>
+    <string name="race_announcement_starting">Armando motores,  la carrera empieza en %d segundos.</string>
+    <string name="race_lap_report">Vuelta %1$d.</string>
+    <string name="race_pilot_finished">%1$s finalizado,  puedes aterrizar.</string>
+    <string name="race_pilot_already_finished">%1$s aterriza ya,   cansino.</string>
+    <string name="seconds_short">segundos.</string>
+
+    <!-- Reports -->
+    <string name="report_file_name">Informe guardado en: %s</string>
+    <string name="report_failure">Guardado de Informe erroneo, revise que tenga almacenamiento.</string>
+
+    <!-- Voltage monitoring -->
+    <string name="battery_status_critical">Bateria de Dispositivo Critica</string>
+    <string name="battery_status_low">Bateria de dispositivo baja</string>
+
+    <!-- Bluetooth -->
+    <string name="connected">Conectado</string>
+    <string name="connection_failed">No conectado</string>
+    <string name="connected_to">Conectado a %s</string>
+    <string name="disconnected">Desconectado</string>
+    <string name="setup_speak_english_only">Speak in English</string>
+
+    <plurals name="pilots_in_race">
+        <item quantity="one">Inicio de Carrera (%1$d pilot)</item>
+        <item quantity="other">Inicio de Carrera (%1$d pilots)</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%1$d minuto</item>
+        <item quantity="other">%1$d minutos</item>
+    </plurals>
+</resources>

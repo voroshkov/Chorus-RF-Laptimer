@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#c42121</color>
+    <color name="colorPrimaryDark">#e20202</color>
+    <color name="colorAccent">#ff4081</color>
+    <color name="colorWarn">#ffa000</color>
+    <color name="colorBatteryMonitor">#fcf7b7</color>
+    <color name="colorRaceResultGroup">#8a000000</color>
+    <color name="colorRaceResultGroupFinished">#ff4081</color>
+    <color name="colorRaceResultChild">#8a000000</color>
+    <color name="colorRaceResultChildBest">#ff4081</color>
+</resources>

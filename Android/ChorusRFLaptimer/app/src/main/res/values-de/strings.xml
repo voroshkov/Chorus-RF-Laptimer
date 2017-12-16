@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Chorus RF Laptimer</string>
+
+    <!-- Menu -->
+    <string name="menu_bt_connect">Verbinden per Bluetooth</string>
+    <string name="menu_udp_connect">Verbinden per WiFi</string>
+    <string name="menu_disconnect">Verbindung trennen</string>
+
+    <!-- Tabs -->
+    <string name="tab_race">Rennen</string>
+    <string name="tab_pilots">Piloten</string>
+    <string name="tab_frequency">Freq</string>
+    <string name="tab_setup">Einstellung</string>
+
+    <!-- Setup -->
+    <string name="setup_pilot_name">Piloten Name</string>
+    <string name="setup_rssi_threshold">RSSI Schwellwert</string>
+    <string name="setup_clear_threshold">zurücksetzen</string>
+    <string name="setup_set_threshold">setzen</string>
+    <string name="setup_calibrate_timers">Zeitmesser Kalibrieren</string>
+    <string name="device_number">Gerät Nr:</string>
+    <string name="setup_time">%d sec.</string>
+    <string name="channel_descriptor">Kanal: %1$s%2$s (%3$s)</string>
+    <string name="calibrate_timers">kalibriere Zeitmesser....</string>
+    <string name="setup_lipo_monitor">LiPo Spannung</string>
+    <string name="setup_adjust_voltage">Spannung justieren</string>
+    <string name="setup_nr_laps">zu fliegende Runden</string>
+    <string name="setup_min_lap_time">mindeste Rundenzeit</string>
+    <string name="setup_skip_first_lap">erste Runde ignorieren</string>
+    <string name="setup_time_to_prepare">Vorlaufzeit für Rennstart</string>
+    <string name="setup_enable_device_sounds">Geräte Töne</string>
+    <string name="setup_speak_lap_times">Ansage Rundenzeit</string>
+    <string name="setup_speak_messages">Ansage Nachrichten</string>
+    <string name="freq_channel">Kanal Nr.</string>
+    <string name="freq_rf_band">Frequenzband</string>
+    <string name="plus_sign">+</string>
+    <string name="minus_sign">-</string>
+    <string name="mhz_string">MHz</string>
+
+    <!-- Race -->
+    <string name="starting_race">Starte Rennen.....</string>
+    <string name="stop_race">Rennen anhalten ( lange drücken )</string>
+    <string name="start_race">Rennen starten</string>
+    <string name="start_race_validation_pilots">Aktiviere Piloten um das Rennen zu beginnen</string>
+    <string name="start_race_validation_thresholds">setze alle Schwellwerte vor dem Rennen</string>
+    <string name="best_lap">Beste Runde:</string>
+    <string name="best_lap_position">Beste Runden Position %s</string>
+    <string name="lap_result">Runde Nr. %1$d: %2$s</string>
+    <string name="last_lap">Letzte Runde:</string>
+    <string name="race_time">Renndauer: </string>
+    <string name="race_position">Position:</string>
+    <string name="race_result_finished">Abgeschlossen</string>
+    <string name="race_results">%1$s (%2$s%3$s) Runden: %4$s %5$s</string>
+    <string name="race_announcement_finished">Rennen ist beendet</string>
+    <string name="race_announcement_starting">Starte Rennen in %d s.</string>
+    <string name="race_lap_report">Runde %1$d.</string>
+    <string name="race_pilot_finished">%1$s beendet.</string>
+    <string name="race_pilot_already_finished">%1$s bereits beendet.</string>
+    <string name="seconds_short">s.</string>
+
+    <!-- Reports -->
+    <string name="report_file_name">Bericht gespeichert als: %s</string>
+    <string name="report_failure">Berichterstellung fehlgeschlagen. Bitte prüfen, ob genug Speicher vorhanden ist.</string>
+
+    <!-- Voltage monitoring -->
+    <string name="battery_status_critical">Gerätespannung kritisch</string>
+    <string name="battery_status_low">Gerätespannung niedrig</string>
+
+    <!-- Bluetooth -->
+    <string name="connected">Verbunden</string>
+    <string name="connection_failed">nicht Verbunden</string>
+    <string name="connected_to">Verbunden zu %s</string>
+    <string name="disconnected">Verbindung getrennt</string>
+    <string name="setup_speak_english_only">Ansage nur in English</string>
+
+    <plurals name="pilots_in_race">
+        <item quantity="one">Starte Rennen (%1$d Pilot)</item>
+        <item quantity="other">Starte Rennen (%1$d Piloten)</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%1$d Minute</item>
+        <item quantity="other">%1$d Minuten</item>
+    </plurals>
+</resources>
