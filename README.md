@@ -314,7 +314,7 @@ Android app:
 - evgen48 - display frequencies in MHz
 - Gleb Godonoga (SidhNor) - internationalization support, Russian localization, permissions tuning
 - Jose Luis Ortiz (JLOFPV) - Spanish localization
-- anunique - help with German localization
+- thestealth131205, anunique - German localization
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
