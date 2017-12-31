@@ -36,6 +36,7 @@ Thanks for your support!
 ## Add-ins/Extensions:
 
 - LED Finish Gate Module: https://github.com/voroshkov/Chorus-LED-Module
+- Chorus RSSI Monitoring Android app (paid): https://play.google.com/store/apps/details?id=app.andrey_voroshkov.chorus_monitor
 
 ## Contents
 
