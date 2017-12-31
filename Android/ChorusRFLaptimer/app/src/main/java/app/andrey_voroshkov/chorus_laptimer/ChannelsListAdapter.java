@@ -86,7 +86,7 @@ public class ChannelsListAdapter extends BaseAdapter {
         viewHolder.txtChannel.setText(AppState.getInstance().getChannelText(position));
         viewHolder.txtBand.setText(AppState.getInstance().getBandText(position));
         viewHolder.spaceChannelColor.setBackgroundColor(Utils.getBackgroundColorItem(position));
-        viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
+        viewHolder.rssiBar.setMax(AppState.MAX_RSSI - AppState.MIN_RSSI);
         String mhzString = mContext.getString(R.string.mhz_string);
         viewHolder.txtFreq.setText(AppState.getInstance().getFrequencyText(position) + " " + mhzString);
 

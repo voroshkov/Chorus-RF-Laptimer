@@ -134,7 +134,7 @@ Geekcreit DT-06 modules by default operate as WiFi access point with IP **192.16
 
 **Don't forget to save each page after making the changes!**
 
-Change Baud Rate to 115200, leave other settings as shown:
+Change Baud Rate to 115200, Serial Split Timeout(ms) to 10, leave other settings as shown:
 
 <img src="docs/img/esp_Serial.png" alt="Serial page setup">
 

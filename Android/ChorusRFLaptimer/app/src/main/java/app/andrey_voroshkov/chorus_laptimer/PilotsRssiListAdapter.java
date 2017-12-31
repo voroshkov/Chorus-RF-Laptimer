@@ -92,7 +92,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.btnDecThr = (Button) convertView.findViewById(R.id.btnDecThresh);
             viewHolder.btnIncThr = (Button) convertView.findViewById(R.id.btnIncThresh);
             viewHolder.btnSetThr = (Button) convertView.findViewById(R.id.btnCapture);
-            viewHolder.rssiBar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
+//            viewHolder.rssiBar = (ProgressBar) convertView.findViewById(R.id.rssiBar);
             viewHolder.isPilotEnabled = (CheckBox) convertView.findViewById(R.id.checkIsPilotEnabled);
             viewHolder.innerGroup = (LinearLayout) convertView.findViewById(R.id.innerGroupLayout);
             viewHolder.edPilotTextWatcher = createTextWatcher(position);
@@ -140,7 +140,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
 
         viewHolder.edPilotName.setText(ds.pilotName, TextView.BufferType.EDITABLE);
 
-        viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
+//        viewHolder.rssiBar.setMax(AppState.RSSI_SPAN);
 
         viewHolder.btnDecThr.setOnClickListener(new View.OnClickListener() {
             @Override

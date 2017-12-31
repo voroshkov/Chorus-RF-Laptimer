@@ -3,6 +3,7 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -160,6 +161,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFormat(PixelFormat.TRANSLUCENT); //this should prevent blinking black when surfaceView is initialized
         setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

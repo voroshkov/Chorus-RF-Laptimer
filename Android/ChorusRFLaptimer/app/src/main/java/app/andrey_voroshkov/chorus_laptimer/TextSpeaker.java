@@ -80,7 +80,9 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
     }
 
     public void shutdown() {
-        tts.shutdown();
+        if (tts != null) {
+            tts.shutdown();
+        }
     }
 
     @Override
@@ -99,7 +101,12 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
                     setContextToUse(currentConfig, localeToSet);
                 }
             }
-            tts.setLanguage(localeToSet);
+            try {
+                tts.setLanguage(localeToSet);
+            }
+            catch(Exception e) {
+                tts = null;
+            }
             DecimalFormatSymbols dfs = new DecimalFormatSymbols(localeToSet);
             decimalSeparator = Character.toString(dfs.getDecimalSeparator());
             isInitialized = true;
@@ -107,12 +114,16 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
     }
 
     private void speakPreLollipop(String text) {
-        tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        if (tts != null) {
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null);
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void speakNormally(String text) {
-        tts.speak(text, TextToSpeech.QUEUE_ADD, null, null);
+        if (tts != null) {
+            tts.speak(text, TextToSpeech.QUEUE_ADD, null, null);
+        }
     }
 
     private void setContextToUseLegacy(Configuration configuration, Locale locale) {

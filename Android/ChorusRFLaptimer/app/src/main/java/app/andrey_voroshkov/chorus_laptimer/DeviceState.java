@@ -14,10 +14,12 @@ public class DeviceState {
     public int calibrationValue;
     public int currentRSSI;
     public boolean isEnabled;
+    public RssiRingBuffer historicalRSSI;
 
-    DeviceState() {
+    DeviceState(int rssiBufferLength) {
         isCalibrated = false;
         isEnabled = true;
+        historicalRSSI = new RssiRingBuffer(rssiBufferLength);
     }
 }
 

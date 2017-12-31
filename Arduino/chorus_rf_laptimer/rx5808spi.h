@@ -76,7 +76,7 @@ void PowerDownFeatures(uint32_t features)
     uint8_t i;
     digitalLow(slaveSelectPin);
     delayMicroseconds(1);
-    
+
     SERIAL_SENDBIT0();
     SERIAL_SENDBIT0();
     SERIAL_SENDBIT0();
@@ -109,7 +109,7 @@ void setupSPIpins() {
     digitalLow(spiClockPin);
     digitalHigh(slaveSelectPin);
     delayMicroseconds(1);
-    
+
     PowerDownFeatures(PD_IFAF | PD_DIV4 | PD_5GVCO | PD_REG1D8 | PD_DIV80 | PD_PLL1D8 | PD_IF_DEMOD | PD_VAMP | PD_VCLAMP | PD_MIXER | PD_IFABF | PD_6M5 | PD_AU6M5 | PD_6M | PD_AU6M | PD_SYN | PD_REGIF);
 }
 
@@ -161,9 +161,9 @@ uint16_t setModuleFrequency(uint16_t frequency) {
     // Finished clocking data in
     digitalHigh(slaveSelectPin);
     delayMicroseconds(1);
-    
+
     delay(MIN_TUNE_TIME);
-    
+
     return frequency;
 }
 

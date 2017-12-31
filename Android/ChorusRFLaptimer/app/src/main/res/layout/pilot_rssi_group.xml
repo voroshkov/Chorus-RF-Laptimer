@@ -124,31 +124,36 @@
                 android:baselineAligned="false">
 
                 <LinearLayout
+                    android:id="@+id/layoutDrawSurface"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:layout_weight="1">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:id="@+id/txtRssi"
-                        android:layout_weight="1"
-                        android:text="1"
-                        android:gravity="center_vertical"
-                        android:layout_gravity="center_horizontal"/>
+                    <!--<SurfaceView-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:id="@+id/drawRssi"/>-->
+                    <!--<TextView-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="match_parent"-->
+                        <!--android:id="@+id/txtRssi"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:text="1"-->
+                        <!--android:gravity="center_vertical"-->
+                        <!--android:layout_gravity="center_horizontal"/>-->
 
-                    <ProgressBar
-                        style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/rssiBar"
-                        android:layout_weight="1"
-                        android:layout_gravity="center_vertical"
-                        android:paddingRight="10dp"
-                        android:progress="256"
-                        android:max="350" />
+                    <!--<ProgressBar-->
+                        <!--style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:id="@+id/rssiBar"-->
+                        <!--android:layout_weight="1"-->
+                        <!--android:layout_gravity="center_vertical"-->
+                        <!--android:paddingRight="10dp"-->
+                        <!--android:progress="256"-->
+                        <!--android:max="350" />-->
                 </LinearLayout>
                 <LinearLayout
                     android:orientation="horizontal"

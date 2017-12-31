@@ -146,10 +146,12 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
 uint16_t rssi;
+uint16_t topRssi;
 
 #define RSSI_MAX 1024
 #define RSSI_MIN 0
-#define MAGIC_THRESHOLD_REDUCE_CONSTANT 2
+#define RSSI_FALL_AMOUNT 2 // RSSI decrease from local maximum by this amount triggers a new lap
+#define MAGIC_THRESHOLD_REDUCE_CONSTANT 2 //
 #define THRESHOLD_ARRAY_SIZE  100
 uint16_t rssiThresholdArray[THRESHOLD_ARRAY_SIZE];
 
@@ -272,34 +274,42 @@ void loop() {
     if (rssiThreshold > 0) { // threshold = 0 means that we don't check rssi values
         if(rssi > rssiThreshold) { // rssi above the threshold - drone is near
             if (allowEdgeGeneration) {  // we haven't fired event for this drone proximity case yet
-                allowEdgeGeneration = 0;
-                gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
 
-                uint32_t now = millis();
-                uint32_t diff = now - lastMilliseconds;
-                if (timeCalibrationConst) {
-                    diff = diff + (int32_t)diff/timeCalibrationConst;
+                if (rssi > topRssi) {
+                    topRssi = rssi;
                 }
-                if (isRaceStarted) { // if we're within the race, then log lap time
-                    if (diff > minLapTime*1000 || (shouldSkipFirstLap && newLapIndex == 0)) { // if minLapTime haven't passed since last lap, then it's probably false alarm
-                        digitalLow(led);
-                        if (newLapIndex < MAX_LAPS-1) { // log time only if there are slots available
-                            lapTimes[newLapIndex] = diff;
-                            newLapIndex++;
-                            lastLapsNotSent++;
-                            addToSendQueue(SEND_LAST_LAPTIMES);
-                        }
-                        lastMilliseconds = now;
-                        playLapTones(); // during the race play tone sequence even if no more laps can be logged
+
+                if (rssi < (topRssi - RSSI_FALL_AMOUNT)) {
+                    allowEdgeGeneration = 0;
+                    gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
+
+                    uint32_t now = millis();
+                    uint32_t diff = now - lastMilliseconds;
+                    if (timeCalibrationConst) {
+                        diff = diff + (int32_t)diff/timeCalibrationConst;
                     }
-                }
-                else {
-                    playLapTones(); // if not within the race, then play once per case
+                    if (isRaceStarted) { // if we're within the race, then log lap time
+                        if (diff > minLapTime*1000 || (shouldSkipFirstLap && newLapIndex == 0)) { // if minLapTime haven't passed since last lap, then it's probably false alarm
+                            digitalLow(led);
+                            if (newLapIndex < MAX_LAPS-1) { // log time only if there are slots available
+                                lapTimes[newLapIndex] = diff;
+                                newLapIndex++;
+                                lastLapsNotSent++;
+                                addToSendQueue(SEND_LAST_LAPTIMES);
+                            }
+                            lastMilliseconds = now;
+                            playLapTones(); // during the race play tone sequence even if no more laps can be logged
+                        }
+                    }
+                    else {
+                        playLapTones(); // if not within the race, then play once per case
+                    }
                 }
             }
         }
         else  {
             allowEdgeGeneration = 1; // we're below the threshold, be ready to catch another case
+            topRssi = rssi;
             digitalHigh(led);
         }
     }
