@@ -174,10 +174,28 @@ public class UDPService implements Connection{
 
     private class ListenerThread extends Thread {
 
+        String mLastIncompleteChunk = "";
+
         private void parseAndCallback(String str) {
-            if (mConnectionListener == null) return;
+            if (mConnectionListener == null || str.length() == 0) return;
+
+            char lastChar = str.charAt(str.length()-1);
+            boolean isLastChunkIncomplete = lastChar != '\n';
 
             String[] chunks = TextUtils.split(str, "\n");
+            int lastChunkIndex = chunks.length - 1;
+
+            if (!mLastIncompleteChunk.isEmpty()) {
+                chunks[0] = mLastIncompleteChunk + chunks[0];
+            }
+
+            if (isLastChunkIncomplete) {
+                mLastIncompleteChunk = chunks[lastChunkIndex];
+                chunks[lastChunkIndex] = "";
+            } else {
+                mLastIncompleteChunk = "";
+            }
+
             for (String chunk : chunks) {
                 if (chunk.isEmpty()) continue;
                 mActivityHandler.sendMessage(composeMessage(MSG_ON_RECEIVE, chunk));
