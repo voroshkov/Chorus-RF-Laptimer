@@ -36,6 +36,7 @@ Thanks for your support!
 ## Add-ins/Extensions:
 
 - LED Finish Gate Module: https://github.com/voroshkov/Chorus-LED-Module
+- Chorus RSSI Monitoring Android app (paid): https://play.google.com/store/apps/details?id=app.andrey_voroshkov.chorus_monitor
 
 ## Contents
 
@@ -313,6 +314,8 @@ Android app:
 - Ray Erik Rabe (raveerk) - CSV reports generation
 - evgen48 - display frequencies in MHz
 - Gleb Godonoga (SidhNor) - internationalization support, Russian localization, permissions tuning
+- Jose Luis Ortiz (JLOFPV) - Spanish localization
+- thestealth131205, anunique - German localization
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
