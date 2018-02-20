@@ -38,7 +38,7 @@ TODO: there's possible optimization in send queue:
     remove already existing items from queue
 */
 
-#define API_VERSION 2 // version number to be increased with each API change (int16)
+#define API_VERSION 3 // version number to be increased with each API change (int16)
 
 // #define DEBUG
 
@@ -67,6 +67,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 
 // input control byte constants
 #define CONTROL_START_RACE      'R'
+#define CONTROL_START_RACE_ABS  'P' // race with absolute laps timing
 #define CONTROL_END_RACE        'r'
 #define CONTROL_DEC_MIN_LAP     'm'
 #define CONTROL_INC_MIN_LAP     'M'
@@ -177,6 +178,7 @@ uint8_t isSendQueueFull = 0;
 
 //----- Lap timings--------------------------------
 uint32_t lastMilliseconds = 0;
+uint32_t raceStartTime = 0;
 #define MIN_MIN_LAP_TIME 1 //seconds
 #define MAX_MIN_LAP_TIME 60 //seconds
 uint8_t minLapTime = 5; //seconds
@@ -196,6 +198,7 @@ uint8_t allowEdgeGeneration = 0;
 uint8_t channelIndex = 0;
 uint8_t bandIndex = 0;
 uint8_t isRaceStarted = 0;
+uint8_t raceType = 0; // type 1: lap times are counted as absolute for each lap; type 2: lap times are relative to the race start (sum of previous absolute lap times);
 uint8_t isSoundEnabled = 1;
 uint8_t isConfigured = 0; //changes to 1 if any input changes the state of the device. it will mean that externally stored preferences should not be applied
 uint8_t rssiMonitor = 0;
@@ -276,7 +279,7 @@ void loop() {
                 gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
 
                 uint32_t now = millis();
-                uint32_t diff = now - lastMilliseconds;
+                uint32_t diff = now - lastMilliseconds; //time diff with the last lap (or with the race start)
                 if (timeCalibrationConst) {
                     diff = diff + (int32_t)diff/timeCalibrationConst;
                 }
@@ -284,7 +287,17 @@ void loop() {
                     if (diff > minLapTime*1000 || (shouldSkipFirstLap && newLapIndex == 0)) { // if minLapTime haven't passed since last lap, then it's probably false alarm
                         digitalLow(led);
                         if (newLapIndex < MAX_LAPS-1) { // log time only if there are slots available
-                            lapTimes[newLapIndex] = diff;
+                            if (raceType == 1) {
+                                // for the raceType 1 count time spent for each lap
+                                lapTimes[newLapIndex] = diff;
+                            } else {
+                                // for the raceType 2 count times relative to the race start (ever-growing with each new lap within the race)
+                                uint32_t diffStart = now - raceStartTime;
+                                if (timeCalibrationConst) {
+                                    diffStart = diffStart + (int32_t)diffStart/timeCalibrationConst;
+                                }
+                                lapTimes[newLapIndex] = diffStart;
+                            }
                             newLapIndex++;
                             lastLapsNotSent++;
                             addToSendQueue(SEND_LAST_LAPTIMES);
@@ -585,12 +598,25 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
     } else {
         switch (controlByte) {
             case CONTROL_START_RACE: // start race
-                lastMilliseconds = millis();
+                raceStartTime = millis();
+                lastMilliseconds = raceStartTime;
                 DEBUG_CODE(
                     digitalHigh(serialTimerPin);
                 );
                 newLapIndex = 0;
                 isRaceStarted = 1;
+                raceType = 1;
+                allowEdgeGeneration = 0;
+                playStartRaceTones();
+                addToSendQueue(SEND_RACE_STATE);
+                isConfigured = 1;
+                break;
+            case CONTROL_START_RACE_ABS: // start race with absolute laps timing
+                raceStartTime = millis();
+                lastMilliseconds = raceStartTime;
+                newLapIndex = 0;
+                isRaceStarted = 1;
+                raceType = 2;
                 allowEdgeGeneration = 0;
                 playStartRaceTones();
                 addToSendQueue(SEND_RACE_STATE);
