@@ -29,7 +29,7 @@ SOFTWARE.
 
 // Pin definitions
 
-#define led 13
+#define ledPin 13
 #define spiDataPin 10
 #define slaveSelectPin 11
 #define spiClockPin 12

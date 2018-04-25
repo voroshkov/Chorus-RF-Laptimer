@@ -143,7 +143,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_ALL_DEVICE_STATE 255
 
 //----- RSSI --------------------------------------
-#define FILTER_ITERATIONS 5
+#define FILTER_ITERATIONS 0 // software filtering iterations; set 0 - if filtered in hardware; set 5 - if not
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
 uint16_t rssi;
@@ -157,6 +157,9 @@ uint16_t rssiThresholdArray[THRESHOLD_ARRAY_SIZE];
 #define DEFAULT_RSSI_MONITOR_DELAY_CYCLES 1000 //each 100ms, if cycle takes 100us
 #define MIN_RSSI_MONITOR_DELAY_CYCLES 10 //each 1ms, if cycle takes 100us, to prevent loss of communication
 uint16_t rssiMonitorDelayCycles = DEFAULT_RSSI_MONITOR_DELAY_CYCLES;
+
+#define RSSI_SETUP_INITIALIZE 0
+#define RSSI_SETUP_NEXT_STEP 1
 
 //----- Voltage monitoring -------------------------
 #define VOLTAGE_READS 3 //get average of VOLTAGE_READS readings
@@ -212,6 +215,7 @@ uint8_t shouldSendSingleItem = 0;
 uint8_t lastLapsNotSent = 0;
 uint16_t rssiMonitorDelayExpiration = 0;
 uint16_t frequency = 0;
+uint8_t isSettingThreshold = 0;
 
 //----- read/write bufs ---------------------------
 #define READ_BUFFER_SIZE 20
@@ -231,9 +235,9 @@ uint8_t proxyBufDataSize = 0;
 
 // ----------------------------------------------------------------------------
 void setup() {
-    // initialize digital pin 13 LED as an output.
-    pinMode(led, OUTPUT);
-    digitalHigh(led);
+    // initialize led pin as output.
+    pinMode(ledPin, OUTPUT);
+    digitalHigh(ledPin);
 
     // init buzzer pin
     pinMode(buzzerPin, OUTPUT);
@@ -253,8 +257,8 @@ void setup() {
 
     initFastADC();
 
-    // Setup Done - Turn Status LED off.
-    digitalLow(led);
+    // Setup Done - Turn Status ledPin off.
+    digitalLow(ledPin);
 
     DEBUG_CODE(
         pinMode(serialTimerPin, OUTPUT);
@@ -285,7 +289,7 @@ void loop() {
                 }
                 if (isRaceStarted) { // if we're within the race, then log lap time
                     if (diff > minLapTime*1000 || (shouldSkipFirstLap && newLapIndex == 0)) { // if minLapTime haven't passed since last lap, then it's probably false alarm
-                        digitalLow(led);
+                        // digitalLow(ledPin);
                         if (newLapIndex < MAX_LAPS-1) { // log time only if there are slots available
                             if (raceType == 1) {
                                 // for the raceType 1 count time spent for each lap
@@ -313,7 +317,7 @@ void loop() {
         }
         else  {
             allowEdgeGeneration = 1; // we're below the threshold, be ready to catch another case
-            digitalHigh(led);
+            // digitalHigh(ledPin);
         }
     }
 
@@ -471,6 +475,10 @@ void loop() {
             addToSendQueue(SEND_CURRENT_RSSI);
             rssiMonitorDelayExpiration = 0;
         }
+    }
+
+    if (isSettingThreshold) {
+        setupThreshold(RSSI_SETUP_NEXT_STEP);
     }
 
     if (isSoundEnabled && playSound) {
@@ -693,8 +701,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 break;
             case CONTROL_SET_THRESHOLD: // set threshold
                 setOrDropThreshold();
-                addToSendQueue(SEND_THRESHOLD);
-                isConfigured = 1;
+
                 break;
             case CONTROL_SET_SOUND: // set sound
                 isSoundEnabled = !isSoundEnabled;
@@ -744,6 +751,10 @@ void readSerialDataChunk () {
 
     uint8_t availBytes = Serial.available();
     if (availBytes) {
+        if (availBytes > READ_BUFFER_SIZE) {
+            digitalHigh(ledPin);
+        }
+
         uint8_t freeBufBytes = READ_BUFFER_SIZE - readBufFilledBytes;
 
         //reset buffer if we couldn't find delimiter in its contents in prev step
@@ -893,22 +904,120 @@ void decThreshold() {
 // ----------------------------------------------------------------------------
 void setOrDropThreshold() {
     if (rssiThreshold == 0) {
-        uint16_t median;
-        for(uint8_t i=0; i < THRESHOLD_ARRAY_SIZE; i++) {
-            rssiThresholdArray[i] = getFilteredRSSI();
-        }
-        sortArray(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
-        median = getMedian(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
-        if (median > MAGIC_THRESHOLD_REDUCE_CONSTANT) {
-            rssiThreshold = median - MAGIC_THRESHOLD_REDUCE_CONSTANT;
-            playSetThresholdTones();
-        }
+        // uint16_t median;
+        // for(uint8_t i=0; i < THRESHOLD_ARRAY_SIZE; i++) {
+        //     rssiThresholdArray[i] = getFilteredRSSI();
+        // }
+        // sortArray(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
+        // median = getMedian(rssiThresholdArray, THRESHOLD_ARRAY_SIZE);
+        // if (median > MAGIC_THRESHOLD_REDUCE_CONSTANT) {
+        //     rssiThreshold = median - MAGIC_THRESHOLD_REDUCE_CONSTANT;
+        //     playSetThresholdTones();
+        // }
+        isSettingThreshold = 1;
+        setupThreshold(RSSI_SETUP_INITIALIZE);
     }
     else {
         rssiThreshold = 0;
+        isSettingThreshold = 0;
+        isConfigured = 1;
+        addToSendQueue(SEND_THRESHOLD);
         playClearThresholdTones();
     }
 }
+
+// ----------------------------------------------------------------------------
+void setupThreshold(uint8_t phase) {
+    // this process assumes the following:
+    // 1. before the process all VTXs are turned ON, but are distant from the Chorus device, so that Chorus sees the "background" rssi values only
+    // 2. once the setup process is initiated by Chorus operator, all pilots walk towards the Chorus device
+    // 3. setup process starts tracking top rssi values
+    // 4. as pilots come closer, rssi should rise above the value defined by RISE_RSSI_THRESHOLD_PERCENT
+    // 5. after that setup expects rssi to fall from the reached top, down by FALL_RSSI_THRESHOLD_PERCENT
+    // 6. after the rssi falls, the top recorded value (decreased by TOP_RSSI_DECREASE_PERCENT) is set as a threshold
+
+    // time constant for accumulation filter: higher value => more delay
+    // value of 20 should give about 100 readings before value reaches the settled rssi
+    #define ACCUMULATION_TIME_CONSTANT 100
+    #define MILLIS_BETWEEN_ACCU_READS 10 // artificial delay between rssi reads to slow down the accumulation
+    #define TOP_RSSI_DECREASE_PERCENT 5 // decrease top value by this percent using diff between low and high as a base
+    #define RISE_RSSI_THRESHOLD_PERCENT 20 // rssi value should pass this percentage above low value to continue finding the peak and further fall down of rssi
+    #define FALL_RSSI_THRESHOLD_PERCENT 50 // rssi should fall below this percentage of diff between high and low to finalize setup of the threshold
+
+    static uint8_t rssiSetupPhase;
+    static uint16_t rssiLow;
+    static uint16_t rssiHigh;
+    static uint16_t rssiHighEnoughForMonitoring;
+    static uint32_t accumulatedShiftedRssi; // accumulates rssi slowly; contains multiplied rssi value for better accuracy
+    static uint32_t lastRssiAccumulationTime;
+
+    if (!isSettingThreshold) return; // just for safety, normally it's controlled outside
+
+    if (phase == RSSI_SETUP_INITIALIZE) {
+        // initialization step
+        playThresholdSetupStartTones();
+        rssiThreshold = 0xFFFF; // just to make it clearable by setThreshold function
+        isSettingThreshold = 1;
+        rssiSetupPhase = 0;
+        rssiLow = rssi;
+        rssiHigh = rssi;
+        accumulatedShiftedRssi = rssi * ACCUMULATION_TIME_CONSTANT; // multiply to prevent loss in accuracy
+        rssiHighEnoughForMonitoring = rssiLow + rssiLow * RISE_RSSI_THRESHOLD_PERCENT / 100;
+        lastRssiAccumulationTime = millis();
+    } else {
+        // active phase step (searching for high value and fall down)
+        if (rssiSetupPhase == 0) {
+            // in this phase of the setup we are tracking rssi growth until it reaches the predefined percentage from low
+
+            // searching for peak
+            if (rssi > rssiHigh) {
+                rssiHigh = rssi;
+            }
+
+            // since filter runs too fast, we have to introduce a delay between subsequent readings of filter values
+            uint32_t curTime = millis();
+            if ((curTime - lastRssiAccumulationTime) > MILLIS_BETWEEN_ACCU_READS) {
+                lastRssiAccumulationTime = curTime;
+                // this is actually a filter with a delay determined by ACCUMULATION_TIME_CONSTANT
+                accumulatedShiftedRssi = rssi  + (accumulatedShiftedRssi * (ACCUMULATION_TIME_CONSTANT - 1) / ACCUMULATION_TIME_CONSTANT );
+            }
+
+            uint16_t accumulatedRssi = accumulatedShiftedRssi / ACCUMULATION_TIME_CONSTANT; // find actual rssi from multiplied value
+
+            if (accumulatedRssi > rssiHighEnoughForMonitoring) {
+                rssiSetupPhase = 1;
+                accumulatedShiftedRssi = rssiHigh * ACCUMULATION_TIME_CONSTANT;
+                playThresholdSetupMiddleTones();
+            }
+        } else {
+            // in this phase of the setup we are tracking highest rssi and expect it to fall back down so that we know that the process is complete
+
+            if (rssi > rssiHigh) {
+                rssiHigh = rssi;
+                accumulatedShiftedRssi = rssiHigh * ACCUMULATION_TIME_CONSTANT; // set to highest found rssi
+            }
+
+            // since filter runs too fast, we have to introduce a delay between subsequent readings of filter values
+            uint32_t curTime = millis();
+            if ((curTime - lastRssiAccumulationTime) > MILLIS_BETWEEN_ACCU_READS) {
+                lastRssiAccumulationTime = curTime;
+                // this is actually a filter with a delay determined by ACCUMULATION_TIME_CONSTANT
+                accumulatedShiftedRssi = rssi  + (accumulatedShiftedRssi * (ACCUMULATION_TIME_CONSTANT - 1) / ACCUMULATION_TIME_CONSTANT );
+            }
+            uint16_t accumulatedRssi = accumulatedShiftedRssi / ACCUMULATION_TIME_CONSTANT;
+
+            uint16_t rssiLowEnoughForSetup = rssiHigh - (rssiHigh - rssiLow) * FALL_RSSI_THRESHOLD_PERCENT / 100;
+            if (accumulatedRssi < rssiLowEnoughForSetup) {
+                rssiThreshold = rssiHigh - ((rssiHigh - rssiLow) * TOP_RSSI_DECREASE_PERCENT) / 100;
+                isSettingThreshold = 0;
+                isConfigured = 1;
+                playThresholdSetupDoneTones();
+                addToSendQueue(SEND_THRESHOLD);
+            }
+        }
+    }
+}
+
 // ----------------------------------------------------------------------------
 void setThresholdValue(uint16_t threshold) {
     rssiThreshold = threshold;

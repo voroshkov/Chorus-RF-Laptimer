@@ -39,6 +39,7 @@ uint8_t lastToneSeqIndex;
 
 //----- buzzer tone sequences ------------------------------
 // pairs of [frequency(Hz), duration(ms), ...]
+// NOTES: 523, 587, 659, 698, 784, 880, 988, 1046
 
 #define TONE_SEQ_DETECT_LEN 8
 uint16_t toneSeq_Detect [TONE_SEQ_DETECT_LEN] = { 950, 50, 1050, 50, 1250, 50, 1350, 50 };
@@ -57,6 +58,16 @@ uint16_t toneSeq_StartRace [TONE_SEQ_START_RACE_LEN] = { 1500, 700 };
 
 #define TONE_SEQ_END_RACE_LEN 10
 uint16_t toneSeq_EndRace [TONE_SEQ_END_RACE_LEN] = { 1500, 120, 0, 30, 1500, 120, 0, 30, 1500, 120 };
+
+#define TONE_SEQ_SETUP_THRESHOLD_START 10
+uint16_t toneSeq_SetupThresholdStart [TONE_SEQ_SETUP_THRESHOLD_START] = { 659, 100, 0, 20, 880, 100, 0, 20, 659, 100 };
+
+#define TONE_SEQ_SETUP_THRESHOLD_MIDDLE 10
+uint16_t toneSeq_SetupThresholdMiddle [TONE_SEQ_SETUP_THRESHOLD_MIDDLE] = { 659, 150, 0, 30, 784, 150, 0, 30, 880, 150 };
+
+#define TONE_SEQ_SETUP_THRESHOLD_DONE 14
+uint16_t toneSeq_SetupThresholdDone [TONE_SEQ_SETUP_THRESHOLD_DONE] = { 880, 150, 0, 30, 784, 150, 0, 30, 659, 150, 0, 30, 523, 500};
+
 
 // ----------------------------------------------------------------------------
 void startPlayingTones() {
@@ -99,5 +110,23 @@ void playStartRaceTones() {
 void playEndRaceTones() {
     curToneSeq = toneSeq_EndRace;
     lastToneSeqIndex = TONE_SEQ_END_RACE_LEN - 1;
+    startPlayingTones();
+}
+// ----------------------------------------------------------------------------
+void playThresholdSetupStartTones() {
+    curToneSeq = toneSeq_SetupThresholdStart;
+    lastToneSeqIndex = TONE_SEQ_SETUP_THRESHOLD_START - 1;
+    startPlayingTones();
+}
+// ----------------------------------------------------------------------------
+void playThresholdSetupMiddleTones() {
+    curToneSeq = toneSeq_SetupThresholdMiddle;
+    lastToneSeqIndex = TONE_SEQ_SETUP_THRESHOLD_MIDDLE - 1;
+    startPlayingTones();
+}
+// ----------------------------------------------------------------------------
+void playThresholdSetupDoneTones() {
+    curToneSeq = toneSeq_SetupThresholdDone;
+    lastToneSeqIndex = TONE_SEQ_SETUP_THRESHOLD_DONE - 1;
     startPlayingTones();
 }
