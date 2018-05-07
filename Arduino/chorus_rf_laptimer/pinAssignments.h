@@ -42,6 +42,5 @@ SOFTWARE.
     #define loopTimerPin 4
     #define serialTimerPin 3
     #define bufferBusyPin 7
-    #define sequencePin 6
-
+    #define dbgPin 6
 #endif

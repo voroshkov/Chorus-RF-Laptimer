@@ -147,6 +147,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
 uint16_t rssi;
+uint16_t slowRssi;
 
 #define RSSI_MAX 1024
 #define RSSI_MIN 0
@@ -264,7 +265,7 @@ void setup() {
         pinMode(serialTimerPin, OUTPUT);
         pinMode(loopTimerPin, OUTPUT);
         pinMode(bufferBusyPin, OUTPUT);
-        pinMode(sequencePin, OUTPUT);
+        pinMode(dbgPin, OUTPUT);
     );
 }
 // ----------------------------------------------------------------------------
@@ -273,14 +274,20 @@ void loop() {
         digitalToggle(loopTimerPin);
     );
 
-    rssi = getFilteredRSSI();
+    // TODO: revise if additional filtering is really needed
+    // TODO: if needed, then maybe use the same algorithm, as getSlowChangingRSSI to avoid decrease of values?
+    rssi = getFilteredRSSI(); // actually it doesn't filter
+
+    if (!isRaceStarted) { // no need to get slowRssi during race time because it's used only in threshold setting, which is already set by the race time
+        slowRssi = getSlowChangingRSSI(); // filter RSSI
+    }
 
     // check rssi threshold to identify when drone finishes the lap
     if (rssiThreshold > 0) { // threshold = 0 means that we don't check rssi values
         if(rssi > rssiThreshold) { // rssi above the threshold - drone is near
             if (allowEdgeGeneration) {  // we haven't fired event for this drone proximity case yet
                 allowEdgeGeneration = 0;
-                gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
+                // gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
 
                 uint32_t now = millis();
                 uint32_t diff = now - lastMilliseconds; //time diff with the last lap (or with the race start)
@@ -938,10 +945,11 @@ void setupThreshold(uint8_t phase) {
 
     // time constant for accumulation filter: higher value => more delay
     // value of 20 should give about 100 readings before value reaches the settled rssi
-    #define ACCUMULATION_TIME_CONSTANT 100
+    // don't make it bigger than 2000 to avoid overflow of accumulatedShiftedRssi
+    #define ACCUMULATION_TIME_CONSTANT 150
     #define MILLIS_BETWEEN_ACCU_READS 10 // artificial delay between rssi reads to slow down the accumulation
-    #define TOP_RSSI_DECREASE_PERCENT 5 // decrease top value by this percent using diff between low and high as a base
-    #define RISE_RSSI_THRESHOLD_PERCENT 20 // rssi value should pass this percentage above low value to continue finding the peak and further fall down of rssi
+    #define TOP_RSSI_DECREASE_PERCENT 10 // decrease top value by this percent using diff between low and high as a base
+    #define RISE_RSSI_THRESHOLD_PERCENT 25 // rssi value should pass this percentage above low value to continue finding the peak and further fall down of rssi
     #define FALL_RSSI_THRESHOLD_PERCENT 50 // rssi should fall below this percentage of diff between high and low to finalize setup of the threshold
 
     static uint8_t rssiSetupPhase;
@@ -959,9 +967,9 @@ void setupThreshold(uint8_t phase) {
         rssiThreshold = 0xFFFF; // just to make it clearable by setThreshold function
         isSettingThreshold = 1;
         rssiSetupPhase = 0;
-        rssiLow = rssi;
-        rssiHigh = rssi;
-        accumulatedShiftedRssi = rssi * ACCUMULATION_TIME_CONSTANT; // multiply to prevent loss in accuracy
+        rssiLow = slowRssi; // using slowRssi to avoid catching random current rssi
+        rssiHigh = rssiLow;
+        accumulatedShiftedRssi = rssiLow * ACCUMULATION_TIME_CONSTANT; // multiply to prevent loss in accuracy
         rssiHighEnoughForMonitoring = rssiLow + rssiLow * RISE_RSSI_THRESHOLD_PERCENT / 100;
         lastRssiAccumulationTime = millis();
     } else {
@@ -969,9 +977,9 @@ void setupThreshold(uint8_t phase) {
         if (rssiSetupPhase == 0) {
             // in this phase of the setup we are tracking rssi growth until it reaches the predefined percentage from low
 
-            // searching for peak
-            if (rssi > rssiHigh) {
-                rssiHigh = rssi;
+            // searching for peak; using slowRssi to avoid catching sudden random peaks
+            if (slowRssi > rssiHigh) {
+                rssiHigh = slowRssi;
             }
 
             // since filter runs too fast, we have to introduce a delay between subsequent readings of filter values
@@ -979,7 +987,7 @@ void setupThreshold(uint8_t phase) {
             if ((curTime - lastRssiAccumulationTime) > MILLIS_BETWEEN_ACCU_READS) {
                 lastRssiAccumulationTime = curTime;
                 // this is actually a filter with a delay determined by ACCUMULATION_TIME_CONSTANT
-                accumulatedShiftedRssi = rssi  + (accumulatedShiftedRssi * (ACCUMULATION_TIME_CONSTANT - 1) / ACCUMULATION_TIME_CONSTANT );
+                accumulatedShiftedRssi = rssi  + (accumulatedShiftedRssi * (ACCUMULATION_TIME_CONSTANT - 1) / ACCUMULATION_TIME_CONSTANT);
             }
 
             uint16_t accumulatedRssi = accumulatedShiftedRssi / ACCUMULATION_TIME_CONSTANT; // find actual rssi from multiplied value
@@ -992,8 +1000,9 @@ void setupThreshold(uint8_t phase) {
         } else {
             // in this phase of the setup we are tracking highest rssi and expect it to fall back down so that we know that the process is complete
 
-            if (rssi > rssiHigh) {
-                rssiHigh = rssi;
+            // continue searching for peak; using slowRssi to avoid catching sudden random peaks
+            if (slowRssi > rssiHigh) {
+                rssiHigh = slowRssi;
                 accumulatedShiftedRssi = rssiHigh * ACCUMULATION_TIME_CONSTANT; // set to highest found rssi
             }
 
@@ -1043,6 +1052,15 @@ uint16_t getFilteredRSSI() {
     }
 
     return rssiArr[FILTER_ITERATIONS];
+}
+// ----------------------------------------------------------------------------
+// this is just a digital filter function
+uint16_t getSlowChangingRSSI() {
+    #define TIME_DELAY_CONSTANT 1000 // this is a filtering constant that regulates both depth of filtering and delay at the same time
+    static uint32_t slowRssiMultiplied;
+
+    slowRssiMultiplied = rssi  + (slowRssiMultiplied * (TIME_DELAY_CONSTANT - 1) / TIME_DELAY_CONSTANT );
+    return slowRssiMultiplied / TIME_DELAY_CONSTANT;
 }
 // ----------------------------------------------------------------------------
 void sortArray(uint16_t a[], uint16_t size) {
