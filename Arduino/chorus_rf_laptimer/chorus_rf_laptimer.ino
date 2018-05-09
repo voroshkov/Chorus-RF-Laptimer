@@ -271,7 +271,7 @@ void loop() {
 
     // check rssi threshold to identify when drone finishes the lap
     if (rssiThreshold > 0) { // threshold = 0 means that we don't check rssi values
-        if(rssi > rssiThreshold && rssi < rssiPrevious) { // rssi above the threshold adg getting lower - drone is passing
+        if(rssi > rssiThreshold && rssi < rssiPrevious) { // rssi above the threshold and getting lower - drone is passing
             if (allowEdgeGeneration) {  // we haven't fired event for this drone proximity case yet
                 allowEdgeGeneration = 0;
                 gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
