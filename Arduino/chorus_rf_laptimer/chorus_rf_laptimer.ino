@@ -146,6 +146,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
 uint16_t rssi;
+uint16_t rssiPrevious = 0;
 
 #define RSSI_MAX 1024
 #define RSSI_MIN 0
@@ -270,7 +271,7 @@ void loop() {
 
     // check rssi threshold to identify when drone finishes the lap
     if (rssiThreshold > 0) { // threshold = 0 means that we don't check rssi values
-        if(rssi > rssiThreshold) { // rssi above the threshold - drone is near
+        if(rssi > rssiThreshold && rssi < rssiPrevious) { // rssi above the threshold adg getting lower - drone is passing
             if (allowEdgeGeneration) {  // we haven't fired event for this drone proximity case yet
                 allowEdgeGeneration = 0;
                 gen_rising_edge(pinRaspiInt);  //generate interrupt for EasyRaceLapTimer software
@@ -303,7 +304,9 @@ void loop() {
             digitalHigh(led);
         }
     }
-
+    
+    rssiPrevious = rssi; // saving rssi value for edge detection
+    
     readSerialDataChunk();
 
     sendProxyDataChunk();
