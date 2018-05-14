@@ -620,6 +620,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 );
                 newLapIndex = 0;
                 isRaceStarted = 1;
+                isSettingThreshold = 0; // safety measure: stop setting threshold upon race start to avoid losing time there
                 raceType = 1;
                 allowEdgeGeneration = 0;
                 playStartRaceTones();
@@ -631,6 +632,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 lastMilliseconds = raceStartTime;
                 newLapIndex = 0;
                 isRaceStarted = 1;
+                isSettingThreshold = 0; // safety measure: stop setting threshold upon race start to avoid losing time there
                 raceType = 2;
                 allowEdgeGeneration = 0;
                 playStartRaceTones();
