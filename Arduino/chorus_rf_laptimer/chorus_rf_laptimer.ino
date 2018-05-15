@@ -143,7 +143,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 
 //----- RSSI --------------------------------------
 #define FILTER_ITERATIONS 5
-#define SLOPE_DETECTION_ITERATIONS 5  // rssi readings for slope detection
+#define SLOPE_DETECTION_ITERATIONS 10  // rssi readings for slope detection
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
 uint16_t rssi;
