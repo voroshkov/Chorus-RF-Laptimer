@@ -2,7 +2,7 @@
     <string name="app_name">Chorus RF Laptimer</string>
 
     <!-- Menu -->
-`    <string name="menu_bt_connect">Connect via Bluetooth</string>
+    <string name="menu_bt_connect">Connect via Bluetooth</string>
     <string name="menu_udp_connect">Connect via WiFi</string>
     <string name="menu_disconnect">Disconnect</string>
 

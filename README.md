@@ -36,6 +36,7 @@ Thanks for your support!
 ## Add-ins/Extensions:
 
 - LED Finish Gate Module: https://github.com/voroshkov/Chorus-LED-Module
+- Chorus RSSI Monitoring Android app (paid): https://play.google.com/store/apps/details?id=app.andrey_voroshkov.chorus_monitor
 
 ## Contents
 
@@ -84,7 +85,7 @@ Thanks for your support!
 - Android application for controlling the device via Bluetooth or WiFi.
 - 5V * 250 mA power consumption (per device)
 - Low cost (around $16 per device, excluding power supply), compared to similar solutions available on market.
-- Can be tuned to any RF band/channel
+- Can be tuned to any RF band/channel (R, A, B, E, F, D and even a bit of Connex)
 - Monitors several frequencies simultaneously (corresponding to a number of devices)
 - Expandable: make one Solo device and track your solo flight times; make more devices, connect them into a Chorus and compete with teammates
 - Automatic detection of a number of Solo devices in a Chorus
@@ -134,7 +135,7 @@ Geekcreit DT-06 modules by default operate as WiFi access point with IP **192.16
 
 **Don't forget to save each page after making the changes!**
 
-Change Baud Rate to 115200, leave other settings as shown:
+Change Baud Rate to 115200, Serial Split Timeout(ms) to 10, leave other settings as shown:
 
 <img src="docs/img/esp_Serial.png" alt="Serial page setup">
 
@@ -313,6 +314,8 @@ Android app:
 - Ray Erik Rabe (raveerk) - CSV reports generation
 - evgen48 - display frequencies in MHz
 - Gleb Godonoga (SidhNor) - internationalization support, Russian localization, permissions tuning
+- Jose Luis Ortiz (JLOFPV) - Spanish localization
+- thestealth131205, anunique - German localization
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
