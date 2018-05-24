@@ -1,0 +1,79 @@
+<resources>
+    <string name="app_name">Chorus RF Laptimer</string>
+
+    <!-- Menu -->
+    <string name="menu_bt_connect">Connessione via Bluetooth</string>
+    <string name="menu_udp_connect">Connessione via WiFi</string>
+    <string name="menu_disconnect">Disconnetti</string>
+
+    <!-- Tabs -->
+    <string name="tab_race">Gara</string>
+    <string name="tab_pilots">Piloti</string>
+    <string name="tab_frequency">Freq</string>
+    <string name="tab_setup">Impostazioni</string>
+
+    <!-- Setup -->
+    <string name="setup_pilot_name">Nome Pilota</string>
+    <string name="setup_rssi_threshold">Soglia RSSI</string>
+    <string name="setup_clear_threshold">Pulisci</string>
+    <string name="setup_set_threshold">Imposta</string>
+    <string name="setup_calibrate_timers">Calibrazione Timers</string>
+    <string name="device_number">Dispositivo #%d</string>
+    <string name="setup_time">%d sec.</string>
+    <string name="channel_descriptor">Canale: %1$s%2$s (%3$s)</string>
+    <string name="calibrate_timers">Calibro i timers...</string>
+    <string name="setup_lipo_monitor">Lipo Monitor</string>
+    <string name="setup_adjust_voltage">Correggi voltaggio</string>
+    <string name="setup_nr_laps">Numero di Giri</string>
+    <string name="setup_min_lap_time">Tempo Minimo per Giro</string>
+    <string name="setup_skip_first_lap">Salta Il Primo Giro</string>
+    <string name="setup_time_to_prepare">Tempo Prima Della Partenza</string>
+    <string name="setup_enable_device_sounds">Abilita Suono Buzzer</string>
+    <string name="setup_speak_lap_times">Annuncia tempi sul Giro</string>
+    <string name="setup_speak_messages">Abilita Messaggi Vocali</string>
+    <string name="setup_speak_english_only">Annunci in Inglese</string>
+    <string name="freq_channel">Canale #</string>
+    <string name="freq_rf_band">Banda RF</string>
+    <string name="plus_sign">+</string>
+    <string name="minus_sign">-</string>
+    <string name="mhz_string">MHz</string>
+
+    <!-- Race -->
+    <string name="starting_race">Partenza...</string>
+    <string name="stop_race">Ferma Gara(Premi a lungo)</string>
+    <string name="start_race">Inizia Gara</string>
+    <string name="start_race_validation_pilots">Prepara i piloti per iniziare la Gara</string>
+    <string name="start_race_validation_thresholds">Imposta tutte le soglie prima della Partenza</string>
+    <string name="best_lap">Miglior giro:</string>
+    <string name="best_lap_position">Miglior posizione del giro: %s</string>
+    <string name="lap_result">Giro # %1$d:  %2$s</string>
+    <string name="last_lap">Ultimo giro:</string>
+    <string name="race_time">Tempo totale:</string>
+    <string name="race_position">Posizione:</string>
+    <string name="race_result_finished">TERMINATA</string>
+    <string name="race_results">%1$s (%2$s%3$s) Giri: %4$s %5$s</string>
+    <string name="race_announcement_finished">Gara terminata</string>
+    <string name="race_announcement_starting">Partenza tra %d secondi</string>
+    <string name="race_lap_report">Giro %1$d.</string>
+    <string name="race_pilot_finished">%1$s terminato.</string>
+    <string name="race_pilot_already_finished">%1$s già terminato.</string>
+    <string name="seconds_short">secondi</string>
+
+    <!-- Reports -->
+    <string name="report_file_name">Report salvato come: %s</string>
+    <string name="report_failure">Errore creando il report. Controlla ci sia spazio sufficiente nel dispositivo.</string>
+
+    <!-- Voltage monitoring -->
+    <string name="battery_status_critical">Livello batteria critico</string>
+    <string name="battery_status_low">Livello batteria basso</string>
+
+    <!-- Bluetooth -->
+    <string name="connected">Connesso</string>
+    <string name="connection_failed">Non connesso</string>
+    <string name="connected_to">Connessione a %s</string>
+    <string name="disconnected">Disconnesso</string>
+
+    <string name="api_err_title">Compatibility Error</string>
+    <string name="api_err_message">Chorus node(s) # %1$s are flashed with outdated firmware.\n\nPlease flash firmware with API version %2$d or higher and try again.</string>
+    <string name="api_err_button">Disconnect</string>
+</resources>
