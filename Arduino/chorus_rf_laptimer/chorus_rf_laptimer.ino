@@ -146,13 +146,13 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_MON_INTERVAL       10
 #define SEND_TIME_ADJUSTMENT    11
 #define SEND_API_VERSION        12
-#define SEND_END_SEQUENCE       13
+#define SEND_VOLTAGE            13
+#define SEND_THRESHOLD_SETUP_MODE 14
+#define SEND_END_SEQUENCE       15
 // following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES          100
 #define SEND_TIME                   101
 #define SEND_CURRENT_RSSI           102
-#define SEND_VOLTAGE                103
-#define SEND_THRESHOLD_SETUP_MODE   104
 // special item that sends all subsequent items from 0 (see above)
 #define SEND_ALL_DEVICE_STATE       255
 
@@ -419,9 +419,25 @@ void loop() {
                     onItemSent();
                 }
                 break;
+            case 13: // SEND_VOLTAGE
+                uint16_t voltage;
+                voltage = readVoltage();
+                if (voltage > VOLTAGE_ZERO_THRESHOLD) {
+                    if (sendIntToSerial(RESPONSE_VOLTAGE, voltage)) {
+                        onItemSent();
+                    }
+                } else {
+                    onItemSent();
+                }
+                break;
+            case 14: // SEND_THRESHOLD_SETUP_MODE
+                if (send4BitsToSerial(RESPONSE_THRESHOLD_SETUP, thresholdSetupMode)) {
+                    onItemSent();
+                }
+                break;
             // Below is a termination case, to notify that data for CONTROL_GET_ALL_DATA is over.
             // Must be the last item in the sequence!
-            case 13: // SEND_END_SEQUENCE
+            case 15: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -445,29 +461,13 @@ void loop() {
                     onItemSent();
                 }
                 break;
-            case 101: // SEND_CALIBR_TIME
+            case 101: // SEND_CURRENT_TIME
                 if (sendLongToSerial(RESPONSE_TIME, millisUponRequest)) {
                     onItemSent();
                 }
                 break;
             case 102: // SEND_CURRENT_RSSI
                 if (sendIntToSerial(RESPONSE_RSSI, rssi)) {
-                    onItemSent();
-                }
-                break;
-            case 103: // SEND_VOLTAGE
-                uint16_t voltage;
-                voltage = readVoltage();
-                if (voltage > VOLTAGE_ZERO_THRESHOLD) {
-                    if (sendIntToSerial(RESPONSE_VOLTAGE, voltage)) {
-                        onItemSent();
-                    }
-                } else {
-                    onItemSent();
-                }
-                break;
-            case 104: // SEND_THRESHOLD_SETUP_MODE
-                if (send4BitsToSerial(RESPONSE_THRESHOLD_SETUP, thresholdSetupMode)) {
                     onItemSent();
                 }
                 break;
