@@ -60,6 +60,7 @@ public class PilotsSetupFragment extends Fragment {
                     case DeviceBand:
                     case DeviceThreshold:
                     case PilotEnabledDisabled:
+                    case ThresholdSetupState:
                         updateResults();
                         break;
                     case DeviceRSSI:

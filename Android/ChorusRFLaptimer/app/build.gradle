@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.2'
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "app.andrey_voroshkov.chorus_laptimer"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 17
-        versionName "0.7.5"
+        versionCode 18
+        versionName "0.7.6"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = "ChorusRFLaptimer"
     }

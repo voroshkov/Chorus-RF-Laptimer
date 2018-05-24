@@ -33,6 +33,7 @@
     <string name="setup_enable_device_sounds">Activar Buzzer Chorus</string>
     <string name="setup_speak_lap_times">Escuchar Tiempo de Vueltas</string>
     <string name="setup_speak_messages">Escuchar Mensajes</string>
+    <string name="setup_speak_english_only">Speak in English</string>
     <string name="freq_channel">Canal #</string>
     <string name="freq_rf_band">RF Band</string>
     <string name="plus_sign">+</string>
@@ -73,7 +74,10 @@
     <string name="connection_failed">No conectado</string>
     <string name="connected_to">Conectado a %s</string>
     <string name="disconnected">Desconectado</string>
-    <string name="setup_speak_english_only">Speak in English</string>
+
+    <string name="api_err_title">Compatibility Error</string>
+    <string name="api_err_message">Chorus node(s) # %1$s are flashed with outdated firmware.\n\nPlease flash firmware with API version %2$d or higher and try again.</string>
+    <string name="api_err_button">Disconnect</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Inicio de Carrera (%1$d pilot)</item>

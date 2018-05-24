@@ -129,14 +129,19 @@ public class RaceSetupFragment extends Fragment {
         btnDecMLT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R*m");
+                int mlt = AppState.getInstance().raceState.minLapTime;
+                if (mlt > 0) {
+                    mlt--;
+                }
+                AppState.getInstance().sendBtCommand("R*M" + String.format("%02X", mlt));
             }
         });
 
         btnIncMLT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R*M");
+                int mlt = AppState.getInstance().raceState.minLapTime + 1;
+                AppState.getInstance().sendBtCommand("R*M" + String.format("%02X", mlt));
             }
         });
 
@@ -175,7 +180,8 @@ public class RaceSetupFragment extends Fragment {
         chkDeviceSoundEnabled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R*D");
+                boolean isSoundEnabled = AppState.getInstance().isDeviceSoundEnabled;
+                AppState.getInstance().sendBtCommand("R*S" + (isSoundEnabled ? "0" : "1"));
             }
         });
 
@@ -189,7 +195,8 @@ public class RaceSetupFragment extends Fragment {
         chkSkipFirstLap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R*F");
+                boolean shouldSkip = AppState.getInstance().shouldSkipFirstLap;
+                AppState.getInstance().sendBtCommand("R*1" + (shouldSkip ? "1" : "0"));
             }
         });
 
