@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,11 +43,12 @@ public class RaceResultFragment extends Fragment {
                 if (counter == 0) {
                     //last beep
                     AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_GO);
-                    AppState.getInstance().sendBtCommand("R*R");
+                    AppState.getInstance().sendBtCommand("R*R1");
                 } else {
                     this.sendEmptyMessageDelayed(counter - 1, 1000);
                     //first 3 beeps
-                    if (counter < 4) {
+                    if (counter < AppState.START_BEEPS_COUNT) {
+                        AppState.getInstance().sendBtCommand("T"+ String.format("%01X", counter));
                         AppState.getInstance().playTone(AppState.TONE_PREPARE, AppState.DURATION_PREPARE);
                     }
                 }
@@ -125,6 +127,8 @@ public class RaceResultFragment extends Fragment {
                 pd.setCancelable(false);
                 pd.setProgressNumberFormat(null);
                 pd.show();
+                AppState.getInstance().clearOldCalibrationTimes();
+                final long msStart = System.currentTimeMillis();
                 final Handler h = new Handler() {
                     public void handleMessage(Message msg) {
                         switch(msg.what) {
@@ -135,13 +139,15 @@ public class RaceResultFragment extends Fragment {
                                 }
                                 break;
                             case 1:
-                                AppState.getInstance().sendBtCommand("R*i");
+                                long msEnd = System.currentTimeMillis();
+                                AppState.getInstance().sendBtCommand("R*t");
+                                AppState.getInstance().setCalibrationActualTime((int)(msEnd - msStart));
                                 pd.dismiss();
                                 break;
                         }
                     }
                 };
-                AppState.getInstance().sendBtCommand("R*I");
+                AppState.getInstance().sendBtCommand("R*t");
                 h.sendEmptyMessage(0);
                 h.sendEmptyMessageDelayed(1, AppState.CALIBRATION_TIME_MS);
             }
@@ -153,10 +159,11 @@ public class RaceResultFragment extends Fragment {
                 boolean isStarted = AppState.getInstance().raceState.isStarted;
                 if (!isStarted && !mIsStartingRace) {
                     //stop rssi monitoring first, then start race
-                    AppState.getInstance().sendBtCommand("R*v");
+                    AppState.getInstance().sendBtCommand("R*I0000");
 
                     Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
                     btnRace.setText(R.string.starting_race);
+                    AppState.getInstance().sendBtCommand("TP");
                     mIsStartingRace = true;
                     int timeBeforeRace = AppState.getInstance().timeToPrepareForRace;
                     if (timeBeforeRace >= AppState.MIN_TIME_BEFORE_RACE_TO_SPEAK)
@@ -174,12 +181,13 @@ public class RaceResultFragment extends Fragment {
                 boolean isStarted = AppState.getInstance().raceState.isStarted;
                 if (isStarted) {
                     //stop race and start RSSI monitoring
-                    AppState.getInstance().sendBtCommand("R*r");
-                    AppState.getInstance().sendBtCommand("R*V");
+                    AppState.getInstance().sendBtCommand("R*R0");
+                    AppState.getInstance().sendBtCommand("R*I0064");
                     return true;
                 }  else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
                     mIsStartingRace = false;
+                    AppState.getInstance().sendBtCommand("R*R0"); // send end race (workaround for the led gate to switch to no-race mode)
                     mRaceStartingHandler.removeCallbacksAndMessages(null);
                     updateButtons(rootView);
                     return true;

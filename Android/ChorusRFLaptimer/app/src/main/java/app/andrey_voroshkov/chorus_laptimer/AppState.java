@@ -6,6 +6,7 @@ import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.StringRes;
+import android.text.TextUtils;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,8 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 public class AppState {
     public static final byte DELIMITER = '\n';
 
+    public static final int SUPPORTED_API_VERSION = 4;
+
     public static final int MIN_RSSI = 80;
     public static final int MAX_RSSI = 315;
     public static final int RSSI_SPAN = MAX_RSSI - MIN_RSSI;
@@ -24,6 +27,8 @@ public class AppState {
     public static final String bandNames [] = {"R", "A", "B", "E", "F", "D", "Connex1", "Connex2"};
     public static final int DEFAULT_MIN_LAP_TIME = 5;
     public static final int DEFAULT_LAPS_TO_GO = 3;
+    public static final int NO_API_VERSION = -1;
+    public static final int NO_TIME_ADJUSTMENT = 0x7FFFFFF;
 
     //tone sounds and durations (race start, lap count, etc)
     public static final int TONE_PREPARE = ToneGenerator.TONE_DTMF_1;
@@ -33,6 +38,7 @@ public class AppState {
     public static final int TONE_LAP = ToneGenerator.TONE_DTMF_S;
     public static final int DURATION_LAP = 400;
     public static final int MIN_TIME_BEFORE_RACE_TO_SPEAK = 5; //seconds, don't speak "Prepare" message if less time is set
+    public static final int START_BEEPS_COUNT = 4; //number of beeps in start beeps sequence. should be within 1 - 16
 
     //voltage measuring constants
     public static final int BATTERY_CHECK_INTERVAL = 10000; // 10 seconds
@@ -76,6 +82,8 @@ public class AppState {
     public int batteryAdjustmentConst = 1;
     public boolean isLiPoMonitorEnabled = true;
     public boolean isConnected = false;
+    public int calibrationActualTime = 10000;
+    public boolean didWrongApiEventFire = false;
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
@@ -94,7 +102,7 @@ public class AppState {
             public void handleMessage(Message msg) {
                 AppState app = AppState.getInstance();
                 if (app.isConnected && app.isLiPoMonitorEnabled && app.raceState != null && !app.raceState.isStarted) {
-                    AppState.getInstance().sendBtCommand("R*Y");
+                    AppState.getInstance().sendBtCommand("R*v");
                 }
                 sendEmptyMessageDelayed(0, BATTERY_CHECK_INTERVAL);
             }
@@ -324,6 +332,13 @@ public class AppState {
         }
     }
 
+    public int getThresholdSetupState(int deviceId) {
+        if (deviceStates == null) return 0;
+        if (deviceStates.size() <= deviceId) return 0;
+        int thresholdSetupState = deviceStates.get(deviceId).thresholdSetupState;
+        return thresholdSetupState;
+    }
+
     // Channels to send to the SPI registers
     private static int channelTable[]  = {
             // Channel 1 - 8
@@ -408,6 +423,7 @@ public class AppState {
     //---------------------------------------------------------------------
     public void sendBtCommand(String cmd) {
         if (conn == null) return;
+//        Log.i("SEND BT COMMAND", cmd);
         conn.send(cmd + (char)DELIMITER);
     }
 
@@ -426,7 +442,7 @@ public class AppState {
     }
 
     public void onBeforeDisconnect() {
-        sendBtCommand("R*v"); // turn off RSSI monitoring before disconnect
+        sendBtCommand("R*I0000"); // turn off RSSI monitoring before disconnect
         suspendBatteryMonitoringHandlers();
     }
     //---------------------------------------------------------------------
@@ -455,13 +471,53 @@ public class AppState {
         emitEvent(DataAction.NDevices);
 
         resetDeviceTransmissionStates();
-        sendBtCommand("R*A");
+        clearApiVersions();
+        clearWrongApiWarningCounter();
+        sendBtCommand("R*#");
+        sendBtCommand("R*a");
     }
 
     public void resetDeviceTransmissionStates() {
         for(int i=0; i<deviceTransmissionStates.size(); i++) {
             deviceTransmissionStates.set(i, false);
         }
+    }
+    public void checkApiVersion(int deviceId, int version) {
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+        currentState.apiVersion = version;
+
+        boolean doHaveAllVersions = true;
+        for (DeviceState ds: deviceStates) {
+            int ver = ds.apiVersion;
+            if (ver == NO_API_VERSION) {
+                doHaveAllVersions = false;
+                break;
+            }
+        }
+        if (doHaveAllVersions) {
+            if (!getModulesWithWrongApiVersion().equals("") && !didWrongApiEventFire) {
+                emitEvent(DataAction.WrongApiVersion);
+                didWrongApiEventFire = true;
+            }
+        }
+    }
+
+    public String getModulesWithWrongApiVersion() {
+        boolean isAnyWrong = false;
+        ArrayList<String> wrongsList = new ArrayList<>();
+        int count = deviceStates.size();
+        for(int i = 0; i < count; i++) {
+            DeviceState ds = deviceStates.get(i);
+            if (ds.apiVersion < SUPPORTED_API_VERSION) {
+                isAnyWrong = true;
+                wrongsList.add(Integer.toString(i + 1));
+            }
+        }
+        if (!isAnyWrong) return "";
+        return  TextUtils.join(", ", wrongsList);
     }
 
     public void changeDeviceChannel(int deviceId, int channel) {
@@ -670,6 +726,18 @@ public class AppState {
             }
         }
     }
+    public void clearOldCalibrationTimes() {
+        calibrationActualTime = 0;
+        for (DeviceState ds: deviceStates) {
+            ds.isCalibrated = false;
+            ds.calibrationTime = 0;
+            ds.deviceTime = 0;
+        }
+    }
+
+    public void setCalibrationActualTime(int calibrationActualTime) {
+        this.calibrationActualTime = calibrationActualTime;
+    }
 
     public void changeCalibration(int deviceId, boolean isCalibrated) {
         if (deviceId >= numberOfDevices) {
@@ -683,7 +751,7 @@ public class AppState {
         emitEvent(DataAction.DeviceCalibrationStatus);
     }
 
-    public void changeDeviceCalibrationTime(int deviceId, int calibrationTime) {
+    public void changeDeviceCalibrationTime(int deviceId, long deviceTime) {
         if (deviceId >= numberOfDevices) {
             return;
         }
@@ -691,7 +759,15 @@ public class AppState {
         if (currentState == null) {
             return;
         }
+
+        if (currentState.deviceTime == 0) {
+            currentState.deviceTime = deviceTime; // first read? just store current time into device state
+            return;
+        }
+
+        int calibrationTime = (int)(deviceTime - currentState.deviceTime); // find diff between this time and previous read
         currentState.calibrationTime = calibrationTime;
+        currentState.deviceTime = 0; // just drop prev read to avoid possible mistakes in future
         boolean doHaveAllTimes = true;
         for (DeviceState ds: deviceStates) {
             int time = ds.calibrationTime;
@@ -706,16 +782,18 @@ public class AppState {
     }
 
     public void calculateAndSendCalibrationValues() {
-        int baseTime = CALIBRATION_TIME_MS;
+        int baseTime = calibrationActualTime;
         for (int i = 0; i < numberOfDevices; i++) {
             int time = deviceStates.get(i).calibrationTime;
+
             int diff = baseTime - time;
-            int calibrationValue = 0;
+
+            int calibrationValue = NO_TIME_ADJUSTMENT; // predefined const
             if (diff != 0) {
                 calibrationValue = baseTime/diff;
             }
             deviceStates.get(i).calibrationValue = calibrationValue;
-            sendBtCommand("C" + String.format("%X", i) + String.format("%08X", calibrationValue));
+            sendBtCommand("R" + String.format("%X", i) + "J" + String.format("%08X", calibrationValue));
         }
         emitEvent(DataAction.DeviceCalibrationValue);
     }
@@ -730,6 +808,18 @@ public class AppState {
             emitEvent(DataAction.DeviceRSSI);
         }
         emitEvent(DataAction.RSSImonitorState);
+    }
+
+    public void changeThresholdSetupState(int deviceId, int thrSetupState) {
+        if (deviceId >= numberOfDevices) {
+            return;
+        }
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+        currentState.thresholdSetupState = thrSetupState;
+        emitEvent(DataAction.ThresholdSetupState);
     }
 
     //use to determine if all devices reported their state after connection
@@ -755,10 +845,10 @@ public class AppState {
                 return;
             }
             if (raceState.isStarted && isRssiMonitorOn) {
-                sendBtCommand("R*v"); // turn RSSI Monitoring off
+                sendBtCommand("R*I0000"); // turn RSSI Monitoring off
             }
             if (!raceState.isStarted && !isRssiMonitorOn) {
-                sendBtCommand("R*V"); // turn RSSI Monitoring on
+                sendBtCommand("R*I0064"); // turn RSSI Monitoring on
             }
             //also decide to apply preferences after all states are received
             AppPreferences.applyInAppPreferences();
@@ -827,6 +917,17 @@ public class AppState {
     public void clearVoltage() {
         lastVoltageReading = 0;
         recalculateVoltage();
+    }
+
+    public void clearWrongApiWarningCounter() {
+        didWrongApiEventFire = false;
+    }
+
+    public void clearApiVersions() {
+        int count = deviceStates.size();
+        for(int i = 0; i < count; i++) {
+            deviceStates.get(i).apiVersion = NO_API_VERSION;
+        }
     }
 
     public void changeAdjustmentConst(int adjConst) {

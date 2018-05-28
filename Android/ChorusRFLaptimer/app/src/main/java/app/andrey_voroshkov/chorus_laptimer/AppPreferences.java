@@ -207,19 +207,19 @@ public class AppPreferences {
         boolean prefSkipFirstLap = app.preferences.getBoolean(SKIP_FIRST_LAP, true);
         if (app.shouldSkipFirstLap != prefSkipFirstLap) {
             app.changeSkipFirstLap(prefSkipFirstLap);
-            app.sendBtCommand("R*F");
+            app.sendBtCommand("R*1" + (prefSkipFirstLap ? "0" : "1"));
         }
 
         boolean prefEnableDeviceSounds = app.preferences.getBoolean(ENABLE_DEVICE_SOUNDS, true);
         if (app.isDeviceSoundEnabled != prefEnableDeviceSounds) {
             app.changeDeviceSoundState(prefEnableDeviceSounds);
-            app.sendBtCommand("R*D");
+            app.sendBtCommand("R*S" + (prefEnableDeviceSounds ? "1" : "0"));
         }
 
         if (app.raceState != null) {
             int prefMLT = app.preferences.getInt(MIN_LAP_TIME, 3);
             app.changeRaceMinLapTime(prefMLT);
-            app.sendBtCommand("R*L" + String.format("%02X", prefMLT));
+            app.sendBtCommand("R*M" + String.format("%02X", prefMLT));
         }
 
         if (app.deviceStates != null) {
@@ -233,7 +233,7 @@ public class AppPreferences {
                     if (i < bandsCount) {
                         int prefBand = Integer.parseInt(bandsArray[i]);
                         app.changeDeviceBand(i, prefBand);
-                        app.sendBtCommand("R" +  String.format("%X", i) + "N" + String.format("%X", prefBand));
+                        app.sendBtCommand("R" +  String.format("%X", i) + "B" + String.format("%X", prefBand));
                     }
                 }
             }
@@ -248,7 +248,7 @@ public class AppPreferences {
                    if (i < channelsCount) {
                         int prefChannel = Integer.parseInt(channelsArray[i]);
                         app.changeDeviceChannel(i, prefChannel);
-                        app.sendBtCommand("R" +  String.format("%X", i) + "H" + String.format("%X", prefChannel));
+                        app.sendBtCommand("R" +  String.format("%X", i) + "C" + String.format("%X", prefChannel));
                     }
                 }
             }
@@ -263,7 +263,7 @@ public class AppPreferences {
                     if (i < thresholdsCount) {
                         int prefThreshold = Integer.parseInt(thresholdsArray[i]);
                         app.changeDeviceThreshold(i, prefThreshold);
-                        app.sendBtCommand("R" +  String.format("%X", i) + "S" + String.format("%04X", prefThreshold));
+                        app.sendBtCommand("R" +  String.format("%X", i) + "T" + String.format("%04X", prefThreshold));
                     }
                 }
             }

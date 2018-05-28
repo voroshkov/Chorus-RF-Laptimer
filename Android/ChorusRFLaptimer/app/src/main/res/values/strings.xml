@@ -31,6 +31,7 @@
     <string name="setup_enable_device_sounds">Enable Device Sounds</string>
     <string name="setup_speak_lap_times">Speak Lap Times</string>
     <string name="setup_speak_messages">Speak Messages</string>
+    <string name="setup_speak_english_only">Speak in English</string>
     <string name="freq_channel">Channel #</string>
     <string name="freq_rf_band">RF Band</string>
     <string name="plus_sign">+</string>
@@ -56,7 +57,7 @@
     <string name="race_lap_report">Lap %1$d.</string>
     <string name="race_pilot_finished">%1$s finished.</string>
     <string name="race_pilot_already_finished">%1$s already finished.</string>
-    <string name="seconds_short">s.</string>
+    <string name="seconds_short">seconds</string>
 
     <!-- Reports -->
     <string name="report_file_name">Report saved as: %s</string>
@@ -71,7 +72,10 @@
     <string name="connection_failed">Not connected</string>
     <string name="connected_to">Connected to %s</string>
     <string name="disconnected">Disconnected</string>
-    <string name="setup_speak_english_only">Speak in English</string>
+
+    <string name="api_err_title">Compatibility Error</string>
+    <string name="api_err_message">Chorus node(s) # %1$s are flashed with outdated firmware.\n\nPlease flash firmware with API version %2$d or higher and try again.</string>
+    <string name="api_err_button">Disconnect</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Start Race (%1$d pilot)</item>

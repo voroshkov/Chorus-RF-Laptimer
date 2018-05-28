@@ -14,6 +14,9 @@ public class DeviceState {
     public int calibrationValue;
     public int currentRSSI;
     public boolean isEnabled;
+    public long deviceTime;
+    public int thresholdSetupState;
+    public int apiVersion;
 
     DeviceState() {
         isCalibrated = false;

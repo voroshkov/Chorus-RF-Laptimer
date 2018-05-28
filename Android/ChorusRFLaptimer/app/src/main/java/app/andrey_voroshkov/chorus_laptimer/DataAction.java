@@ -30,5 +30,7 @@ public enum DataAction {
     BatteryVoltage,
     VoltageAdjustmentConst,
     LiPoMonitorEnable,
+    WrongApiVersion,
+    ThresholdSetupState,
     Disconnect
 }

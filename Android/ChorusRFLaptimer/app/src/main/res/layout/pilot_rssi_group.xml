@@ -97,6 +97,16 @@
                         android:id="@+id/btnDecThresh"
                         android:textStyle="normal|bold" />
 
+                    <ProgressBar
+                        android:id="@+id/spinThresholdSetup"
+                        style="@style/Widget.AppCompat.ProgressBar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:max="100"
+                        android:padding="0dp"
+                        android:visibility="visible" />
+
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"

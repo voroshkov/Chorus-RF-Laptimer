@@ -2,6 +2,8 @@ package app.andrey_voroshkov.chorus_laptimer;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
@@ -191,10 +193,33 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
         AppPreferences.applyAll();
 
+        AppState.getInstance().addListener(new IDataListener() {
+            @Override
+            public void onDataChange(DataAction dataItemName) {
+                switch (dataItemName) {
+                    case WrongApiVersion:
+                        MainActivity.this.showWrongApiDialog();
+                }
+            }
+        });
         //Ensure permissions permissions before any disk IO
         ensurePermissions();
         //this will cleanup csv reports after 2 weeks (14 days)
         cleanUpCSVReports();
+    }
+
+    public void showWrongApiDialog () {
+        String modulesWithWrongApi = AppState.getInstance().getModulesWithWrongApiVersion();
+        new AlertDialog.Builder(MainActivity.this)
+            .setTitle(getResources().getString(R.string.api_err_title))
+            .setMessage(getResources().getString(R.string.api_err_message, modulesWithWrongApi, AppState.SUPPORTED_API_VERSION))
+            .setCancelable(false)
+            .setPositiveButton(getResources().getString(R.string.api_err_button), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    AppState.getInstance().conn.disconnect();
+                }
+            }).show();
     }
 
     public void onDestroy() {
