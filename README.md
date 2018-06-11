@@ -316,6 +316,7 @@ Android app:
 - Gleb Godonoga (SidhNor) - internationalization support, Russian localization, permissions tuning
 - Jose Luis Ortiz (JLOFPV) - Spanish localization
 - thestealth131205, anunique - German localization
+- Nicola Gorghetto (nikybiasion) - Italian localization
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
