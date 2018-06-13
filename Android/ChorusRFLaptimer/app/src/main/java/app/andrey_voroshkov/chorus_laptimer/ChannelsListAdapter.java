@@ -93,28 +93,40 @@ public class ChannelsListAdapter extends BaseAdapter {
         viewHolder.btnDecCh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "c");
+                int newChannel = AppState.getInstance().deviceStates.get(position).channel - 1;
+                if (newChannel >= 0) {
+                    AppState.getInstance().sendBtCommand("R" + deviceId + "C" + String.format("%X", newChannel));
+                }
             }
         });
 
         viewHolder.btnIncCh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "C");
+                int newChannel = AppState.getInstance().deviceStates.get(position).channel + 1;
+                if (newChannel <= 7) {
+                    AppState.getInstance().sendBtCommand("R" + deviceId + "C" + String.format("%X", newChannel));
+                }
             }
         });
 
         viewHolder.btnDecBand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "b");
+                int newBand = AppState.getInstance().deviceStates.get(position).band - 1;
+                if (newBand >= 0) {
+                    AppState.getInstance().sendBtCommand("R" + deviceId + "B" + String.format("%X", newBand));
+                }
             }
         });
 
         viewHolder.btnIncBand.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "B");
+                int newBand = AppState.getInstance().deviceStates.get(position).band + 1;
+                if (newBand <= 6) {
+                    AppState.getInstance().sendBtCommand("R" + deviceId + "B" + String.format("%X", newBand));
+                }
             }
         });
 

@@ -345,7 +345,7 @@ void loop() {
     }
     
     readSerialDataChunk();
-
+  
     sendProxyDataChunk();
 
     // send data chunk through Serial

@@ -19,7 +19,7 @@
     <string name="setup_clear_threshold">zurücksetzen</string>
     <string name="setup_set_threshold">setzen</string>
     <string name="setup_calibrate_timers">Zeitmesser Kalibrieren</string>
-    <string name="device_number">Gerät Nr:</string>
+    <string name="device_number">Gerät Nr%d</string>
     <string name="setup_time">%d sec.</string>
     <string name="channel_descriptor">Kanal: %1$s%2$s (%3$s)</string>
     <string name="calibrate_timers">kalibriere Zeitmesser....</string>
@@ -32,6 +32,7 @@
     <string name="setup_enable_device_sounds">Geräte Töne</string>
     <string name="setup_speak_lap_times">Ansage Rundenzeit</string>
     <string name="setup_speak_messages">Ansage Nachrichten</string>
+    <string name="setup_speak_english_only">Ansage nur in English</string>
     <string name="freq_channel">Kanal Nr.</string>
     <string name="freq_rf_band">Frequenzband</string>
     <string name="plus_sign">+</string>
@@ -72,7 +73,10 @@
     <string name="connection_failed">nicht Verbunden</string>
     <string name="connected_to">Verbunden zu %s</string>
     <string name="disconnected">Verbindung getrennt</string>
-    <string name="setup_speak_english_only">Ansage nur in English</string>
+
+    <string name="api_err_title">Kompatibilitätsfehler</string>
+    <string name="api_err_message">Das Chorusmodul %1$s ist mit einer veralteten Firmware beschrieben.\n\nBitte spielen Sie die Firmware mit API-Version %2$d oder höher auf das Modul und versuchen Sie es erneut.</string>
+    <string name="api_err_button">Verbindung trennen</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Starte Rennen (%1$d Pilot)</item>
