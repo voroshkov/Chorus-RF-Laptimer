@@ -179,7 +179,7 @@ It seems to work fine being connected this way, however adding 100 Ω resistors 
 <img src="docs/img/wiring_resistors.png" alt="Wiring with resistors" width="">
 
 <a name="schematic-and-pcb"></a>
-### Schematic and PCB
+### Schematic and PCBs
 Schematic and PCB design in DipTrace format are available in the **DipTrace** folder.
 
 <img src="docs/img/Schematic.png" alt="Schematic" width="400">
@@ -189,6 +189,11 @@ Schematic and PCB design in DipTrace format are available in the **DipTrace** fo
 [**PCB by Joao Reis**](contributors/PCB/Joao_Reis_PCB_Project_v1.1.zip) (Gerber format, SeedStudio compatible):
 
 <img src="docs/img/pcb_reis.png" alt="PCB by Joao Reis" width="200">
+
+[**PCB by Philip Seidel**](https://github.com/ps915/Chorus-RF-Laptimer-PCB) (4 node, DipTrace, Gerber):
+
+<img src="https://github.com/ps915/Chorus-RF-Laptimer-PCB/blob/master/p3.JPG" alt="PCB by Philipp Seidel" width="400">
+
 
 <a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
@@ -323,6 +328,10 @@ Arduino app:
 
 iOS app:
 - Lazar Djordjevic (lazar89nis) - entire app implementation!
+
+Alternative PCB design:
+- Joao Reis
+- Plilipp Seidel
 
 <a name="contacts"></a>
 ## Contacts
