@@ -125,9 +125,13 @@ Generalized steps:
 
 1. Connect HC-06 -> USB-UART Adapter -> PC
 2. Open Arduino IDE, set adapter's COM port, run Serial Monitor
-3. Send command: "AT+BAUD8" (module replies "OK115200")
+3. Send command: 
+    - old modules: "AT+BAUD8" (module replies "OK115200")
+    - new modules: "AT+UART=115200,0,0"
 
-You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively.
+
+
+You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively (or "AT+NAME=new_name" in new firmware versions).
 
 <a name="wifi-module-setup"></a>
 ### WiFi module setup
