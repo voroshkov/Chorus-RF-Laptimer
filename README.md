@@ -13,6 +13,7 @@ This is a "lightweight" alternative to IR lap timing systems having the advantag
 ------------------------------------------------
 - 2018-06: Ingegration with LiveTime is in progress
 - 2018-06: Arduinos got new API, incompatible with prev versions. All mobile apps are up to date with the new API.
+- 2018-06: New threshold setup algorithm is implemented. Instead of measuring immediate RSSI at some point in space it's now a staged process
 - 2018-05: Philipp Seidel published his great open source 4-node PCB: https://github.com/ps915/Chorus-RF-Laptimer-PCB
 - 2017-11: iOS app is live on AppStore: https://itunes.apple.com/app/id1296647206. All credits go to Lazar Djordjevic!
 - 2017-10: WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
