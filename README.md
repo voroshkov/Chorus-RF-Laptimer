@@ -9,8 +9,11 @@
 This is a VTX Radio Frequency Lap Timing solution for drone racers - the evolution of a [Solo DIY RF Laptimer project](https://github.com/voroshkov/Solo-DIY-RF-Laptimer).
 Several updated Solo Laptimer devices connected together make up a Chorus Laptimer device which is capable of tracking several drones at once.
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
-## HOT NEWS !
+## NEWS FEED:
 ------------------------------------------------
+- 2018-06: Ingegration with LiveTime is in progress
+- 2018-06: Arduinos got new API, incompatible with prev versions. All mobile apps are up to date with the new API.
+- 2018-05: Philipp Seidel published his great open source 4-node PCB: https://github.com/ps915/Chorus-RF-Laptimer-PCB
 - 2017-11: iOS app is live on AppStore: https://itunes.apple.com/app/id1296647206. All credits go to Lazar Djordjevic!
 - 2017-10: WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
 - 2017-10: Android app is now available on Google Play only. The source code remains here.
@@ -47,7 +50,7 @@ Thanks for your support!
 - [Limitations](#limitations)
 - [How it works](#how-it-works)
 - [Hardware](#hardware)
-    - [Used parts:](#used-parts)
+    - [Used parts](#used-parts)
     - [Bluetooth module setup](#bluetooth-module-setup)
     - [WiFi module setup](#wifi-module-setup)
     - [RX5808 SPI patch \(required\)](#rx5808-spi-patch-required)
@@ -107,7 +110,7 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
 ## Hardware
 
 <a name="used-parts"></a>
-### Used parts:
+### Used parts
  - RX5808 (with SPI patch) (**N** items)
  - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
  - HC-06/HC-05 (HM-10 for iOS) Bluetooth module (**1** item)
