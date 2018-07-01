@@ -9,8 +9,12 @@
 This is a VTX Radio Frequency Lap Timing solution for drone racers - the evolution of a [Solo DIY RF Laptimer project](https://github.com/voroshkov/Solo-DIY-RF-Laptimer).
 Several updated Solo Laptimer devices connected together make up a Chorus Laptimer device which is capable of tracking several drones at once.
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
-## HOT NEWS !
+## NEWS FEED:
 ------------------------------------------------
+- 2018-06: Integration with LiveTime is in progress
+- 2018-06: Arduinos got new API (v.4), incompatible with prev versions. All mobile apps are up to date with the new API.
+- 2018-06: New threshold setup algorithm is implemented. Instead of measuring immediate RSSI at some point in space it's now a staged process
+- 2018-05: Philipp Seidel published his great open source 4-node PCB: https://github.com/ps915/Chorus-RF-Laptimer-PCB
 - 2017-11: iOS app is live on AppStore: https://itunes.apple.com/app/id1296647206. All credits go to Lazar Djordjevic!
 - 2017-10: WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
 - 2017-10: Android app is now available on Google Play only. The source code remains here.
@@ -47,7 +51,7 @@ Thanks for your support!
 - [Limitations](#limitations)
 - [How it works](#how-it-works)
 - [Hardware](#hardware)
-    - [Used parts:](#used-parts)
+    - [Used parts](#used-parts)
     - [Bluetooth module setup](#bluetooth-module-setup)
     - [WiFi module setup](#wifi-module-setup)
     - [RX5808 SPI patch \(required\)](#rx5808-spi-patch-required)
@@ -107,7 +111,7 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
 ## Hardware
 
 <a name="used-parts"></a>
-### Used parts:
+### Used parts
  - RX5808 (with SPI patch) (**N** items)
  - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
  - HC-06/HC-05 (HM-10 for iOS) Bluetooth module (**1** item)
@@ -125,9 +129,13 @@ Generalized steps:
 
 1. Connect HC-06 -> USB-UART Adapter -> PC
 2. Open Arduino IDE, set adapter's COM port, run Serial Monitor
-3. Send command: "AT+BAUD8" (module replies "OK115200")
+3. Send command: 
+    - old modules: "AT+BAUD8" (module replies "OK115200")
+    - new modules: "AT+UART=115200,0,0"
 
-You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively.
+
+
+You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively (or "AT+NAME=new_name" in new firmware versions).
 
 <a name="wifi-module-setup"></a>
 ### WiFi module setup
@@ -179,7 +187,7 @@ It seems to work fine being connected this way, however adding 100 Ω resistors 
 <img src="docs/img/wiring_resistors.png" alt="Wiring with resistors" width="">
 
 <a name="schematic-and-pcb"></a>
-### Schematic and PCB
+### Schematic and PCBs
 Schematic and PCB design in DipTrace format are available in the **DipTrace** folder.
 
 <img src="docs/img/Schematic.png" alt="Schematic" width="400">
@@ -189,6 +197,11 @@ Schematic and PCB design in DipTrace format are available in the **DipTrace** fo
 [**PCB by Joao Reis**](contributors/PCB/Joao_Reis_PCB_Project_v1.1.zip) (Gerber format, SeedStudio compatible):
 
 <img src="docs/img/pcb_reis.png" alt="PCB by Joao Reis" width="200">
+
+[**PCB by Philip Seidel**](https://github.com/ps915/Chorus-RF-Laptimer-PCB) (4 node, DipTrace, Gerber):
+
+<img src="https://github.com/ps915/Chorus-RF-Laptimer-PCB/blob/master/p3.JPG" alt="PCB by Philipp Seidel" width="400">
+
 
 <a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
@@ -323,6 +336,10 @@ Arduino app:
 
 iOS app:
 - Lazar Djordjevic (lazar89nis) - entire app implementation!
+
+Alternative PCB design:
+- Joao Reis
+- Plilipp Seidel
 
 <a name="contacts"></a>
 ## Contacts
