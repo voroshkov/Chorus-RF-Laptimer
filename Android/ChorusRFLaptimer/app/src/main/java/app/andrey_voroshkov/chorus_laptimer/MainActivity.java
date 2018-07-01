@@ -180,6 +180,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
+        if (mViewPager == null) return;
+
         mViewPager.setOffscreenPageLimit(4);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -217,7 +219,9 @@ public class MainActivity extends AppCompatActivity {
             .setPositiveButton(getResources().getString(R.string.api_err_button), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    AppState.getInstance().conn.disconnect();
+                    if (AppState.getInstance().conn != null) {
+                        AppState.getInstance().conn.disconnect();
+                    }
                 }
             }).show();
     }
@@ -250,7 +254,9 @@ public class MainActivity extends AppCompatActivity {
 
         Handler delayedDisconnect = new Handler() {
             public void handleMessage(Message msg) {
-                AppState.getInstance().conn.disconnect();
+                if (AppState.getInstance().conn != null) {
+                    AppState.getInstance().conn.disconnect();
+                }
             }
         };
 
@@ -351,6 +357,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
             if (resultCode == Activity.RESULT_OK)
                 bt.connect(data);

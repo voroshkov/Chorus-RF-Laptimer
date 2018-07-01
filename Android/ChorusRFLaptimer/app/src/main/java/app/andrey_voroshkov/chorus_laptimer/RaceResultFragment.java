@@ -79,6 +79,8 @@ public class RaceResultFragment extends Fragment {
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
+                if (!isAdded()) return;
+
                 switch (dataItemName) {
                     case RaceState:
                     case NDevices:
@@ -93,8 +95,6 @@ public class RaceResultFragment extends Fragment {
                         break;
                     case DeviceThreshold:
                     case Disconnect:
-                        updateButtons(rootView);
-                        break;
                     case DeviceCalibrationStatus:
                         updateButtons(rootView);
                         break;

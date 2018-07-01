@@ -47,19 +47,23 @@ public class RaceSetupFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.race_setup, container, false);
         mRootView = rootView;
         mContext = getContext();
-
-        updateText(rootView);
-        updateSkipFirstLapCheckbox(rootView);
-        updateSoundCheckbox(rootView);
-        updateSpeakLapTimesCheckbox(rootView);
-        updateSpeakMessagesCheckbox(rootView);
-        updateSpeakEnglishOnlyCheckbox(rootView);
-        updateLiPoMonitorCheckbox(rootView);
-        updateBatteryProgressIndicator(rootView);
+        
+        if (isAdded()) {
+            updateText(rootView);
+            updateSkipFirstLapCheckbox(rootView);
+            updateSoundCheckbox(rootView);
+            updateSpeakLapTimesCheckbox(rootView);
+            updateSpeakMessagesCheckbox(rootView);
+            updateSpeakEnglishOnlyCheckbox(rootView);
+            updateLiPoMonitorCheckbox(rootView);
+            updateBatteryProgressIndicator(rootView);
+        }
 
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
+                if (!isAdded()) return;
+
                 switch (dataItemName) {
                     case RaceMinLap:
                     case RaceLaps:
