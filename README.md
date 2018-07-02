@@ -325,6 +325,8 @@ You can set RSSI threshold in 2 alternative ways:
  4. Pass the gate (don't stop) and move away from it (either return or go forward). Make sure that you pass Chorus a bit farther than the most distant point of the gate where you want Chorus to capture a flying drone during the race.
  5. At some point distant from the gate, the blue progress bar will change to the captured RSSI threshold value. You're done!
 
+Note: you can set thresholds for all pilots in a heat at once. Just start threshold setup for each pilot and have all pilots walk by the gate.
+
 <img src="docs/img/autoThresholdSetup.png" alt="Automatic Threshold Setup" width="">
 
 <a name="troubleshooting"></a>
