@@ -361,7 +361,7 @@ iOS app:
 
 Alternative PCB design:
 - Joao Reis
-- Plilipp Seidel
+- Philipp Seidel
 
 <a name="contacts"></a>
 ## Contacts
