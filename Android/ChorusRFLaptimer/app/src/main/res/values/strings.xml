@@ -4,6 +4,7 @@
     <!-- Menu -->
     <string name="menu_bt_connect">Connect via Bluetooth</string>
     <string name="menu_udp_connect">Connect via WiFi</string>
+    <string name="menu_usb_connect">Connect via USB</string>
     <string name="menu_disconnect">Disconnect</string>
 
     <!-- Tabs -->

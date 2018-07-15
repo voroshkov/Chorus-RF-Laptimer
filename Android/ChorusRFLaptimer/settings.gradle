@@ -1,1 +1,2 @@
-include ':app', ':bluetoothSPP'
+include ':app', ':bluetoothSPP', ':usbSerialForAndroid'
+project(':usbSerialForAndroid').projectDir = new File('usbSerialForAndroid')

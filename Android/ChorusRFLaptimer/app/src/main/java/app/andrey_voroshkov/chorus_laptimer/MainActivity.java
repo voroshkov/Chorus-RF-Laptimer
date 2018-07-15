@@ -3,8 +3,15 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -22,8 +29,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.hoho.android.usbserial.driver.UsbSerialDriver;
+import com.hoho.android.usbserial.driver.UsbSerialPort;
+import com.hoho.android.usbserial.driver.UsbSerialProber;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -37,8 +50,11 @@ public class MainActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     private Menu menu;
+    private BroadcastReceiver mUsbReceiver;
+    private PendingIntent mPermissionIntent;
     BTService bt;
     UDPService udp;
+    USBService usb;
 
     public void onDisconnected() {
         Toast.makeText(getApplicationContext(), getString(R.string.disconnected), Toast.LENGTH_SHORT).show();
@@ -90,12 +106,37 @@ public class MainActivity extends AppCompatActivity {
         String parsedMsg;
         try {
             parsedMsg = Utils.btDataChunkParser(message);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             parsedMsg = e.toString();
         }
         // Toast.makeText(getApplicationContext(), parsedMsg, Toast.LENGTH_SHORT).show();
     }
+
+    void initUSB() {
+        usb = new USBService((UsbManager) getSystemService(Context.USB_SERVICE));
+        usb.setConnectionListener(new ConnectionListener() {
+            @Override
+            public void onConnected(String name) {
+                MainActivity.this.onUDPConnected(getGatewayIP());
+            }
+
+            @Override
+            public void onDisconnected() {
+                MainActivity.this.onUDPDisconnected();
+            }
+
+            @Override
+            public void onConnectionFailed(String errorMsg) {
+                MainActivity.this.onUDPConnectionFailed();
+            }
+
+            @Override
+            public void onDataReceived(String message) {
+                MainActivity.this.onDataReceived(message);
+            }
+        });
+    }
+
 
     void initUDP() {
         udp = new UDPService();
@@ -125,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     void initBluetooth() {
         bt = new BTService(this, AppState.DELIMITER);
 
-        if(!bt.isBluetoothAvailable()) {
+        if (!bt.isBluetoothAvailable()) {
             Toast.makeText(getApplicationContext()
                     , "Bluetooth is not available"
                     , Toast.LENGTH_SHORT).show();
@@ -138,7 +179,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onConnectionFailed(String s) {
-                MainActivity.this.onBTConnectionFailed();            }
+                MainActivity.this.onBTConnectionFailed();
+            }
 
             public void onConnected(String name) {
                 MainActivity.this.onBTConnected(name);
@@ -190,6 +232,8 @@ public class MainActivity extends AppCompatActivity {
 
         initBluetooth();
         initUDP();
+        initBroadcastReceiverForUsbPermissions();
+        initUSB();
         AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext(),
                 AppState.getInstance().shouldSpeakEnglishOnly);
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);
@@ -210,20 +254,20 @@ public class MainActivity extends AppCompatActivity {
         cleanUpCSVReports();
     }
 
-    public void showWrongApiDialog () {
+    public void showWrongApiDialog() {
         String modulesWithWrongApi = AppState.getInstance().getModulesWithWrongApiVersion();
         new AlertDialog.Builder(MainActivity.this)
-            .setTitle(getResources().getString(R.string.api_err_title))
-            .setMessage(getResources().getString(R.string.api_err_message, modulesWithWrongApi, AppState.SUPPORTED_API_VERSION))
-            .setCancelable(false)
-            .setPositiveButton(getResources().getString(R.string.api_err_button), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (AppState.getInstance().conn != null) {
-                        AppState.getInstance().conn.disconnect();
+                .setTitle(getResources().getString(R.string.api_err_title))
+                .setMessage(getResources().getString(R.string.api_err_message, modulesWithWrongApi, AppState.SUPPORTED_API_VERSION))
+                .setCancelable(false)
+                .setPositiveButton(getResources().getString(R.string.api_err_button), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (AppState.getInstance().conn != null) {
+                            AppState.getInstance().conn.disconnect();
+                        }
                     }
-                }
-            }).show();
+                }).show();
     }
 
     public void onDestroy() {
@@ -242,6 +286,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        UsbDevice device = getAvailableUsbDevice();
+        if (device == null) {
+            menu.findItem(R.id.menuUSBConnect).setVisible(false);
+            menu.findItem(R.id.menuUSBDisconnect).setVisible(false);
+        } else {
+            menu.findItem(R.id.menuUSBConnect).setVisible(true);
+            menu.findItem(R.id.menuUSBDisconnect).setVisible(true);
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -260,22 +312,30 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if(id == R.id.menuBTConnect) {
+        if (id == R.id.menuBTConnect) {
             bt.setDeviceTarget(BluetoothState.DEVICE_OTHER);
             Intent intent = new Intent(getApplicationContext(), DeviceList.class);
             startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
-        } else if(id == R.id.menuBTDisconnect) {
+        } else if (id == R.id.menuBTDisconnect) {
             if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
                 AppState.getInstance().onBeforeDisconnect();
                 delayedDisconnect.sendEmptyMessageDelayed(0, 100);
             }
-        } else if(id == R.id.menuUDPConnect) {
+        } else if (id == R.id.menuUDPConnect) {
             udp.connect(getGatewayIP(), 0);
             useUDP();
-        } else if(id == R.id.menuUDPDisconnect) {
+        } else if (id == R.id.menuUDPDisconnect) {
+            AppState.getInstance().onBeforeDisconnect();
+            delayedDisconnect.sendEmptyMessageDelayed(0, 100);
+        } else if (id == R.id.menuUSBConnect) {
+            checkUSBPermissionsAndConnectIfAllowed();
+//            usb.connect((UsbManager) getSystemService(Context.USB_SERVICE));
+//            useUSB();
+        } else if (id == R.id.menuUSBDisconnect) {
             AppState.getInstance().onBeforeDisconnect();
             delayedDisconnect.sendEmptyMessageDelayed(0, 100);
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -294,10 +354,10 @@ public class MainActivity extends AppCompatActivity {
         DhcpInfo dhcp = wifi.getDhcpInfo();
         int ip = dhcp.gateway;
         return String.format("%d.%d.%d.%d",
-            (ip & 0xff),
-            (ip >> 8 & 0xff),
-            (ip >> 16 & 0xff),
-            (ip >> 24 & 0xff)
+                (ip & 0xff),
+                (ip >> 8 & 0xff),
+                (ip >> 16 & 0xff),
+                (ip >> 24 & 0xff)
         );
     }
 
@@ -307,12 +367,11 @@ public class MainActivity extends AppCompatActivity {
 //            Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 //            startActivityForResult(intent, BluetoothState.REQUEST_ENABLE_BT);
         } else {
-            if(!bt.isServiceAvailable()) {
+            if (!bt.isServiceAvailable()) {
                 bt.runService();
                 useBT();
             }
         }
-
     }
 
     /**
@@ -329,8 +388,8 @@ public class MainActivity extends AppCompatActivity {
         long todayMillis = calToday.getTimeInMillis();
 
         //iterate from files inside the ChorusLapTimer directory
-        if(file.list() != null){
-            for(int i = 0; i < file.list().length; i++){
+        if (file.list() != null) {
+            for (int i = 0; i < file.list().length; i++) {
                 File currFile = file.listFiles()[i];
                 //check difference of file.lastModified compared to date today
                 long diff = todayMillis - currFile.lastModified();
@@ -356,14 +415,18 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().conn = udp;
     }
 
+    public void useUSB() {
+        AppState.getInstance().conn = usb;
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
             if (resultCode == Activity.RESULT_OK)
                 bt.connect(data);
-                useBT();
-        } else if(requestCode == BluetoothState.REQUEST_ENABLE_BT) {
-            if(resultCode == Activity.RESULT_OK) {
+            useBT();
+        } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
+            if (resultCode == Activity.RESULT_OK) {
                 bt.runService();
             } else {
                 Toast.makeText(getApplicationContext()
@@ -382,5 +445,70 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     REQUEST_WRITE_STORAGE_CODE);
         }
+    }
+
+    private void connectToUsbDevice() {
+        usb.connect();
+        useUSB();
+    }
+
+    ;
+
+    private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+
+    private void initBroadcastReceiverForUsbPermissions() {
+        mPermissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
+
+        mUsbReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+                if (ACTION_USB_PERMISSION.equals(action)) {
+                    synchronized (this) {
+                        UsbDevice device = (UsbDevice) intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+                        if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                            if (device != null) {
+                                //call method to set up device communication
+                                connectToUsbDevice();
+                            }
+                        } else {
+    //                        Log.d(TAG, "permission denied for device " + device);
+    //                        Toast.makeText(getApplicationContext(), getString(R.string.cannotAccessUsb), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "Cannot access USB device", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+
+    private void checkUSBPermissionsAndConnectIfAllowed() {
+        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        UsbDevice device = getAvailableUsbDevice();
+        if (device == null) return;
+
+        if (manager.hasPermission(device)) {
+            connectToUsbDevice();
+            return;
+        }
+
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        registerReceiver(mUsbReceiver, filter);
+        manager.requestPermission(device, mPermissionIntent);
+    }
+
+    private UsbDevice getAvailableUsbDevice() {
+        UsbManager manager = (UsbManager) getSystemService(Context.USB_SERVICE);
+
+        // Find all available drivers from attached devices.
+        List<UsbSerialDriver> availableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(manager);
+        if (availableDrivers.isEmpty()) {
+            return null;
+        }
+
+        // Open a connection to the first available driver.
+        UsbSerialDriver driver = availableDrivers.get(0);
+        return driver.getDevice();
     }
 }

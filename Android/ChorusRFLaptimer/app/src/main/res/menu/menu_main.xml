@@ -20,4 +20,13 @@
         android:title="@string/menu_disconnect"
         android:visible="false"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menuUSBConnect"
+        android:title="@string/menu_usb_connect"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menuUSBDisconnect"
+        android:title="@string/menu_disconnect"
+        android:visible="false"
+        app:showAsAction="never" />
 </menu>
