@@ -78,6 +78,8 @@
     <string name="api_err_message">Chorus node(s) # %1$s are flashed with outdated firmware.\n\nPlease flash firmware with API version %2$d or higher and try again.</string>
     <string name="api_err_button">Disconnect</string>
 
+    <string name="cannotAccessUsbDevice">Cannot access USB device</string>
+
     <plurals name="pilots_in_race">
         <item quantity="one">Start Race (%1$d pilot)</item>
         <item quantity="other">Start Race (%1$d pilots)</item>

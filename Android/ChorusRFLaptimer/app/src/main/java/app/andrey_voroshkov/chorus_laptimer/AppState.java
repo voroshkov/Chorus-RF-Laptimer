@@ -10,8 +10,6 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
-
 /**
  * Created by Andrey_Voroshkov on 1/22/2017.
  */

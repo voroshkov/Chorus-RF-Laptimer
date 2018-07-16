@@ -58,7 +58,7 @@ public class USBService implements Connection{
             String data = msgBundle.getString(KEY_MSG_DATA);
             switch(msgType) {
                 case MSG_ON_CONNECT:
-                    mConnectionListener.onConnected("");
+                    mConnectionListener.onConnected(data);
                     break;
                 case MSG_ON_CONNECTION_FAIL:
                     mConnectionListener.onConnectionFailed(data);
@@ -147,7 +147,14 @@ public class USBService implements Connection{
             e.printStackTrace();
         }
 
-        mActivityHandler.sendMessage(composeMessage(MSG_ON_CONNECT, ""));
+        String deviceName;
+        try {
+            deviceName = mPort.getDriver().getClass().getSimpleName();
+        }
+        catch(Exception e) {
+            deviceName = "";
+        }
+        mActivityHandler.sendMessage(composeMessage(MSG_ON_CONNECT, deviceName));
     }
 
     @Override
@@ -199,8 +206,6 @@ public class USBService implements Connection{
         private Handler mSendHandler;
 
         public void run () {
-            if (mPort == null) return;
-
             // prepare handler to process send commands via messages to SenderThread
             Looper.prepare();
 

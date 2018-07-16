@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiInfo;
@@ -30,11 +29,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
-import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +39,7 @@ import java.util.concurrent.TimeUnit;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ConnectionListener {
 
     private static final int REQUEST_WRITE_STORAGE_CODE = 315;
     /**
@@ -62,44 +59,17 @@ public class MainActivity extends AppCompatActivity {
         AppState.getInstance().onDisconnected();
     }
 
-    public void onBTDisconnected() {
-        onDisconnected();
-        toggleConnectionMenu(false, true);
-    }
-
-    public void onUDPDisconnected() {
-        onDisconnected();
-        toggleConnectionMenu(false, false);
-    }
-
-    public void onConnectionFailed() {
+    public void onConnectionFailed(String errorMsg) {
         Toast.makeText(getApplicationContext(), getString(R.string.connection_failed), Toast.LENGTH_SHORT).show();
         AppState.getInstance().speakMessage(R.string.connection_failed);
     }
 
-    public void onBTConnectionFailed() {
-        onConnectionFailed();
-    }
-
-    public void onUDPConnectionFailed() {
-        onConnectionFailed();
-    }
 
     public void onConnected(String name) {
         String txt = getString(R.string.connected_to, name);
         Toast.makeText(getApplicationContext(), txt, Toast.LENGTH_SHORT).show();
         AppState.getInstance().speakMessage(R.string.connected);
         AppState.getInstance().onConnected();
-    }
-
-    public void onBTConnected(String name) {
-        onConnected(name);
-        toggleConnectionMenu(true, true);
-    }
-
-    public void onUDPConnected(String name) {
-        onConnected(name);
-        toggleConnectionMenu(true, false);
     }
 
     public void onDataReceived(String message) {
@@ -114,53 +84,13 @@ public class MainActivity extends AppCompatActivity {
 
     void initUSB() {
         usb = new USBService((UsbManager) getSystemService(Context.USB_SERVICE));
-        usb.setConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnected(String name) {
-                MainActivity.this.onUDPConnected(getGatewayIP());
-            }
-
-            @Override
-            public void onDisconnected() {
-                MainActivity.this.onUDPDisconnected();
-            }
-
-            @Override
-            public void onConnectionFailed(String errorMsg) {
-                MainActivity.this.onUDPConnectionFailed();
-            }
-
-            @Override
-            public void onDataReceived(String message) {
-                MainActivity.this.onDataReceived(message);
-            }
-        });
+        usb.setConnectionListener(this);
     }
 
 
     void initUDP() {
         udp = new UDPService();
-        udp.setConnectionListener(new ConnectionListener() {
-            @Override
-            public void onConnected(String name) {
-                MainActivity.this.onUDPConnected(getGatewayIP());
-            }
-
-            @Override
-            public void onDisconnected() {
-                MainActivity.this.onUDPDisconnected();
-            }
-
-            @Override
-            public void onConnectionFailed(String errorMsg) {
-                MainActivity.this.onUDPConnectionFailed();
-            }
-
-            @Override
-            public void onDataReceived(String message) {
-                MainActivity.this.onDataReceived(message);
-            }
-        });
+        udp.setConnectionListener(this);
     }
 
     void initBluetooth() {
@@ -173,32 +103,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        bt.setConnectionListener(new ConnectionListener() {
-            public void onDisconnected() {
-                MainActivity.this.onBTDisconnected();
-            }
-
-            public void onConnectionFailed(String s) {
-                MainActivity.this.onBTConnectionFailed();
-            }
-
-            public void onConnected(String name) {
-                MainActivity.this.onBTConnected(name);
-            }
-
-            public void onDataReceived(String msg) {
-                MainActivity.this.onDataReceived(msg);
-            }
-        });
-    }
-
-    void toggleConnectionMenu(boolean isConnected, boolean isBluetooth) {
-        menu.findItem(R.id.menuBTConnect).setVisible(!isConnected);
-        menu.findItem(R.id.menuUDPConnect).setVisible(!isConnected);
-        boolean isBtConnected = isConnected && isBluetooth;
-        menu.findItem(R.id.menuBTDisconnect).setVisible(isBtConnected);
-        boolean isUdpConnected = isConnected && !isBluetooth;
-        menu.findItem(R.id.menuUDPDisconnect).setVisible(isUdpConnected);
+        bt.setConnectionListener(this);
     }
 
     @Override
@@ -286,13 +191,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        UsbDevice device = getAvailableUsbDevice();
-        if (device == null) {
-            menu.findItem(R.id.menuUSBConnect).setVisible(false);
-            menu.findItem(R.id.menuUSBDisconnect).setVisible(false);
+        Connection conn = AppState.getInstance().conn;
+        if (conn != null) {
+            for(int i = 0; i < menu.size(); i++) {
+                menu.getItem(i).setVisible(false);
+            }
+            menu.findItem(R.id.menuDisconnect).setVisible(true);
         } else {
-            menu.findItem(R.id.menuUSBConnect).setVisible(true);
-            menu.findItem(R.id.menuUSBDisconnect).setVisible(true);
+            UsbDevice device = getAvailableUsbDevice();
+            menu.findItem(R.id.menuUSBConnect).setVisible(device != null);
+            menu.findItem(R.id.menuBTConnect).setVisible(true);
+            menu.findItem(R.id.menuUDPConnect).setVisible(true);
+            menu.findItem(R.id.menuDisconnect).setVisible(false);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -312,28 +222,23 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if (id == R.id.menuBTConnect) {
-            bt.setDeviceTarget(BluetoothState.DEVICE_OTHER);
-            Intent intent = new Intent(getApplicationContext(), DeviceList.class);
-            startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
-        } else if (id == R.id.menuBTDisconnect) {
-            if (bt.getServiceState() == BluetoothState.STATE_CONNECTED) {
+        switch (id) {
+            case R.id.menuBTConnect:
+                bt.setDeviceTarget(BluetoothState.DEVICE_OTHER);
+                Intent intent = new Intent(getApplicationContext(), DeviceList.class);
+                startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
+                break;
+            case R.id.menuUDPConnect:
+                udp.connect(getGatewayIP(), 0);
+                useUDP();
+                break;
+            case R.id.menuUSBConnect:
+                checkUSBPermissionsAndConnectIfAllowed();
+                break;
+            case R.id.menuDisconnect:
                 AppState.getInstance().onBeforeDisconnect();
                 delayedDisconnect.sendEmptyMessageDelayed(0, 100);
-            }
-        } else if (id == R.id.menuUDPConnect) {
-            udp.connect(getGatewayIP(), 0);
-            useUDP();
-        } else if (id == R.id.menuUDPDisconnect) {
-            AppState.getInstance().onBeforeDisconnect();
-            delayedDisconnect.sendEmptyMessageDelayed(0, 100);
-        } else if (id == R.id.menuUSBConnect) {
-            checkUSBPermissionsAndConnectIfAllowed();
-//            usb.connect((UsbManager) getSystemService(Context.USB_SERVICE));
-//            useUSB();
-        } else if (id == R.id.menuUSBDisconnect) {
-            AppState.getInstance().onBeforeDisconnect();
-            delayedDisconnect.sendEmptyMessageDelayed(0, 100);
+                break;
         }
 
         return super.onOptionsItemSelected(item);
@@ -369,7 +274,6 @@ public class MainActivity extends AppCompatActivity {
         } else {
             if (!bt.isServiceAvailable()) {
                 bt.runService();
-                useBT();
             }
         }
     }
@@ -422,9 +326,10 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
-            if (resultCode == Activity.RESULT_OK)
+            if (resultCode == Activity.RESULT_OK) {
                 bt.connect(data);
-            useBT();
+                useBT();
+            }
         } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
             if (resultCode == Activity.RESULT_OK) {
                 bt.runService();
@@ -452,8 +357,6 @@ public class MainActivity extends AppCompatActivity {
         useUSB();
     }
 
-    ;
-
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
 
     private void initBroadcastReceiverForUsbPermissions() {
@@ -473,8 +376,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                         } else {
     //                        Log.d(TAG, "permission denied for device " + device);
-    //                        Toast.makeText(getApplicationContext(), getString(R.string.cannotAccessUsb), Toast.LENGTH_SHORT).show();
-                            Toast.makeText(getApplicationContext(), "Cannot access USB device", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), getString(R.string.cannotAccessUsbDevice), Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
