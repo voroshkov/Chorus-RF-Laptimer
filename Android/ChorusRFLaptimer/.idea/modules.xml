@@ -6,7 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/bluetoothSPP/bluetoothSPP.iml" filepath="$PROJECT_DIR$/bluetoothSPP/bluetoothSPP.iml" />
       <module fileurl="file://$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" filepath="$PROJECT_DIR$/usbSerialForAndroid/usbSerialForAndroid.iml" />
-      <module fileurl="file://$PROJECT_DIR$/usb-serial-for-android/usbSerialForAndroid/usbSerialForAndroid.iml" filepath="$PROJECT_DIR$/usb-serial-for-android/usbSerialForAndroid/usbSerialForAndroid.iml" />
     </modules>
   </component>
 </project>
