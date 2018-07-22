@@ -39,7 +39,7 @@ public class UDPService implements Connection{
     ByteBuffer mSendBuf = ByteBuffer.allocateDirect(MAX_SEND_PACKET_SIZE);
     ByteBuffer mReceiveBuf = ByteBuffer.allocateDirect(MAX_UDP_PACKET_SIZE);
 
-    DatagramChannel mChannel = null;
+    volatile DatagramChannel mChannel = null;
     ConnectionListener mConnectionListener = null;
     SenderThread mSenderThread = null;
     ListenerThread mListenerThread = null;
@@ -154,10 +154,12 @@ public class UDPService implements Connection{
         if (mChannel != null) {
             try {
                 mChannel.disconnect();
-                mChannel = null;
             }
             catch(Exception e) {
                 // TODO: handle exception here ?
+            }
+            finally {
+                mChannel = null;
             }
         }
 

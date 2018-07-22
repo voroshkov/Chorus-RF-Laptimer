@@ -41,7 +41,7 @@ public class USBService implements Connection{
     UsbManager mUsbManager = null;
     ListenerThread mListenerThread = null;
     SenderThread mSenderThread = null;
-    UsbSerialPort mPort = null;
+    volatile UsbSerialPort mPort = null;
 
     USBService(UsbManager usbManager) {
         mActivityHandler = new HandlerExtension();
@@ -174,13 +174,13 @@ public class USBService implements Connection{
 
         if (mPort != null) {
             try {
-                synchronized (mPort) {
-                    mPort.close();
-                    mPort = null;
-                }
+                mPort.close();
             }
             catch(Exception e) {
                 // TODO: handle exception here ?
+            }
+            finally {
+                mPort = null;
             }
         }
 

@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
     }
 
     public void onConnectionFailed(String errorMsg) {
+        AppState.getInstance().conn = null;
         Toast.makeText(getApplicationContext(), getString(R.string.connection_failed), Toast.LENGTH_SHORT).show();
         AppState.getInstance().speakMessage(R.string.connection_failed);
     }
