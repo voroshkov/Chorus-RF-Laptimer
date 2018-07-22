@@ -11,6 +11,7 @@ Several updated Solo Laptimer devices connected together make up a Chorus Laptim
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 ## NEWS FEED:
 ------------------------------------------------
+- 2018-07: Added support for USB devices in Android app (you can use wired connection or 433/915MHz telemetry modules for better range)
 - 2018-06: Integration with LiveTime is in progress
 - 2018-06: Arduinos got new API (v.4), incompatible with prev versions. All mobile apps are up to date with the new API.
 - 2018-06: New threshold setup algorithm is implemented. Instead of measuring immediate RSSI at some point in space it's now a staged process
