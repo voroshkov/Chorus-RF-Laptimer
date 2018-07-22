@@ -10,8 +10,6 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
-
 /**
  * Created by Andrey_Voroshkov on 1/22/2017.
  */
@@ -957,6 +955,66 @@ public class AppState {
                 suspendBatteryMonitoringHandlers();
             }
         }
+    }
+
+    private ConnectionTester mConnectionTester = null;
+    private Handler mConnectionTesterSendHandler;
+
+    public boolean checkIsConnectionTestRunning() {
+        return mConnectionTester != null;
+    }
+
+    public void startOrStopConnectionTester() {
+        if (mConnectionTester == null) {
+            // start the range tester
+            sendBtCommand("R*I0000"); // turn rssi monitoring off
+            mConnectionTester = new ConnectionTester();
+
+            mConnectionTesterSendHandler = new Handler() {
+                public void handleMessage(Message msg) {
+                    AppState app = AppState.getInstance();
+                    if (app.isConnected && app.raceState != null && !app.raceState.isStarted && app.mConnectionTester != null) {
+                        AppState.getInstance().sendBtCommand("%" + String.format("%04X", mConnectionTester.getNextValueToSend()));
+                        mConnectionTester.calcDiffTimes();
+                        emitEvent(DataAction.ConnectionTester);
+                    }
+                    sendEmptyMessageDelayed(0, mConnectionTester.SEND_DELAY_MS);
+                }
+            };
+            mConnectionTesterSendHandler.sendEmptyMessage(0);
+        }
+        else {
+            // stop the range tester
+            mConnectionTesterSendHandler.removeCallbacksAndMessages(null);
+            mConnectionTesterSendHandler = null;
+            mConnectionTester = null;
+            sendBtCommand("R*I0064"); // turn rssi monitoring off
+        }
+    }
+
+    public void invokeConnectionTestCalculation(int value) {
+        if (mConnectionTester == null) return;
+        mConnectionTester.receiveNextValue(value);
+    }
+
+    public double getConnectionTestFailurePercentage() {
+        if (mConnectionTester == null) return 0;
+        return mConnectionTester.getFailuresPercentage();
+    }
+
+    public long getConnectionTestMinDelay() {
+        if (mConnectionTester == null) return 0;
+        return mConnectionTester.minDelay;
+    }
+
+    public long getConnectionTestMaxDelay() {
+        if (mConnectionTester == null) return 0;
+        return mConnectionTester.maxDelay;
+    }
+
+    public long getConnectionTestAvgDelay() {
+        if (mConnectionTester == null) return 0;
+        return mConnectionTester.avgDelay;
     }
 }
 

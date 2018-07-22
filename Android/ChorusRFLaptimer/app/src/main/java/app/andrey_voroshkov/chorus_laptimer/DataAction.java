@@ -32,5 +32,6 @@ public enum DataAction {
     LiPoMonitorEnable,
     WrongApiVersion,
     ThresholdSetupState,
-    Disconnect
+    Disconnect,
+    ConnectionTester
 }

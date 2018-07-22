@@ -4,6 +4,7 @@
     <!-- Menu -->
     <string name="menu_bt_connect">Connect via Bluetooth</string>
     <string name="menu_udp_connect">Connect via WiFi</string>
+    <string name="menu_usb_connect">Connect via USB</string>
     <string name="menu_disconnect">Disconnect</string>
 
     <!-- Tabs -->
@@ -76,6 +77,8 @@
     <string name="api_err_title">Compatibility Error</string>
     <string name="api_err_message">Chorus node(s) # %1$s are flashed with outdated firmware.\n\nPlease flash firmware with API version %2$d or higher and try again.</string>
     <string name="api_err_button">Disconnect</string>
+
+    <string name="cannotAccessUsbDevice">Cannot access USB device</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Start Race (%1$d pilot)</item>

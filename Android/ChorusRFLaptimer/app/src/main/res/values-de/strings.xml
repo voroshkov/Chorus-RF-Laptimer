@@ -5,6 +5,8 @@
     <!-- Menu -->
     <string name="menu_bt_connect">Verbinden per Bluetooth</string>
     <string name="menu_udp_connect">Verbinden per WiFi</string>
+    <string name="menu_usb_connect">Verbinden per USB</string>
+
     <string name="menu_disconnect">Verbindung trennen</string>
 
     <!-- Tabs -->
@@ -77,6 +79,8 @@
     <string name="api_err_title">Kompatibilitätsfehler</string>
     <string name="api_err_message">Das Chorusmodul %1$s ist mit einer veralteten Firmware beschrieben.\n\nBitte spielen Sie die Firmware mit API-Version %2$d oder höher auf das Modul und versuchen Sie es erneut.</string>
     <string name="api_err_button">Verbindung trennen</string>
+
+    <string name="cannotAccessUsbDevice">Cannot access USB device</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Starte Rennen (%1$d Pilot)</item>
