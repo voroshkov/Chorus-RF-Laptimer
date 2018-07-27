@@ -157,7 +157,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_ALL_DEVICE_STATE       255
 
 //----- RSSI --------------------------------------
-#define FILTER_ITERATIONS 0 // software filtering iterations; set 0 - if filtered in hardware; set 5 - if not
+#define FILTER_ITERATIONS 5 // software filtering iterations; set 0 - if filtered in hardware; set 5 - if not
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
 uint16_t rssi;
