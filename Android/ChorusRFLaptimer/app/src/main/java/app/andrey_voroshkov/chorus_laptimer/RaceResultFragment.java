@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,6 +78,8 @@ public class RaceResultFragment extends Fragment {
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
+                if (!isAdded()) return;
+
                 switch (dataItemName) {
                     case RaceState:
                     case NDevices:
@@ -93,8 +94,6 @@ public class RaceResultFragment extends Fragment {
                         break;
                     case DeviceThreshold:
                     case Disconnect:
-                        updateButtons(rootView);
-                        break;
                     case DeviceCalibrationStatus:
                         updateButtons(rootView);
                         break;

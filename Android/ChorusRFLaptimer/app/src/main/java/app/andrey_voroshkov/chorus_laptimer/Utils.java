@@ -16,6 +16,15 @@ public class Utils {
         return ourInstance;
     }
 
+    private static long lastReceiveTime;
+    public static long receiveDelay;
+
+    public static long getReceiveDelay() {
+        long curTime = System.currentTimeMillis();
+        long curDiff = curTime - lastReceiveTime;
+        return curDiff > receiveDelay ? curDiff : receiveDelay;
+    }
+
     private Utils() {
     }
 
@@ -42,6 +51,10 @@ public class Utils {
     }
 
     public static String btDataChunkParser(String chunk) {
+        long curTime = System.currentTimeMillis();
+        receiveDelay = curTime - lastReceiveTime;
+        lastReceiveTime = curTime;
+
         StringBuilder result = new StringBuilder();
 
         if (chunk.length() < 2) {
@@ -145,6 +158,10 @@ public class Utils {
             }
         } else if (dest == 'R') {
 
+        } else if (dest == '%') {
+            // this is a connection test roundtrip command
+            int value = Integer.parseInt(chunk.substring(1,5), 16);
+            AppState.getInstance().invokeConnectionTestCalculation(value);
         } else if (dest == 'N') {
             result.append("ModulesCount: ").append(module);
             AppState.getInstance().setNumberOfDevices(moduleId);

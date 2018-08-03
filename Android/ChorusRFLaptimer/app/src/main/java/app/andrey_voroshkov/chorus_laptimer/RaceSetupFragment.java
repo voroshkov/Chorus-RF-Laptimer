@@ -47,19 +47,23 @@ public class RaceSetupFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.race_setup, container, false);
         mRootView = rootView;
         mContext = getContext();
-
-        updateText(rootView);
-        updateSkipFirstLapCheckbox(rootView);
-        updateSoundCheckbox(rootView);
-        updateSpeakLapTimesCheckbox(rootView);
-        updateSpeakMessagesCheckbox(rootView);
-        updateSpeakEnglishOnlyCheckbox(rootView);
-        updateLiPoMonitorCheckbox(rootView);
-        updateBatteryProgressIndicator(rootView);
+        
+        if (isAdded()) {
+            updateText(rootView);
+            updateSkipFirstLapCheckbox(rootView);
+            updateSoundCheckbox(rootView);
+            updateSpeakLapTimesCheckbox(rootView);
+            updateSpeakMessagesCheckbox(rootView);
+            updateSpeakEnglishOnlyCheckbox(rootView);
+            updateLiPoMonitorCheckbox(rootView);
+            updateBatteryProgressIndicator(rootView);
+        }
 
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
+                if (!isAdded()) return;
+
                 switch (dataItemName) {
                     case RaceMinLap:
                     case RaceLaps:
@@ -89,6 +93,9 @@ public class RaceSetupFragment extends Fragment {
                     case LiPoMonitorEnable:
                         updateLiPoMonitorCheckbox(rootView);
                         break;
+                    case ConnectionTester:
+                        updateRangeTester(rootView);
+                        break;
                 }
             }
         });
@@ -109,6 +116,27 @@ public class RaceSetupFragment extends Fragment {
         Button btnIncAdjust = (Button) rootView.findViewById(R.id.btnIncAdjustmentConst);
         TextView txtVoltage = (TextView) rootView.findViewById(R.id.txtVoltage);
         LinearLayout layoutVoltage = (LinearLayout) rootView.findViewById(R.id.layoutVoltage);
+
+        LinearLayout layoutAdvancedActivator = (LinearLayout) rootView.findViewById(R.id.layoutAdvancedActivator);
+        LinearLayout layoutAdvanced = (LinearLayout) rootView.findViewById(R.id.layoutAdvanced);
+        final Button btnTestConnection = (Button) rootView.findViewById(R.id.btnTestConnection);
+
+        layoutAdvancedActivator.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                toggleAdvancedControls(rootView);
+                return false;
+            }
+        });
+
+        btnTestConnection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newButtonText = AppState.getInstance().checkIsConnectionTestRunning() ? "Start" : "Stop";
+                btnTestConnection.setText(newButtonText);
+                AppState.getInstance().startOrStopConnectionTester();
+            }
+        });
 
         btnDecAdjust.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -267,6 +295,16 @@ public class RaceSetupFragment extends Fragment {
         }
     }
 
+    private void toggleAdvancedControls(View rootView) {
+        LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.layoutAdvanced);
+        boolean isVisible = layout.getVisibility() == View.VISIBLE;
+        if (!isVisible) {
+            layout.setVisibility(View.VISIBLE);
+        } else {
+            layout.setVisibility(View.GONE);
+        }
+    }
+
     private void updateText(View rootView) {
         TextView txtMinLaps = (TextView) rootView.findViewById(R.id.txtMinLapTime);
         txtMinLaps.setText(getString(R.string.setup_time, AppState.getInstance().raceState.minLapTime));
@@ -328,6 +366,18 @@ public class RaceSetupFragment extends Fragment {
     private void updateBatteryVoltageText(View rootView) {
         TextView txtVoltage = (TextView) rootView.findViewById(R.id.txtVoltage);
         txtVoltage.setText(String.format("%.2f", AppState.getInstance().batteryVoltage) + "V");
+    }
 
+    private void updateRangeTester(View rootView) {
+        TextView txtRangeTestPercentage =  (TextView) rootView.findViewById(R.id.txtRangeTestPercentage);
+        txtRangeTestPercentage.setText(String.format("%.2f", AppState.getInstance().getConnectionTestFailurePercentage()) + "%");
+        TextView txtRangeTestMaxTime =  (TextView) rootView.findViewById(R.id.txtRangeMaxTime);
+        txtRangeTestMaxTime.setText(Long.toString(AppState.getInstance().getConnectionTestMaxDelay()) + "ms");
+        TextView txtRangeTestAvgTime =  (TextView) rootView.findViewById(R.id.txtRangeAvgTime);
+        txtRangeTestAvgTime.setText(Long.toString(AppState.getInstance().getConnectionTestAvgDelay()) + "ms");
+        TextView txtRangeTestMinTime =  (TextView) rootView.findViewById(R.id.txtRangeMinTime);
+        txtRangeTestMinTime.setText(Long.toString(AppState.getInstance().getConnectionTestMinDelay()) + "ms");
+        TextView txtReceiveDelay =  (TextView) rootView.findViewById(R.id.txtReceiveDelay);
+        txtReceiveDelay.setText(Long.toString(Utils.getReceiveDelay()) + "ms");
     }
 }
