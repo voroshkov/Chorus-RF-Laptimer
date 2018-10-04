@@ -34,6 +34,7 @@ If you feel like spending some money for the purspose - I'd also be very gratefu
 Thanks for your support!
 
 ## Featured references:
+- This project's Wiki page: https://github.com/voroshkov/Chorus-RF-Laptimer/wiki
 - Chorus RF Laptimer Facebook group (primary news feed and knowledge sharing place): https://www.facebook.com/groups/ChorusRFLaptimer/
 - Chorus RF Laptimer discussion thread @ RC Groups (deprecated: low activity): https://www.rcgroups.com/forums/showthread.php?2801815
 - PC GUI Interface project for Chorus RF Laptimer (outdated: doesn't support latest Arduino firmware): https://github.com/anunique/ChorusGUI
