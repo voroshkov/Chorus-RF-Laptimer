@@ -11,6 +11,7 @@ Several updated Solo Laptimer devices connected together make up a Chorus Laptim
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 ## NEWS FEED:
 ------------------------------------------------
+- 2018-10: Chorus is now basically supported in LiveTime Scoring Engine - racing organization PC software
 - 2018-07: Added support for USB devices in Android app (you can use wired connection or 433/915MHz telemetry modules for better range)
 - 2018-06: Integration with LiveTime is in progress
 - 2018-06: Arduinos got new API (v.4), incompatible with prev versions. All mobile apps are up to date with the new API.
@@ -33,10 +34,12 @@ If you feel like spending some money for the purspose - I'd also be very gratefu
 Thanks for your support!
 
 ## Featured references:
-- Chorus RF Laptimer Facebook group: https://www.facebook.com/groups/ChorusRFLaptimer/
-- Chorus RF Laptimer discussion thread @ RC Groups: https://www.rcgroups.com/forums/showthread.php?2801815
-- PC GUI Interface project for Chorus RF Laptimer: https://github.com/anunique/ChorusGUI
-- Delta5 Race Timer Facebook group: https://www.facebook.com/groups/Delta5RaceTimer/
+- This project's Wiki page: https://github.com/voroshkov/Chorus-RF-Laptimer/wiki
+- Chorus RF Laptimer Facebook group (primary news feed and knowledge sharing place): https://www.facebook.com/groups/ChorusRFLaptimer/
+- Chorus RF Laptimer discussion thread @ RC Groups (deprecated: low activity): https://www.rcgroups.com/forums/showthread.php?2801815
+- PC GUI Interface project for Chorus RF Laptimer (outdated: doesn't support latest Arduino firmware): https://github.com/anunique/ChorusGUI
+- Delta5 Race Timer Facebook group (alternative DIY race timer project): https://www.facebook.com/groups/Delta5RaceTimer/
+- LiveTime Scoring Engine (PC software for racing organization with support for Chorus): https://www.livetimescoring.com/
 
 ## Add-ins/Extensions:
 
@@ -363,6 +366,10 @@ iOS app:
 Alternative PCB design:
 - Joao Reis
 - Philipp Seidel
+
+LiveTime integration:
+- David Lewis - building and contributing several Chorus nodes to LiveTime team for integration testing
+- Cory Kroll - implementation of Chorus support in LiveTime
 
 <a name="contacts"></a>
 ## Contacts
