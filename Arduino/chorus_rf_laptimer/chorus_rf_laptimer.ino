@@ -38,7 +38,9 @@ TODO: there's possible optimization in send queue:
     remove already existing items from queue
 */
 
-#define API_VERSION 4 // version number to be increased with each API change (int16)
+#define API_VERSION 5 // version number to be increased with each API change (int16)
+
+#define EXPERIMENTAL_FEATURES_AVAILABLE // comment out if current code version doesn't contain any experimental features
 
 // #define DEBUG
 
@@ -63,7 +65,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 // single analog read with FASTADC defined (see below) takes ~20us on 16MHz arduino
 // so e.g. 10 reads will take 200 ms, which gives resolution of 5 RSSI reads per ms,
 // this means that we can theoretically have 1ms timing accuracy :)
-#define RSSI_READS 5 // 5 should give about 10 000 readings per second
+#define RSSI_READS 4 // numer of rssi reads to average the value
 
 // API in brief (sorted alphabetically):
 // Req  Resp Description
@@ -101,6 +103,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_MIN_LAP_TIME        'M'
 #define CONTROL_SOUND               'S'
 #define CONTROL_THRESHOLD           'T'
+#define CONTROL_EXPERIMENTAL_MODE   'E'
 // get only:
 #define CONTROL_GET_API_VERSION     '#'
 #define CONTROL_GET_ALL_DATA        'a'
@@ -108,6 +111,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define CONTROL_GET_TIME            't'
 #define CONTROL_GET_VOLTAGE         'v'
 #define CONTROL_GET_IS_CONFIGURED   'y'
+#define CONTROL_GET_DEBUG_INFO      '~'
 
 // output id byte constants
 #define RESPONSE_WAIT_FIRST_LAP      '1'
@@ -122,6 +126,7 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define RESPONSE_MIN_LAP_TIME        'M'
 #define RESPONSE_SOUND               'S'
 #define RESPONSE_THRESHOLD           'T'
+#define RESPONSE_EXPERIMENTAL_MODE   'E'
 
 #define RESPONSE_API_VERSION         '#'
 #define RESPONSE_RSSI                'r'
@@ -148,7 +153,8 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define SEND_API_VERSION        12
 #define SEND_VOLTAGE            13
 #define SEND_THRESHOLD_SETUP_MODE 14
-#define SEND_END_SEQUENCE       15
+#define SEND_EXPERIMENTAL_MODE  15
+#define SEND_END_SEQUENCE       16
 // following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES          100
 #define SEND_TIME                   101
@@ -160,12 +166,48 @@ const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 
 #define FILTER_ITERATIONS 5 // software filtering iterations; set 0 - if filtered in hardware; set 5 - if not
 uint16_t rssiArr[FILTER_ITERATIONS + 1];
 uint16_t rssiThreshold = 190;
-uint16_t rssi;
-uint16_t slowRssi;
+uint16_t rssi; // rssi measured using first (slight) filter
+uint16_t rssi2; // rssi measured using second (deeper/slower) filter
+uint16_t rssi3; // rssi measured using third (even deeper/slower) filter that is expected to produce a smooth curve
+uint16_t rssiForThresholdSetup; // special rssi for threshold setup (slooow filter)
+
+#define PROXIMITY_STEPS 10
+bool isApproaching = false;
+const uint32_t proximityTimesArray[PROXIMITY_STEPS] PROGMEM = {20, 50, 100, 200, 500, 700, 1000, 1200, 1500, 2000};
+uint16_t currentProximityIndex;
+uint32_t currentProximityIndexTime;
+
+//lap detection variables
+bool isFirstThresholdCrossed;
+bool didLeaveDeviceAreaThisLap;
+uint16_t upperSecondLevelRssiThreshold;
+uint16_t lowerSecondLevelThreshold;
+uint16_t minDeepRssi;
+uint16_t maxDeepRssi;
+uint16_t maxRssi;
+uint16_t maxDeepRssiAfterFirstThreshold;
+uint32_t timeWhenMaxAfterFirstThresholdWasDetected;
+uint32_t timeWhenFirstThresholdCrossed;
+uint32_t maxRssiDetectionTime;
+uint32_t maxDeepRssiDetectionTime;
+uint32_t minDeepRssiDetectionTime;
+
+uint32_t deepFilteredRssiMultiplied;
+uint32_t smoothlyFilteredRssiMultiplied;
+
+#define MAIN_RSSI_FILTER_CONSTANT 60 // this is a filtering constant that regulates both smoothness of filtering and delay at the same time
+#define DEEP_FILTER_CONSTANT 100 // filtering constant for the second filter which generates threshold values for next lap
+#define SMOOTH_FILTER_CONSTANT 1000 // filtering constant for the third filter which is used to track minimum rssi values to detect if drone left the finish gate area
+
+#define DEFAULT_MAX_RSSI_SEARCH_DELAY 3000 // time to watch for max value after crossing a threshold
+#define ALLOWED_LAP_DETECTION_TIMEOUT 1000 // time allowed for lap detection after first threshold is crossed
+
+#define RELIABLE_RSSI_DETECTION_SUBTRACT 4 // decrease found upperSecondLevelRssiThreshold by this amount to track initial threshold cross event on all laps after 1st
+#define SECOND_LEVEL_RSSI_DETECTION_ADJUSTMENT 2 // decrease found maxDeepRssi by this amount to make next lap detection more reliable
+#define EDGE_RSSI_ADJUSTMENT 10 // decrease found maximum (and increase minimum) by this value after each lap to better find a new one
 
 #define RSSI_MAX 1024
 #define RSSI_MIN 0
-#define MAGIC_THRESHOLD_REDUCE_CONSTANT 2
 #define THRESHOLD_ARRAY_SIZE  100
 uint16_t rssiThresholdArray[THRESHOLD_ARRAY_SIZE];
 
@@ -226,11 +268,12 @@ uint8_t sendLastLapIndex = 0;
 uint8_t shouldSendSingleItem = 0;
 uint8_t lastLapsNotSent = 0;
 uint8_t thresholdSetupMode = 0;
+uint8_t experimentalMode = 0;
 uint16_t frequency = 0;
 uint32_t millisUponRequest = 0;
 
 //----- read/write bufs ---------------------------
-#define READ_BUFFER_SIZE 20
+#define READ_BUFFER_SIZE 30
 uint8_t readBuf[READ_BUFFER_SIZE];
 uint8_t proxyBuf[READ_BUFFER_SIZE];
 uint8_t readBufFilledBytes = 0;
@@ -244,6 +287,8 @@ uint8_t proxyBufDataSize = 0;
 #include "sendSerialHex.h"
 #include "rx5808spi.h"
 #include "sounds.h"
+#include "lapDetectionRoutines.h"
+#include "mainDetectionAlgorithm.h"
 
 // ----------------------------------------------------------------------------
 void setup() {
@@ -285,57 +330,17 @@ void loop() {
         digitalToggle(loopTimerPin);
     );
 
-    // TODO: revise if additional filtering is really needed
-    // TODO: if needed, then maybe use the same algorithm, as getSlowChangingRSSI to avoid decrease of values?
-    rssi = getFilteredRSSI(); // actually it doesn't filter
+    rssi = getFilteredRSSI();
 
-    if (!raceMode) { // no need to get slowRssi during race time because it's used only in threshold setting, which is already set by the race time
-        slowRssi = getSlowChangingRSSI(); // filter RSSI
+    if (!raceMode) { // no need to get rssiForThresholdSetup during race time because it's used only in threshold setting, which is already set by the race time
+        rssiForThresholdSetup = getRssiForAutomaticThresholdSetup(); // filter RSSI
     }
 
-    // check rssi threshold to identify when drone finishes the lap
-    if (rssiThreshold > 0) { // threshold = 0 means that we don't check rssi values
-        if(rssi > rssiThreshold) { // rssi above the threshold - drone is near
-            if (allowLapGeneration) {  // we haven't fired event for this drone proximity case yet
-                allowLapGeneration = 0;
-
-                uint32_t now = millis();
-                uint32_t diff = now - lastMilliseconds; //time diff with the last lap (or with the race start)
-                if (timeAdjustment != 0 && timeAdjustment != INFINITE_TIME_ADJUSTMENT) {
-                    diff = diff + (int32_t)diff/timeAdjustment;
-                }
-                if (raceMode) { // if we're within the race, then log lap time
-                    if (diff > minLapTime*1000 || (!shouldWaitForFirstLap && newLapIndex == 0)) { // if minLapTime haven't passed since last lap, then it's probably false alarm
-                        // digitalLow(ledPin);
-                        if (newLapIndex < MAX_LAPS-1) { // log time only if there are slots available
-                            if (raceMode == 1) {
-                                // for the raceMode 1 count time spent for each lap
-                                lapTimes[newLapIndex] = diff;
-                            } else {
-                                // for the raceMode 2 count times relative to the race start (ever-growing with each new lap within the race)
-                                uint32_t diffStart = now - raceStartTime;
-                                if (timeAdjustment != 0 && timeAdjustment != INFINITE_TIME_ADJUSTMENT) {
-                                    diffStart = diffStart + (int32_t)diffStart/timeAdjustment;
-                                }
-                                lapTimes[newLapIndex] = diffStart;
-                            }
-                            newLapIndex++;
-                            lastLapsNotSent++;
-                            addToSendQueue(SEND_LAST_LAPTIMES);
-                        }
-                        lastMilliseconds = now;
-                        playLapTones(); // during the race play tone sequence even if no more laps can be logged
-                    }
-                }
-                else {
-                    playLapTones(); // if not within the race, then play once per case
-                }
-            }
-        }
-        else  {
-            allowLapGeneration = 1; // we're below the threshold, be ready to catch another case
-            // digitalHigh(ledPin);
-        }
+    // detect lap
+    if (experimentalMode) {
+        runExperimentalLapDetectionAlgorithm();
+    } else {
+        runLapDetectionAlgorithm();
     }
 
     readSerialDataChunk();
@@ -435,9 +440,13 @@ void loop() {
                     onItemSent();
                 }
                 break;
+            case 15: // SEND_EXPERIMENTAL_MODE
+                if (send4BitsToSerial(RESPONSE_EXPERIMENTAL_MODE, experimentalMode)) {
+                    onItemSent();
+                }
             // Below is a termination case, to notify that data for CONTROL_GET_ALL_DATA is over.
             // Must be the last item in the sequence!
-            case 15: // SEND_END_SEQUENCE
+            case 16: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -653,7 +662,7 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
             case CONTROL_THRESHOLD_SETUP: // setup threshold using sophisticated algorithm
                 valueToSet = TO_BYTE(controlData[1]);
                 thresholdSetupMode = valueToSet;
-                if (raceMode) { // don't run threshold setup in race mode because we don't calculate slowRssi in race mode, but it's needed for setup threshold algorithm
+                if (raceMode) { // don't run threshold setup in race mode because we don't calculate rssiForThresholdSetup in race mode, but it's needed for setup threshold algorithm
                     thresholdSetupMode = 0;
                 }
                 if (thresholdSetupMode) {
@@ -662,6 +671,12 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                     playThresholdSetupStopTones();
                 }
                 addToSendQueue(SEND_THRESHOLD_SETUP_MODE);
+                break;
+            case CONTROL_EXPERIMENTAL_MODE:
+                valueToSet = TO_BYTE(controlData[1]);
+                setExperimentalMode(valueToSet);
+                addToSendQueue(SEND_EXPERIMENTAL_MODE);
+                isConfigured = 1;
                 break;
         }
     } else { // get value and other instructions
@@ -697,6 +712,9 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
             case CONTROL_THRESHOLD:
                 addToSendQueue(SEND_THRESHOLD);
                 break;
+            case CONTROL_EXPERIMENTAL_MODE:
+                addToSendQueue(SEND_EXPERIMENTAL_MODE);
+                break;
             case CONTROL_GET_RSSI: // get current RSSI value
                 addToSendQueue(SEND_CURRENT_RSSI);
                 break;
@@ -718,6 +736,11 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
             case CONTROL_GET_IS_CONFIGURED:
                 addToSendQueue(SEND_IS_CONFIGURED);
                 break;
+            #ifdef DEBUG
+            case CONTROL_GET_DEBUG_INFO:
+                sendDebugInfo();
+                break;
+            #endif
         }
     }
 }
@@ -808,6 +831,11 @@ void setRaceMode(uint8_t mode) {
         raceStartTime = millis();
         lastMilliseconds = raceStartTime;
         newLapIndex = 0;
+        allowLapGeneration = 0;
+        upperSecondLevelRssiThreshold = 0;
+        deepFilteredRssiMultiplied = rssi * DEEP_FILTER_CONSTANT;
+        smoothlyFilteredRssiMultiplied = rssi * SMOOTH_FILTER_CONSTANT;
+        resetFieldsBeforeRaceStart();
         if (thresholdSetupMode) {
             thresholdSetupMode = 0; // safety measure: stop setting threshold upon race start to avoid losing time there
             addToSendQueue(SEND_THRESHOLD_SETUP_MODE);
@@ -834,6 +862,12 @@ void setBand(uint8_t band) {
         bandIndex = band;
         frequency = setModuleChannel(channelIndex, bandIndex);
     }
+}
+// ----------------------------------------------------------------------------
+void setExperimentalMode(uint8_t mode) {
+    #ifdef EXPERIMENTAL_FEATURES_AVAILABLE
+    experimentalMode = mode;
+    #endif
 }
 // ----------------------------------------------------------------------------
 void setupThreshold(uint8_t phase) {
@@ -866,7 +900,7 @@ void setupThreshold(uint8_t phase) {
         // initialization step
         playThresholdSetupStartTones();
         thresholdSetupMode = 1;
-        rssiLow = slowRssi; // using slowRssi to avoid catching random current rssi
+        rssiLow = rssiForThresholdSetup; // using rssiForThresholdSetup to avoid catching random current rssi
         rssiHigh = rssiLow;
         accumulatedShiftedRssi = rssiLow * ACCUMULATION_TIME_CONSTANT; // multiply to prevent loss in accuracy
         rssiHighEnoughForMonitoring = rssiLow + rssiLow * RISE_RSSI_THRESHOLD_PERCENT / 100;
@@ -876,9 +910,9 @@ void setupThreshold(uint8_t phase) {
         if (thresholdSetupMode == 1) {
             // in this phase of the setup we are tracking rssi growth until it reaches the predefined percentage from low
 
-            // searching for peak; using slowRssi to avoid catching sudden random peaks
-            if (slowRssi > rssiHigh) {
-                rssiHigh = slowRssi;
+            // searching for peak; using rssiForThresholdSetup to avoid catching sudden random peaks
+            if (rssiForThresholdSetup > rssiHigh) {
+                rssiHigh = rssiForThresholdSetup;
             }
 
             // since filter runs too fast, we have to introduce a delay between subsequent readings of filter values
@@ -900,9 +934,9 @@ void setupThreshold(uint8_t phase) {
         } else {
             // in this phase of the setup we are tracking highest rssi and expect it to fall back down so that we know that the process is complete
 
-            // continue searching for peak; using slowRssi to avoid catching sudden random peaks
-            if (slowRssi > rssiHigh) {
-                rssiHigh = slowRssi;
+            // continue searching for peak; using rssiForThresholdSetup to avoid catching sudden random peaks
+            if (rssiForThresholdSetup > rssiHigh) {
+                rssiHigh = rssiForThresholdSetup;
                 accumulatedShiftedRssi = rssiHigh * ACCUMULATION_TIME_CONSTANT; // set to highest found rssi
             }
 
@@ -948,26 +982,38 @@ uint16_t setRssiMonitorInterval(uint16_t interval) {
     return (interval > 0 && interval < MIN_RSSI_MONITOR_INTERVAL) ? MIN_RSSI_MONITOR_INTERVAL : interval;
 }
 // ----------------------------------------------------------------------------
+// this is just a digital filter function
 uint16_t getFilteredRSSI() {
-    rssiArr[0] = readRSSI();
+    static uint32_t filteredRssiMultiplied;
 
-    // several-pass filter (need several passes because of integer artithmetics)
-    // it reduces possible max value by 1 with each iteration.
-    // e.g. if max rssi is 300, then after 5 filter stages it won't be greater than 295
-    for(uint8_t i=1; i<=FILTER_ITERATIONS; i++) {
-        rssiArr[i] = (rssiArr[i-1] + rssiArr[i]) >> 1;
-    }
+    uint16_t localRssi = readRSSI();
 
-    return rssiArr[FILTER_ITERATIONS];
+    filteredRssiMultiplied = localRssi  + (filteredRssiMultiplied * (MAIN_RSSI_FILTER_CONSTANT - 1) / MAIN_RSSI_FILTER_CONSTANT );
+    return filteredRssiMultiplied / MAIN_RSSI_FILTER_CONSTANT;
+
 }
 // ----------------------------------------------------------------------------
 // this is just a digital filter function
-uint16_t getSlowChangingRSSI() {
-    #define TIME_DELAY_CONSTANT 1000 // this is a filtering constant that regulates both depth of filtering and delay at the same time
-    static uint32_t slowRssiMultiplied;
+// it runs over already filtered rssi
+uint16_t getDeepFilteredRSSI() {
+    deepFilteredRssiMultiplied = rssi  + (deepFilteredRssiMultiplied * (DEEP_FILTER_CONSTANT - 1) / DEEP_FILTER_CONSTANT );
+    return deepFilteredRssiMultiplied / DEEP_FILTER_CONSTANT;
+}
+// ----------------------------------------------------------------------------
+// this is just a digital filter function
+// it runs over already filtered rssi
+uint16_t getSmoothlyFilteredRSSI() {
+    smoothlyFilteredRssiMultiplied = rssi  + (smoothlyFilteredRssiMultiplied * (SMOOTH_FILTER_CONSTANT - 1) / SMOOTH_FILTER_CONSTANT );
+    return smoothlyFilteredRssiMultiplied / SMOOTH_FILTER_CONSTANT;
+}
+// ----------------------------------------------------------------------------
+// this is just a digital filter function
+uint16_t getRssiForAutomaticThresholdSetup() {
+    #define SLOW_TIME_DELAY_CONSTANT 1000 // this is a filtering constant that regulates both depth of filtering and delay at the same time
+    static uint32_t slowChangingRssiMultiplied;
 
-    slowRssiMultiplied = rssi  + (slowRssiMultiplied * (TIME_DELAY_CONSTANT - 1) / TIME_DELAY_CONSTANT );
-    return slowRssiMultiplied / TIME_DELAY_CONSTANT;
+    slowChangingRssiMultiplied = rssi  + (slowChangingRssiMultiplied * (SLOW_TIME_DELAY_CONSTANT - 1) / SLOW_TIME_DELAY_CONSTANT );
+    return slowChangingRssiMultiplied / SLOW_TIME_DELAY_CONSTANT;
 }
 // ----------------------------------------------------------------------------
 void sortArray(uint16_t a[], uint16_t size) {
@@ -995,6 +1041,8 @@ void gen_rising_edge(int pin) {
 uint16_t readRSSI() {
     int rssiA = 0;
 
+    analogRead(rssiPinA); // first fake read to improve further readings accuracy (as suggested by Nicola Gorghetto)
+
     for (uint8_t i = 0; i < RSSI_READS; i++) {
         rssiA += analogRead(rssiPinA);
     }
@@ -1006,10 +1054,31 @@ uint16_t readRSSI() {
 uint16_t readVoltage() {
     int voltageA = 0;
 
+    analogRead(voltagePinA); // first fake read to improve further readings accuracy (as suggested by Nicola Gorghetto)
+
     for (uint8_t i = 0; i < VOLTAGE_READS; i++) {
         voltageA += analogRead(voltagePinA);
     }
 
     voltageA = voltageA/VOLTAGE_READS; // average of RSSI_READS readings
     return voltageA;
+}
+// ----------------------------------------------------------------------------
+void sendDebugInfo() {
+    #ifdef DEBUG
+
+    Serial.print("lapDetTimeoutExp: "); Serial.println(checkIsLapDetectionTimeoutExpired());
+    Serial.print("checkIsLapDetected: "); Serial.println(checkIsLapDetected());
+    Serial.print("now: "); Serial.println(now);
+    Serial.print("lastMillis");Serial.println(lastMilliseconds);
+    Serial.print("rssi: "); Serial.println(rssi);
+    Serial.print("rssi2: "); Serial.println(rssi2);
+    Serial.print("thresh2: "); Serial.println(upperSecondLevelRssiThreshold);
+    Serial.print("lowThresh2: "); Serial.println(lowerSecondLevelThreshold);
+    Serial.print("maxRssi: "); Serial.println(maxRssi);
+    Serial.print("maxDeepRssi: "); Serial.println(maxDeepRssi);
+    Serial.print("minDeepRssi: "); Serial.println(minDeepRssi);
+    Serial.print("didLeave: "); Serial.println(didLeaveDeviceAreaThisLap);
+
+    #endif
 }
