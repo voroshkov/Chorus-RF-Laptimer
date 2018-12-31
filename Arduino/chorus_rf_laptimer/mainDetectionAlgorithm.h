@@ -5,7 +5,7 @@ void runLapDetectionAlgorithm() {
             if (allowLapGeneration) {  // we haven't fired event for this drone proximity case yet
                 allowLapGeneration = 0;
 
-                uint32_t now = millis();
+                now = millis();
                 uint32_t diff = now - lastMilliseconds; //time diff with the last lap (or with the race start)
                 if (timeAdjustment != 0 && timeAdjustment != INFINITE_TIME_ADJUSTMENT) {
                     diff = diff + (int32_t)diff/timeAdjustment;
