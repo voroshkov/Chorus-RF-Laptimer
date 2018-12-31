@@ -236,6 +236,7 @@ uint8_t isSendQueueFull = 0;
 
 //----- Lap timings--------------------------------
 uint32_t lastMilliseconds = 0;
+uint32_t now = 0;
 uint32_t raceStartTime = 0;
 #define MIN_MIN_LAP_TIME 1 //seconds
 #define MAX_MIN_LAP_TIME 120 //seconds
