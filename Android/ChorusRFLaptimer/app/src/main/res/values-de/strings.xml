@@ -35,6 +35,8 @@
     <string name="setup_speak_lap_times">Ansage Rundenzeit</string>
     <string name="setup_speak_messages">Ansage Nachrichten</string>
     <string name="setup_speak_english_only">Ansage nur in English</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Random Start</string>
     <string name="freq_channel">Kanal Nr.</string>
     <string name="freq_rf_band">Frequenzband</string>
     <string name="plus_sign">+</string>

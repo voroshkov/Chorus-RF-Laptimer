@@ -3,8 +3,10 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,12 +43,20 @@ public class RaceSetupFragment extends Fragment {
         return fragment;
     }
 
+    private void showVersion(View rootView) {
+        TextView txtVersion = rootView.findViewById(R.id.txtVersionName);
+        String version = "application version: " + AppState.getInstance().appVersion;
+        txtVersion.setText(version);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.race_setup, container, false);
         mRootView = rootView;
         mContext = getContext();
+
+        showVersion(rootView);
         
         if (isAdded()) {
             updateText(rootView);
@@ -57,6 +67,7 @@ public class RaceSetupFragment extends Fragment {
             updateSpeakEnglishOnlyCheckbox(rootView);
             updateLiPoMonitorCheckbox(rootView);
             updateBatteryProgressIndicator(rootView);
+            updateUseExperimentalFeaturesCheckbox(rootView);
         }
 
         AppState.getInstance().addListener(new IDataListener() {
@@ -68,11 +79,15 @@ public class RaceSetupFragment extends Fragment {
                     case RaceMinLap:
                     case RaceLaps:
                     case PreparationTime:
+                    case RandomStartTime:
                     case VoltageAdjustmentConst:
                         updateText(rootView);
                         break;
                     case SoundEnable:
                         updateSoundCheckbox(rootView);
+                        break;
+                    case UseExperimentalFeatures:
+                        updateUseExperimentalFeaturesCheckbox(rootView);
                         break;
                     case SkipFirstLap:
                         updateSkipFirstLapCheckbox(rootView);
@@ -110,10 +125,13 @@ public class RaceSetupFragment extends Fragment {
         CheckBox chkSpeakLapTimes = (CheckBox) rootView.findViewById(R.id.chkSpeakLapTimes);
         CheckBox chkSpeakMessages = (CheckBox) rootView.findViewById(R.id.chkSpeakMessages);
         CheckBox chkSpeakEnglishOnly = (CheckBox) rootView.findViewById(R.id.chkSpeakEnglishOnly);
+        CheckBox chkUseExperimentalFeatures = (CheckBox) rootView.findViewById(R.id.chkUseExperimentalFeatures);
         CheckBox chkDeviceSoundEnabled = (CheckBox) rootView.findViewById(R.id.chkDeviceSoundEnabled);
         CheckBox chkLiPoMonitor = (CheckBox) rootView.findViewById(R.id.chkLiPoMonitor);
         Button btnDecAdjust = (Button) rootView.findViewById(R.id.btnDecAdjustmentConst);
         Button btnIncAdjust = (Button) rootView.findViewById(R.id.btnIncAdjustmentConst);
+        Button btnDecRandomStartTime = (Button) rootView.findViewById(R.id.btnDecRandomStartTime);
+        Button btnIncRandomStartTime = (Button) rootView.findViewById(R.id.btnIncRandomStartTime);
         TextView txtVoltage = (TextView) rootView.findViewById(R.id.txtVoltage);
         LinearLayout layoutVoltage = (LinearLayout) rootView.findViewById(R.id.layoutVoltage);
 
@@ -205,6 +223,22 @@ public class RaceSetupFragment extends Fragment {
             }
         });
 
+        btnDecRandomStartTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int time = AppState.getInstance().randomStartTime;
+                AppState.getInstance().changeRandomStartTime(time - 1);
+            }
+        });
+
+        btnIncRandomStartTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int time = AppState.getInstance().randomStartTime;
+                AppState.getInstance().changeRandomStartTime(time + 1);
+            }
+        });
+
         chkDeviceSoundEnabled.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,6 +251,21 @@ public class RaceSetupFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 buttonView.setChecked(AppState.getInstance().isDeviceSoundEnabled);
+            }
+        });
+
+        chkUseExperimentalFeatures.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean shouldUseExperimentalFeatures = AppState.getInstance().shouldUseExperimentalFeatures;
+                AppState.getInstance().sendBtCommand("R*E" + (shouldUseExperimentalFeatures ? "0" : "1"));
+            }
+        });
+
+        chkUseExperimentalFeatures.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                buttonView.setChecked(AppState.getInstance().shouldUseExperimentalFeatures);
             }
         });
 
@@ -300,7 +349,8 @@ public class RaceSetupFragment extends Fragment {
         boolean isVisible = layout.getVisibility() == View.VISIBLE;
         if (!isVisible) {
             layout.setVisibility(View.VISIBLE);
-        } else {
+        } else if (!AppState.getInstance().shouldUseExperimentalFeatures && !AppState.getInstance().checkIsConnectionTestRunning()){
+            // only hide if experimental features are off and connection test is not running
             layout.setVisibility(View.GONE);
         }
     }
@@ -317,6 +367,9 @@ public class RaceSetupFragment extends Fragment {
 
         TextView txtAdjustmentConst = (TextView) rootView.findViewById(R.id.txtAdjustmentConst);
         txtAdjustmentConst.setText(Integer.toString(AppState.getInstance().batteryAdjustmentConst));
+
+        TextView txtRandomStartTime = (TextView) rootView.findViewById(R.id.txtRandomStartTime);
+        txtRandomStartTime.setText(getString(R.string.setup_time, AppState.getInstance().randomStartTime));
     }
 
     private void updateSkipFirstLapCheckbox(View rootView) {
@@ -342,6 +395,32 @@ public class RaceSetupFragment extends Fragment {
     private void updateSpeakEnglishOnlyCheckbox(View rootView) {
         CheckBox chkSpeakEnglishOnly = (CheckBox) rootView.findViewById(R.id.chkSpeakEnglishOnly);
         chkSpeakEnglishOnly.setChecked(AppState.getInstance().shouldSpeakEnglishOnly);
+    }
+
+    private boolean areAdvancedControlsVisible(View rootView) {
+        LinearLayout layout = (LinearLayout) rootView.findViewById(R.id.layoutAdvanced);
+        return layout.getVisibility() == View.VISIBLE;
+    }
+
+    private void updateUseExperimentalFeaturesCheckbox(View rootView) {
+        CheckBox chkUseExperimentalFeatures = (CheckBox) rootView.findViewById(R.id.chkUseExperimentalFeatures);
+        boolean shouldUseExperimentalFeatures = AppState.getInstance().shouldUseExperimentalFeatures;
+        chkUseExperimentalFeatures.setChecked(shouldUseExperimentalFeatures);
+        // every time experimental features are turned on, make sure the setting is visible to user
+        if (shouldUseExperimentalFeatures && !areAdvancedControlsVisible(rootView)) {
+            toggleAdvancedControls(rootView);
+        }
+
+        if (isAdded()) {
+            CoordinatorLayout layout = ((AppCompatActivity) getActivity()).findViewById(R.id.main_content);
+            if (shouldUseExperimentalFeatures) {
+                float scale = getResources().getDisplayMetrics().density;
+                int dpAsPixels = (int) (3 * scale + 0.5f);
+                layout.setPadding(dpAsPixels, dpAsPixels,dpAsPixels,dpAsPixels);
+            } else {
+                layout.setPadding(0,0,0,0);
+            }
+        }
     }
 
     private void updateLiPoMonitorCheckbox(View rootView) {

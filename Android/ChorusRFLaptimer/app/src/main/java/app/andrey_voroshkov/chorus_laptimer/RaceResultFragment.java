@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -44,10 +45,22 @@ public class RaceResultFragment extends Fragment {
                     AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_GO);
                     AppState.getInstance().sendBtCommand("R*R1");
                 } else {
-                    this.sendEmptyMessageDelayed(counter - 1, 1000);
+                    // apply conditional randomization for the last beep time
+                    if (counter == 1) {
+                        int lastBeepDelay = 1000; // default is 1 second delay
+                        int randomStartTime = AppState.getInstance().randomStartTime;
+                        if (randomStartTime > 0)  {
+                            Random rand = new Random();
+                            // let's have a min delay of 500 and max would be the specified upper bound
+                            lastBeepDelay = rand.nextInt(randomStartTime * 1000) + 1000;
+                        }
+                        this.sendEmptyMessageDelayed(0, lastBeepDelay);
+                    } else {
+                        this.sendEmptyMessageDelayed(counter - 1, 1000);
+                    }
                     //first 3 beeps
                     if (counter < AppState.START_BEEPS_COUNT) {
-                        AppState.getInstance().sendBtCommand("T"+ String.format("%01X", counter));
+                        AppState.getInstance().sendBtCommand("T" + String.format("%01X", counter));
                         AppState.getInstance().playTone(AppState.TONE_PREPARE, AppState.DURATION_PREPARE);
                     }
                 }
@@ -187,6 +200,7 @@ public class RaceResultFragment extends Fragment {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
                     mIsStartingRace = false;
                     AppState.getInstance().sendBtCommand("R*R0"); // send end race (workaround for the led gate to switch to no-race mode)
+                    AppState.getInstance().sendBtCommand("R*I0064");
                     mRaceStartingHandler.removeCallbacksAndMessages(null);
                     updateButtons(rootView);
                     return true;

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.net.DhcpInfo;
@@ -107,6 +108,17 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         bt.setConnectionListener(this);
     }
 
+    void retrieveAndStoreAppVersion (Context context) {
+        String version = "";
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        AppState.getInstance().appVersion = version;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -140,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         initUDP();
         initBroadcastReceiverForUsbPermissions();
         initUSB();
+        retrieveAndStoreAppVersion(getApplicationContext());
         AppState.getInstance().textSpeaker = new TextSpeaker(getApplicationContext(),
                 AppState.getInstance().shouldSpeakEnglishOnly);
         AppState.getInstance().preferences = getPreferences(MODE_PRIVATE);

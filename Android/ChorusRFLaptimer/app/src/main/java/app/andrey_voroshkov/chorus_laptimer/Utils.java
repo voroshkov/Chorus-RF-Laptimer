@@ -137,6 +137,11 @@ public class Utils {
                     result.append("Threshold setup state: ").append(thresholdSetupState);
                     AppState.getInstance().changeThresholdSetupState(moduleId, thresholdSetupState);
                     break;
+                case 'E':
+                    int experimentalFeatureState = Integer.parseInt(chunk.substring(3,4), 16);
+                    result.append("Experimental features: ").append(experimentalFeatureState != 0 ? "enabled" : "disabled");
+                    AppState.getInstance().changeExperimentalFeatureState(experimentalFeatureState != 0);
+                    break;
                 case 'x':
                     result.append("EndOfSequence. Device# ").append(moduleId);
                     AppState.getInstance().receivedEndOfSequence(moduleId);

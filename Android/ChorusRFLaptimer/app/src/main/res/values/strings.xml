@@ -33,6 +33,8 @@
     <string name="setup_speak_lap_times">Speak Lap Times</string>
     <string name="setup_speak_messages">Speak Messages</string>
     <string name="setup_speak_english_only">Speak in English</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Random Start</string>
     <string name="freq_channel">Channel #</string>
     <string name="freq_rf_band">RF Band</string>
     <string name="plus_sign">+</string>
@@ -54,7 +56,7 @@
     <string name="race_result_finished">FINISHED</string>
     <string name="race_results">%1$s (%2$s%3$s) Laps: %4$s %5$s</string>
     <string name="race_announcement_finished">Race is finished</string>
-    <string name="race_announcement_starting">Starting race in %d s.</string>
+    <string name="race_announcement_starting">Starting race in %d seconds</string>
     <string name="race_lap_report">Lap %1$d.</string>
     <string name="race_pilot_finished">%1$s finished.</string>
     <string name="race_pilot_already_finished">%1$s already finished.</string>

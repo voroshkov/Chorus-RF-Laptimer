@@ -70,7 +70,9 @@ public class AppState {
     public boolean shouldSkipFirstLap = true;
     public boolean wereDevicesConfigured = false;
     public boolean isRssiMonitorOn = false;
-    public int timeToPrepareForRace = 5; //in seconds
+    public boolean shouldUseExperimentalFeatures = false;
+    public int randomStartTime = 0; // in seconds
+    public int timeToPrepareForRace = 5; // in seconds
     public RaceState raceState;
     public ArrayList<DeviceState> deviceStates;
     public ArrayList<ArrayList<LapResult>> raceResults;
@@ -82,6 +84,7 @@ public class AppState {
     public boolean isConnected = false;
     public int calibrationActualTime = 10000;
     public boolean didWrongApiEventFire = false;
+    public String appVersion = "";
 
     private ArrayList<Boolean> deviceTransmissionStates;
     private ArrayList<IDataListener> mListeners;
@@ -621,6 +624,20 @@ public class AppState {
         }
     }
 
+    public void changeRandomStartTime(int time) {
+        if (time < 0) {
+            return;
+        }
+        if (time > 5) {
+            time = 5;
+        }
+        if (randomStartTime != time) {
+            randomStartTime = time;
+            emitEvent(DataAction.RandomStartTime);
+            AppPreferences.save(AppPreferences.RANDOM_START_TIME);
+        }
+    }
+
     public void changeRaceState(boolean isStarted) {
         if (raceState == null) {
             return;
@@ -639,6 +656,12 @@ public class AppState {
         this.isDeviceSoundEnabled = isSoundEnabled;
         emitEvent(DataAction.SoundEnable);
         AppPreferences.save(AppPreferences.ENABLE_DEVICE_SOUNDS);
+    }
+
+    public void changeExperimentalFeatureState(boolean isExperimentalFeatureOn) {
+        this.shouldUseExperimentalFeatures = isExperimentalFeatureOn;
+        emitEvent(DataAction.UseExperimentalFeatures);
+        AppPreferences.save(AppPreferences.USE_EXPERIMENTAL_FEATURES);
     }
 
     public void changeSkipFirstLap(boolean shouldSkip) {

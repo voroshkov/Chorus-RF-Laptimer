@@ -33,6 +33,8 @@
     <string name="setup_speak_lap_times">Говорить время кругов</string>
     <string name="setup_speak_messages">Говорить оповещения</string>
     <string name="setup_speak_english_only">Говорить на английском</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Случайный старт</string>
     <string name="freq_channel">Канал №</string>
     <string name="freq_rf_band">Диапазон</string>
     <string name="plus_sign">+</string>

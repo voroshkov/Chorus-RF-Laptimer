@@ -110,6 +110,9 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             convertView.setTag(viewHolder);
         }
 
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
+        viewHolder.isPilotEnabled.setChecked(isEnabled);
+
         //this listener should be initialized prior to changing text in edPilotName
         viewHolder.edPilotName.addTextChangedListener(viewHolder.edPilotTextWatcher);
 
@@ -125,7 +128,6 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         final DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
-        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
         int thresholdSetupState = AppState.getInstance().getThresholdSetupState(position);
 
         if (thresholdSetupState > 0) {
@@ -148,7 +150,6 @@ public class PilotsRssiListAdapter extends BaseAdapter {
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
         viewHolder.txtChannelLabel.setText(mContext.getString(R.string.channel_descriptor, band, ch, freq));
-        viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         if (ds.threshold == 0) {
             viewHolder.btnSetThr.setText(R.string.setup_set_threshold);

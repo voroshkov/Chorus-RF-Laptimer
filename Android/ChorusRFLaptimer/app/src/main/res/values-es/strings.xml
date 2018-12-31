@@ -36,6 +36,8 @@
     <string name="setup_speak_lap_times">Escuchar Tiempo de Vueltas</string>
     <string name="setup_speak_messages">Escuchar Mensajes</string>
     <string name="setup_speak_english_only">Speak in English</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Random Start</string>
     <string name="freq_channel">Canal #</string>
     <string name="freq_rf_band">RF Band</string>
     <string name="plus_sign">+</string>

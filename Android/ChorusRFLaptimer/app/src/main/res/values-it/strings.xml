@@ -34,6 +34,8 @@
     <string name="setup_speak_lap_times">Annuncia tempi sul Giro</string>
     <string name="setup_speak_messages">Abilita Messaggi Vocali</string>
     <string name="setup_speak_english_only">Annunci in Inglese</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Random Start</string>
     <string name="freq_channel">Canale #</string>
     <string name="freq_rf_band">Banda RF</string>
     <string name="plus_sign">+</string>
