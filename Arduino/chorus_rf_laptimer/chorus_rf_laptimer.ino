@@ -59,7 +59,11 @@ uint8_t MODULE_ID_HEX = '0';
 
 #define BAUDRATE 115200
 
-const uint16_t musicNotes[] PROGMEM = { 523, 587, 659, 698, 784, 880, 988, 1046 };
+const uint16_t musicNotes[] = {
+    523, 587, 659, 698, 784, 880, 988,
+    523*2, 587*2, 659*2, 698*2, 784*2, 880*2, 988*2,
+    523*3, 587*3, 659*3, 698*3, 784*3, 880*3, 988*3,
+};
 
 // number of analog rssi reads to average for the current check.
 // single analog read with FASTADC defined (see below) takes ~20us on 16MHz arduino
@@ -171,15 +175,19 @@ uint16_t rssi2; // rssi measured using second (deeper/slower) filter
 uint16_t rssi3; // rssi measured using third (even deeper/slower) filter that is expected to produce a smooth curve
 uint16_t rssiForThresholdSetup; // special rssi for threshold setup (slooow filter)
 
-#define PROXIMITY_STEPS 10
+#define PROXIMITY_STEPS 20 // starts tracking proximity rssi from threshold decreased by this amount
 bool isApproaching = false;
-const uint32_t proximityTimesArray[PROXIMITY_STEPS] PROGMEM = {20, 50, 100, 200, 500, 700, 1000, 1200, 1500, 2000};
-uint16_t currentProximityIndex;
+const uint16_t proximityTimesArray[PROXIMITY_STEPS] = {
+    20, 50, 100, 200, 500, 700, 1000, 1200, 1500, 2000,
+    2500, 2500, 2500, 2500, 2500, 2500, 3000, 3000, 3000, 3000
+};
+uint8_t currentProximityIndex;
 uint32_t currentProximityIndexTime;
 
 //lap detection variables
 bool isFirstThresholdCrossed;
 bool didLeaveDeviceAreaThisLap;
+bool isLapDetectionTimeoutExpired;
 uint16_t upperSecondLevelRssiThreshold;
 uint16_t lowerSecondLevelThreshold;
 uint16_t minDeepRssi;
@@ -202,7 +210,7 @@ uint32_t smoothlyFilteredRssiMultiplied;
 #define DEFAULT_MAX_RSSI_SEARCH_DELAY 3000 // time to watch for max value after crossing a threshold
 #define ALLOWED_LAP_DETECTION_TIMEOUT 1000 // time allowed for lap detection after first threshold is crossed
 
-#define RELIABLE_RSSI_DETECTION_SUBTRACT 4 // decrease found upperSecondLevelRssiThreshold by this amount to track initial threshold cross event on all laps after 1st
+// #define RELIABLE_RSSI_DETECTION_SUBTRACT 4 // decrease found upperSecondLevelRssiThreshold by this amount to track initial threshold cross event on all laps after 1st
 #define SECOND_LEVEL_RSSI_DETECTION_ADJUSTMENT 2 // decrease found maxDeepRssi by this amount to make next lap detection more reliable
 #define EDGE_RSSI_ADJUSTMENT 10 // decrease found maximum (and increase minimum) by this value after each lap to better find a new one
 
@@ -753,7 +761,7 @@ void readSerialDataChunk () {
     uint8_t availBytes = Serial.available();
     if (availBytes) {
         if (availBytes > READ_BUFFER_SIZE) {
-            digitalHigh(ledPin);
+            // digitalHigh(ledPin);
         }
 
         uint8_t freeBufBytes = READ_BUFFER_SIZE - readBufFilledBytes;

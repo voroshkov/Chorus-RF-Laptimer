@@ -62,13 +62,23 @@ bool checkIsMaxRssiDetectionTimeoutNotExpired() {
 }
 
 bool checkIsLapDetectionTimeoutExpired() {
+    if (isLapDetectionTimeoutExpired) return true;
+
     uint32_t diff = now - lastMilliseconds;
-    return diff > minLapTime * 1000;
+    isLapDetectionTimeoutExpired = diff > minLapTime * 1000;
+    return isLapDetectionTimeoutExpired;
+}
+
+void prepareLapDetectionValues() {
+    upperSecondLevelRssiThreshold = maxDeepRssi - SECOND_LEVEL_RSSI_DETECTION_ADJUSTMENT;
 }
 
 void checkIfDroneLeftDeviceArea() {
+    if (didLeaveDeviceAreaThisLap) return;
+
     if (rssi3 < lowerSecondLevelThreshold) {
         didLeaveDeviceAreaThisLap = true;
+        prepareLapDetectionValues();
     }
 }
 
@@ -88,6 +98,7 @@ bool checkIsLapDetected() {
     // --- the commented part in the condition below would make sure that the proximity is not tracked before threshold. is it needed?
     if (rssi > upperSecondLevelRssiThreshold - PROXIMITY_STEPS /*&& rssi > rssiThreshold*/) {
         isApproaching = true;
+        digitalHigh(ledPin); // debug only
 
         uint16_t diffWithThreshold = upperSecondLevelRssiThreshold - rssi;
         if (diffWithThreshold < currentProximityIndex) {
@@ -143,13 +154,11 @@ bool checkIsLapDetected() {
     return false;
 }
 
-void prepareLapDetectionValues() {
-    upperSecondLevelRssiThreshold = maxDeepRssi - SECOND_LEVEL_RSSI_DETECTION_ADJUSTMENT;
-}
-
 void resetFieldsAfterLapDetection() {
+    digitalLow(ledPin);
     isApproaching = false;
-    currentProximityIndex = 0xFFFF;
+    isLapDetectionTimeoutExpired = false;
+    currentProximityIndex = 0xFF;
     isFirstThresholdCrossed = false;
     didLeaveDeviceAreaThisLap = false;
     timeWhenFirstThresholdCrossed = 0;
@@ -162,7 +171,8 @@ void resetFieldsAfterLapDetection() {
 
 void resetFieldsBeforeRaceStart() {
     isApproaching = false;
-    currentProximityIndex = 0xFFFF;
+    isLapDetectionTimeoutExpired = false;
+    currentProximityIndex = 0xFF;
     isFirstThresholdCrossed = false;
     maxDeepRssi = rssiThreshold - EDGE_RSSI_ADJUSTMENT; // must be below rssiThreshold
     minDeepRssi = rssiThreshold;

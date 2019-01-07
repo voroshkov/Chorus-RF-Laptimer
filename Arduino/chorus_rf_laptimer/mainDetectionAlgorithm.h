@@ -60,16 +60,11 @@ void runExperimentalLapDetectionAlgorithm() {
                 }
             } else {
                 if (checkIsMaxRssiDetectionTimeoutNotExpired()) {
-                    findMaxRssi();
                     findMaxDeepRssi();
                 }
 
                 findMinDeepRssi();
                 checkIfDroneLeftDeviceArea();
-
-                if (didLeaveDeviceAreaThisLap) {
-                    prepareLapDetectionValues();
-                }
 
                 if (checkIsLapDetectionTimeoutExpired()) {
                     if (didLeaveDeviceAreaThisLap) {
