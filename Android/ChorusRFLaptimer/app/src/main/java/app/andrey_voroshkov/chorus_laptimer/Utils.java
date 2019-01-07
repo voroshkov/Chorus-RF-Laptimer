@@ -160,6 +160,28 @@ public class Utils {
                     int apiVersion = Integer.parseInt(chunk.substring(3,7), 16);
                     AppState.getInstance().checkApiVersion(moduleId, apiVersion);
                     break;
+
+                //debug cases below
+                case '@': //proximity index
+                    int proximityIndex = Integer.parseInt(chunk.substring(3,5), 16);
+                    AppState.getInstance().setDebugProximityIndex(moduleId, proximityIndex);
+                    break;
+                case '>': //is left device area
+                    int didLeaveDeviceArea = Integer.parseInt(chunk.substring(3,4), 16);
+                    AppState.getInstance().setDebugLeftDeviceArea(moduleId, didLeaveDeviceArea!=0);
+                    break;
+                case '?': //minlap expired
+                    int isMinLapExpired = Integer.parseInt(chunk.substring(3,4), 16);
+                    AppState.getInstance().setDebugMinLapExpired(moduleId, isMinLapExpired!=0);
+                    break;
+                case '[': //
+                    int dynThreshold = Integer.parseInt(chunk.substring(3,7), 16);
+                    AppState.getInstance().setDebugDynamicThreshold(moduleId, dynThreshold);
+                    break;
+                case '^': //
+                    int maxRssi = Integer.parseInt(chunk.substring(3,7), 16);
+                    AppState.getInstance().setDebugMaxRssi(moduleId, maxRssi);
+                    break;
             }
         } else if (dest == 'R') {
 

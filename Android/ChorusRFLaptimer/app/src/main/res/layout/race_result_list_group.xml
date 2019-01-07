@@ -151,6 +151,11 @@
 
             </LinearLayout>
         </LinearLayout>
+        <TextView
+            android:id="@+id/txtDbg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="some text here"/>
     </LinearLayout>
 
 

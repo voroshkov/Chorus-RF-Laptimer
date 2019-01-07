@@ -32,6 +32,12 @@ void findMaxRssi () {
         maxRssi = rssi;
         maxRssiDetectionTime = now;
     }
+    // send each 100 ms and only if value was changed since last send
+    if (maxRssi != dbgSentMaxRssi && (now - dbgMaxRssiLastSentTime) > 100) {
+        addToSendQueue(SEND_DBG_MAX_RSSI);
+        dbgMaxRssiLastSentTime = now;
+        dbgSentMaxRssi = maxRssi;
+    }
 }
 
 void findMaxDeepRssi () {
@@ -62,13 +68,42 @@ bool checkIsMaxRssiDetectionTimeoutNotExpired() {
 }
 
 bool checkIsLapDetectionTimeoutExpired() {
+    if (isLapDetectionTimeoutExpired) return true;
+
     uint32_t diff = now - lastMilliseconds;
-    return diff > minLapTime * 1000;
+    isLapDetectionTimeoutExpired = diff > minLapTime * 1000;
+    if (isLapDetectionTimeoutExpired) {
+        addToSendQueue(SEND_DBG_MINLAP_EXPIRED); // send lap detection expired debug info
+    }
+    return isLapDetectionTimeoutExpired;
+}
+
+void prepareLapDetectionValues() {
+    upperSecondLevelRssiThreshold = maxDeepRssi - SECOND_LEVEL_RSSI_DETECTION_ADJUSTMENT;
+    addToSendQueue(SEND_DBG_DYNAMIC_THRESHOLD);
 }
 
 void checkIfDroneLeftDeviceArea() {
+    if (didLeaveDeviceAreaThisLap) return;
+
     if (rssi3 < lowerSecondLevelThreshold) {
         didLeaveDeviceAreaThisLap = true;
+        addToSendQueue(SEND_DBG_LEFT_DEVICE_AREA); // send LeaveDeviceArea debug notification
+        prepareLapDetectionValues();
+    }
+}
+
+void sendDebugProximityIndex() {
+    static uint8_t lastSentIdx = 200; //something different :)
+    uint8_t indexToSend = currentProximityIndex & B11111110; // only keep even numbers to decrease load on android app
+    if (lastSentIdx == indexToSend) {
+        // dont send same value twice ( if 2 sends are subsequent then we may change currentProximityIndex before sending it, thus send same value twice or omit some values)
+        onItemSent();
+        return;
+    }
+    if (sendByteToSerial(RESPONSE_DBG_PROXIMITY_IDX, indexToSend)) {
+        lastSentIdx = indexToSend;
+        onItemSent();
     }
 }
 
@@ -81,18 +116,22 @@ bool checkIsLapDetected() {
 
     // for other laps detect immediately if second threshold is crossed
     if (rssi > upperSecondLevelRssiThreshold) {
+        currentProximityIndex = 100; // lap detected by threshold
         return true;
     }
 
     // otherwise mark the proximity thresholds crossing
     // --- the commented part in the condition below would make sure that the proximity is not tracked before threshold. is it needed?
-    if (rssi > upperSecondLevelRssiThreshold - PROXIMITY_STEPS /*&& rssi > rssiThreshold*/) {
+    if (rssi > (upperSecondLevelRssiThreshold - PROXIMITY_STEPS) /*&& rssi > rssiThreshold*/) {
         isApproaching = true;
+        digitalHigh(ledPin); // debug only
 
         uint16_t diffWithThreshold = upperSecondLevelRssiThreshold - rssi;
         if (diffWithThreshold < currentProximityIndex) {
             currentProximityIndex = diffWithThreshold;
             currentProximityIndexTime = now;
+            addToSendQueue(SEND_DBG_PROXIMITY_IDX); // send debug proximity index
+            playNote(musicNotes[PROXIMITY_STEPS - currentProximityIndex]);
         }
     }
 
@@ -101,6 +140,7 @@ bool checkIsLapDetected() {
         if (timeDiff > proximityTimesArray[currentProximityIndex]) { // time's up
             // substitute now with saved time of max value detection. DON'T USE the "now" AFTER THIS,EXCEPT FOR RECORDING A NEW LAP
             now = currentProximityIndexTime;
+            currentProximityIndex = 255; // lap detected by timeout
             return true; //record a lap
         }
     }
@@ -143,28 +183,43 @@ bool checkIsLapDetected() {
     return false;
 }
 
-void prepareLapDetectionValues() {
-    upperSecondLevelRssiThreshold = maxDeepRssi - SECOND_LEVEL_RSSI_DETECTION_ADJUSTMENT;
+void sendDeviceDebugData() {
+    addToSendQueue(SEND_DBG_PROXIMITY_IDX);
+    addToSendQueue(SEND_DBG_MINLAP_EXPIRED);
+    addToSendQueue(SEND_DBG_LEFT_DEVICE_AREA);
+    addToSendQueue(SEND_DBG_DYNAMIC_THRESHOLD);
+    addToSendQueue(SEND_DBG_MAX_RSSI);
 }
 
 void resetFieldsAfterLapDetection() {
+    digitalLow(ledPin);
     isApproaching = false;
-    currentProximityIndex = 0xFFFF;
+    isLapDetectionTimeoutExpired = false;
+    // currentProximityIndex = 0xFF;
     isFirstThresholdCrossed = false;
     didLeaveDeviceAreaThisLap = false;
     timeWhenFirstThresholdCrossed = 0;
+    maxRssi = 0; // debug only
+    dbgSentMaxRssi = 0; //debug only
     lowerSecondLevelThreshold = (maxDeepRssi + minDeepRssi) / 2; // mid value between maxDeepRssi and minDeepRssi
     maxDeepRssi = maxDeepRssi > rssiThreshold ? maxDeepRssi : rssiThreshold; // init with the max known value
     minDeepRssi = minDeepRssi < rssiThreshold ? minDeepRssi : rssiThreshold; // init with the min known value
     maxDeepRssi -= EDGE_RSSI_ADJUSTMENT; // this is to make sure that maxDeepRssi doesn't accumulate the ever-max value during the race
     minDeepRssi += EDGE_RSSI_ADJUSTMENT; // this is to make sure that minDeepRssi doesn't accumulate the ever-min value during the race
+    sendDeviceDebugData();
 }
 
+
 void resetFieldsBeforeRaceStart() {
+    maxRssi = 0; // debug only
+    dbgSentMaxRssi = 0;// debug only
     isApproaching = false;
-    currentProximityIndex = 0xFFFF;
+    isLapDetectionTimeoutExpired = false;
+    currentProximityIndex = 0xFF;
     isFirstThresholdCrossed = false;
     maxDeepRssi = rssiThreshold - EDGE_RSSI_ADJUSTMENT; // must be below rssiThreshold
     minDeepRssi = rssiThreshold;
     lowerSecondLevelThreshold = rssiThreshold;
+    dbgMaxRssiLastSentTime = millis();
+    sendDeviceDebugData();
 }

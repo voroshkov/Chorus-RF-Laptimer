@@ -120,7 +120,21 @@ public class RaceResultsListAdapter extends BaseExpandableListAdapter {
         View colorStrip = convertView.findViewById(R.id.resultColorStrip);
         colorStrip.setBackgroundColor(Utils.getBackgroundColorItem(groupPosition));
 
+        TextView txtDebug = convertView.findViewById(R.id.txtDbg);
+        txtDebug.setText(getDebugText(groupPosition));
+
         return convertView;
+    }
+
+    private String getDebugText(int deviceId) {
+        DeviceState ds = AppState.getInstance().deviceStates.get(deviceId);
+        if (ds == null) return "";
+        DeviceDebugInfo dbg = ds.dbg;
+        return Integer.toString(dbg.dbg_maxRssi) + " "
+                + (dbg.dbg_isMinLapExpired ? "v" : "x") + " "
+                + (dbg.dbg_hasLeftDeviceArea ? "v" : "x") + " "
+                + Integer.toString(dbg.dbg_dynamicThreshold) + " "
+                + dbg.dbg_proximity;
     }
 
     private String createGroupViewText(int position, int laps, boolean isFinished) {

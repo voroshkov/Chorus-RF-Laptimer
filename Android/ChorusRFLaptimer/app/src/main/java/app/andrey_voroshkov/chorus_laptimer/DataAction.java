@@ -35,5 +35,6 @@ public enum DataAction {
     WrongApiVersion,
     ThresholdSetupState,
     Disconnect,
-    ConnectionTester
+    ConnectionTester,
+    DebugInfo
 }

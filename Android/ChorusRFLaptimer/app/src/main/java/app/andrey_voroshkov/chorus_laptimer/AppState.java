@@ -1039,5 +1039,63 @@ public class AppState {
         if (mConnectionTester == null) return 0;
         return mConnectionTester.avgDelay;
     }
+
+    public void setDebugProximityIndex(int deviceId, int idx) {
+        final String delimiter = "-";
+        final String sequenceEnd = " ";
+
+        String newValue = Integer.toString(idx);
+        if (idx >= 200) newValue = "X" + sequenceEnd;
+        else if (idx >= 100) newValue = "!!!" + sequenceEnd;
+
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+
+        if (currentState.dbg.dbg_proximity.endsWith(sequenceEnd)) {
+            currentState.dbg.dbg_proximity = newValue;
+        } else {
+            currentState.dbg.dbg_proximity += delimiter + newValue;
+        }
+
+        emitEvent(DataAction.DebugInfo);
+    }
+
+    public void setDebugLeftDeviceArea(int deviceId, boolean hasLeft) {
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+        currentState.dbg.dbg_hasLeftDeviceArea = hasLeft;
+        emitEvent(DataAction.DebugInfo);
+    }
+
+    public void setDebugMinLapExpired(int deviceId, boolean isExpired) {
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+        currentState.dbg.dbg_isMinLapExpired = isExpired;
+        emitEvent(DataAction.DebugInfo);
+    }
+
+    public void setDebugDynamicThreshold (int deviceId, int dynThreshold) {
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+        currentState.dbg.dbg_dynamicThreshold = dynThreshold;
+        emitEvent(DataAction.DebugInfo);
+    }
+
+    public void setDebugMaxRssi (int deviceId, int maxRssi) {
+        DeviceState currentState = deviceStates.get(deviceId);
+        if (currentState == null) {
+            return;
+        }
+        currentState.dbg.dbg_maxRssi = maxRssi;
+        emitEvent(DataAction.DebugInfo);
+    }
 }
 

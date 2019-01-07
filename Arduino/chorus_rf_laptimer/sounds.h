@@ -71,6 +71,8 @@ uint16_t toneSeq_SetupThresholdMiddle [TONE_SEQ_SETUP_THRESHOLD_MIDDLE] = { 659,
 #define TONE_SEQ_SETUP_THRESHOLD_DONE 14
 uint16_t toneSeq_SetupThresholdDone [TONE_SEQ_SETUP_THRESHOLD_DONE] = { 880, 150, 0, 30, 784, 150, 0, 30, 659, 150, 0, 30, 523, 500};
 
+#define TONE_SEQ_SINGLE_NOTE 2
+uint16_t toneSeq_SingleNote[TONE_SEQ_SINGLE_NOTE] = {0, 100};
 
 // ----------------------------------------------------------------------------
 void startPlayingTones() {
@@ -136,5 +138,13 @@ void playThresholdSetupMiddleTones() {
 void playThresholdSetupDoneTones() {
     curToneSeq = toneSeq_SetupThresholdDone;
     lastToneSeqIndex = TONE_SEQ_SETUP_THRESHOLD_DONE - 1;
+    startPlayingTones();
+}
+
+// ----------------------------------------------------------------------------
+void playNote(uint16_t noteFreq) {
+    curToneSeq = toneSeq_SingleNote;
+    lastToneSeqIndex = TONE_SEQ_SINGLE_NOTE - 1;
+    *curToneSeq = noteFreq;
     startPlayingTones();
 }

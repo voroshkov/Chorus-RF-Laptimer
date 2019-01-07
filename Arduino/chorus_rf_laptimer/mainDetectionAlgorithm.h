@@ -60,20 +60,21 @@ void runExperimentalLapDetectionAlgorithm() {
                 }
             } else {
                 if (checkIsMaxRssiDetectionTimeoutNotExpired()) {
-                    findMaxRssi();
                     findMaxDeepRssi();
                 }
 
                 findMinDeepRssi();
                 checkIfDroneLeftDeviceArea();
 
-                if (didLeaveDeviceAreaThisLap) {
-                    prepareLapDetectionValues();
-                }
-
                 if (checkIsLapDetectionTimeoutExpired()) {
                     if (didLeaveDeviceAreaThisLap) {
+
+                        // for debug only; find and show max rssi this lap after drone left the device area
+                        // this is to debug maxRssi when we approach the device
+                        findMaxRssi();
+
                         if (checkIsLapDetected()) {
+                            addToSendQueue(SEND_DBG_PROXIMITY_IDX); // debug only
                             registerNewLap();
                         }
                     }

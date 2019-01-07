@@ -117,6 +117,7 @@ public class RaceResultFragment extends Fragment {
                     case LapResult:
                     case RaceLaps:
                     case SkipFirstLap:
+                    case DebugInfo:
 //                    case DeviceChannel:
 //                    case DeviceBand:
                         updateResults();
@@ -365,5 +366,4 @@ public class RaceResultFragment extends Fragment {
 
         return fileName;
     }
-
 }
