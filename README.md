@@ -133,13 +133,9 @@ Generalized steps:
 
 1. Connect HC-06 -> USB-UART Adapter -> PC
 2. Open Arduino IDE, set adapter's COM port, run Serial Monitor
-3. Send command:
-    - old modules: "AT+BAUD8" (module replies "OK115200")
-    - new modules: "AT+UART=115200,0,0"
+3. Send commands
 
-
-
-You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively (or "AT+NAME=new_name" in new firmware versions).
+More details for HC-06 are on [this wiki page](https://github.com/voroshkov/Chorus-RF-Laptimer/wiki/Bluetooth-Module-Setup)
 
 <a name="wifi-module-setup"></a>
 ### WiFi module setup
