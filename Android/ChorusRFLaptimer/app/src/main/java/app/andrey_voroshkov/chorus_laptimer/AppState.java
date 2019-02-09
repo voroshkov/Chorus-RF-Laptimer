@@ -430,6 +430,16 @@ public class AppState {
 
     public void onConnected() {
         isConnected = true;
+
+        // The following 3 meaningless commands is an attempt to fix the issue, when the app
+        // connects to device, but cannot communicate with it.
+        // They should flush the output buffer on the phone and input buffers on Chorus nodes
+        // and make sure there are no unsent characters in the buffers.
+        // So further "N0" command and its response should be recognized correctly.
+        sendBtCommand("   ");
+        sendBtCommand("   ");
+        sendBtCommand("   ");
+
         sendBtCommand("N0");
         wereDevicesConfigured = false;
     }

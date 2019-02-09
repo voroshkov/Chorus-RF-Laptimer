@@ -7,8 +7,8 @@ android {
         applicationId "app.andrey_voroshkov.chorus_laptimer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 22
-        versionName "0.7.10"
+        versionCode 24
+        versionName "0.7.12"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         archivesBaseName = "ChorusRFLaptimer"
     }
