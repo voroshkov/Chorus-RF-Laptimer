@@ -110,8 +110,6 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             convertView.setTag(viewHolder);
         }
 
-        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
-        viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         //this listener should be initialized prior to changing text in edPilotName
         viewHolder.edPilotName.addTextChangedListener(viewHolder.edPilotTextWatcher);
@@ -124,6 +122,9 @@ public class PilotsRssiListAdapter extends BaseAdapter {
                 AppState.getInstance().changeDeviceEnabled(position, isChecked);
             }
         });
+
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
+        viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         final DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
