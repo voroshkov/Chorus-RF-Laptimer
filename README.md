@@ -11,6 +11,7 @@ Several updated Solo Laptimer devices connected together make up a Chorus Laptim
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
 ## NEWS FEED:
 ------------------------------------------------
+- 2019-01: Chorus32 project by Alessandro Carcione gets popular. It's a port of Chorus to ESP32 which is under active development now
 - 2018-10: Chorus is now basically supported in LiveTime Scoring Engine - racing organization PC software
 - 2018-07: Added support for USB devices in Android app (you can use wired connection or 433/915MHz telemetry modules for better range)
 - 2018-06: Integration with LiveTime is in progress
@@ -40,6 +41,7 @@ Thanks for your support!
 - PC GUI Interface project for Chorus RF Laptimer (outdated: doesn't support latest Arduino firmware): https://github.com/anunique/ChorusGUI
 - Delta5 Race Timer Facebook group (alternative DIY race timer project): https://www.facebook.com/groups/Delta5RaceTimer/
 - LiveTime Scoring Engine (PC software for racing organization with support for Chorus): https://www.livetimescoring.com/
+- Chorus32 project (very promising port of Chorus API to ESP32 hardware): https://github.com/AlessandroAU/Chorus32-ESP32LapTimer
 
 ## Add-ins/Extensions:
 
