@@ -1,3 +1,6 @@
+uint16_t getDeepFilteredRSSI();
+uint16_t getSmoothlyFilteredRSSI();
+
 void runLapDetectionAlgorithm() {
     // check rssi threshold to identify when drone finishes the lap
     if (rssiThreshold > 0) { // threshold = 0 means that we don't check rssi values
