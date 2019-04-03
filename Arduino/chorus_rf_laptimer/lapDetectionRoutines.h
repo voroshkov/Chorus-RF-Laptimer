@@ -1,6 +1,7 @@
 // forward declarations of 2 functions from main .ino file because this file is included earlier
 uint8_t addToSendQueue(uint8_t item);
 void resetFieldsAfterLapDetection();
+void onItemSent();
 
 
 // depends on a lot of global variables. to be used inside a rssi check logic in race mode
