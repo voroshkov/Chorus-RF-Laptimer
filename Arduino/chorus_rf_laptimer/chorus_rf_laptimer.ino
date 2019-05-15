@@ -235,7 +235,7 @@ uint16_t frequency = 0;
 uint32_t millisUponRequest = 0;
 
 //----- read/write bufs ---------------------------
-#define READ_BUFFER_SIZE 20
+#define READ_BUFFER_SIZE 30
 uint8_t readBuf[READ_BUFFER_SIZE];
 uint8_t proxyBuf[READ_BUFFER_SIZE];
 uint8_t readBufFilledBytes = 0;
@@ -1002,6 +1002,8 @@ uint16_t readRSSI() {
     int rssiA = 0;
     int rssiArray[RSSI_READS];
     
+    analogRead(rssiPinA); // first fake read to improve further readings accuracy (as suggested by Nicola Gorghetto)
+    
     for (uint8_t i = 0; i < RSSI_READS; i++) {
         rssiArray[i] = analogRead(rssiPinA);
         rssiA += rssiArray[i];
@@ -1030,6 +1032,8 @@ uint16_t readRSSI() {
 uint16_t readVoltage() {
     int voltageA = 0;
 
+    analogRead(voltagePinA); // first fake read to improve further readings accuracy (as suggested by Nicola Gorghetto)
+    
     for (uint8_t i = 0; i < VOLTAGE_READS; i++) {
         voltageA += analogRead(voltagePinA);
     }
