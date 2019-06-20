@@ -160,6 +160,10 @@ public class Utils {
                     int apiVersion = Integer.parseInt(chunk.substring(3,7), 16);
                     AppState.getInstance().checkApiVersion(moduleId, apiVersion);
                     break;
+                case 'A':
+                    int isPilotActive = Integer.parseInt(chunk.substring(3,4), 16);
+                    AppState.getInstance().changeDeviceEnabled(moduleId, (isPilotActive != 0));
+                    break;
             }
         } else if (dest == 'R') {
 
