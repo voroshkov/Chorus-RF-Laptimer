@@ -108,6 +108,7 @@ const uint16_t musicNotes[] = {
 #define CONTROL_SOUND               'S'
 #define CONTROL_THRESHOLD           'T'
 #define CONTROL_EXPERIMENTAL_MODE   'E'
+#define CONTROL_MODULE_ACTIVE       'A'
 // get only:
 #define CONTROL_GET_API_VERSION     '#'
 #define CONTROL_GET_ALL_DATA        'a'
@@ -131,6 +132,7 @@ const uint16_t musicNotes[] = {
 #define RESPONSE_SOUND               'S'
 #define RESPONSE_THRESHOLD           'T'
 #define RESPONSE_EXPERIMENTAL_MODE   'E'
+#define RESPONSE_MODULE_ACTIVE       'A'
 
 #define RESPONSE_API_VERSION         '#'
 #define RESPONSE_RSSI                'r'
