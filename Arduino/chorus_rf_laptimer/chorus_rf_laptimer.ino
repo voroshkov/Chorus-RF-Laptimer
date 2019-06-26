@@ -160,7 +160,8 @@ const uint16_t musicNotes[] = {
 #define SEND_VOLTAGE            13
 #define SEND_THRESHOLD_SETUP_MODE 14
 #define SEND_EXPERIMENTAL_MODE  15
-#define SEND_END_SEQUENCE       16
+#define SEND_MODULE_ACTIVE      16
+#define SEND_END_SEQUENCE       17
 // following items don't participate in "send all items" response
 #define SEND_LAST_LAPTIMES          100
 #define SEND_TIME                   101
@@ -282,6 +283,7 @@ uint8_t thresholdSetupMode = 0;
 uint8_t experimentalMode = 0;
 uint16_t frequency = 0;
 uint32_t millisUponRequest = 0;
+uint8_t isModuleActive = 1; // 0 means this module is inactive and the VRX is disabled
 
 //----- read/write bufs ---------------------------
 #define READ_BUFFER_SIZE 30
@@ -455,9 +457,13 @@ void loop() {
                 if (send4BitsToSerial(RESPONSE_EXPERIMENTAL_MODE, experimentalMode)) {
                     onItemSent();
                 }
+            case 16: // SEND_MODULE_ACTIVE
+                if (send4BitsToSerial(RESPONSE_MODULE_ACTIVE, isModuleActive)) {
+                    onItemSent();
+                }
             // Below is a termination case, to notify that data for CONTROL_GET_ALL_DATA is over.
             // Must be the last item in the sequence!
-            case 16: // SEND_END_SEQUENCE
+            case 17: // SEND_END_SEQUENCE
                 if (send4BitsToSerial(RESPONSE_END_SEQUENCE, 1)) {
                     onItemSent();
                     isSendingData = 0;
@@ -689,6 +695,12 @@ void handleSerialControlInput(uint8_t *controlData, uint8_t length) {
                 addToSendQueue(SEND_EXPERIMENTAL_MODE);
                 isConfigured = 1;
                 break;
+            case CONTROL_MODULE_ACTIVE:
+                valueToSet = TO_BYTE(controlData[1]);
+                setModuleActive(valueToSet);
+                addToSendQueue(SEND_MODULE_ACTIVE);
+                isConfigured = 1;
+                break;
         }
     } else { // get value and other instructions
         switch (controlByte) {
@@ -881,6 +893,17 @@ void setExperimentalMode(uint8_t mode) {
     #endif
 }
 // ----------------------------------------------------------------------------
+void setModuleActive(uint8_t active) {
+    isModuleActive = active;
+    if(active) {
+        resetModule();
+        // We need to set the freqency again on power up
+        setModuleFrequency(frequency);
+    } else {
+        powerDownModule();
+    }
+}
+
 void setupThreshold(uint8_t phase) {
     // this process assumes the following:
     // 1. before the process all VTXs are turned ON, but are distant from the Chorus device, so that Chorus sees the "background" rssi values only

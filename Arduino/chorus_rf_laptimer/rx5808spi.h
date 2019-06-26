@@ -75,6 +75,67 @@ void SERIAL_ENABLE_HIGH() {
     delayMicroseconds(1);
 }
 
+void powerDownModule() {
+    cli();
+    SERIAL_ENABLE_HIGH();
+    SERIAL_ENABLE_LOW();
+
+    // send 0x0A
+    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT1();
+    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT1();
+
+    // write
+    SERIAL_SENDBIT1();
+
+    // set all bits to one -> disable all modules
+     for (uint8_t i = 20; i > 0; i--) {
+        SERIAL_SENDBIT1();
+    }
+    // Finished clocking data in
+    SERIAL_ENABLE_HIGH();
+    delayMicroseconds(1);
+
+    digitalLow(slaveSelectPin);
+    digitalLow(spiClockPin);
+    digitalLow(spiDataPin);
+    sei();
+
+    delay(MIN_TUNE_TIME);
+}
+
+void resetModule() {
+    cli();
+    SERIAL_ENABLE_HIGH();
+    SERIAL_ENABLE_LOW();
+
+    // State register
+    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT0();
+
+    // write
+    SERIAL_SENDBIT1();
+
+    // set all bits to zero -> reset
+    for (int i = 20; i > 0; i--) {
+        SERIAL_SENDBIT0();
+    }
+
+    // Finished clocking data in
+    SERIAL_ENABLE_HIGH();
+    delayMicroseconds(1);
+
+    digitalLow(slaveSelectPin);
+    digitalLow(spiClockPin);
+    digitalLow(spiDataPin);
+    sei();
+
+    delay(MIN_TUNE_TIME);
+}
+
 uint16_t setModuleFrequency(uint16_t frequency) {
     uint8_t i;
     uint16_t channelData;
