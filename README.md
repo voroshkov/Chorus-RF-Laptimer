@@ -9,8 +9,15 @@
 This is a VTX Radio Frequency Lap Timing solution for drone racers - the evolution of a [Solo DIY RF Laptimer project](https://github.com/voroshkov/Solo-DIY-RF-Laptimer).
 Several updated Solo Laptimer devices connected together make up a Chorus Laptimer device which is capable of tracking several drones at once.
 This is a "lightweight" alternative to IR lap timing systems having the advantage that it does not require any additional equipment on drones except VTX.
-## HOT NEWS !
+## NEWS FEED:
 ------------------------------------------------
+- 2019-01: Chorus32 project by Alessandro Carcione gets popular. It's a port of Chorus to ESP32 which is under active development now
+- 2018-10: Chorus is now basically supported in LiveTime Scoring Engine - racing organization PC software
+- 2018-07: Added support for USB devices in Android app (you can use wired connection or 433/915MHz telemetry modules for better range)
+- 2018-06: Integration with LiveTime is in progress
+- 2018-06: Arduinos got new API (v.4), incompatible with prev versions. All mobile apps are up to date with the new API.
+- 2018-06: New threshold setup algorithm is implemented. Instead of measuring immediate RSSI at some point in space it's now a staged process
+- 2018-05: Philipp Seidel published his great open source 4-node PCB: https://github.com/ps915/Chorus-RF-Laptimer-PCB
 - 2017-11: iOS app is live on AppStore: https://itunes.apple.com/app/id1296647206. All credits go to Lazar Djordjevic!
 - 2017-10: WiFi modules (DT-06) are now supported as an alternative to Bluetooth connection! (still not sure how stable the connection will be with these modules, so use at your own risk and report if you discover any odd behavior with them)
 - 2017-10: Android app is now available on Google Play only. The source code remains here.
@@ -28,10 +35,13 @@ If you feel like spending some money for the purspose - I'd also be very gratefu
 Thanks for your support!
 
 ## Featured references:
-- Chorus RF Laptimer Facebook group: https://www.facebook.com/groups/ChorusRFLaptimer/
-- Chorus RF Laptimer discussion thread @ RC Groups: https://www.rcgroups.com/forums/showthread.php?2801815
-- PC GUI Interface project for Chorus RF Laptimer: https://github.com/anunique/ChorusGUI
-- Delta5 Race Timer Facebook group: https://www.facebook.com/groups/Delta5RaceTimer/
+- This project's Wiki page: https://github.com/voroshkov/Chorus-RF-Laptimer/wiki
+- Chorus RF Laptimer Facebook group (primary news feed and knowledge sharing place): https://www.facebook.com/groups/ChorusRFLaptimer/
+- Chorus RF Laptimer discussion thread @ RC Groups (deprecated: low activity): https://www.rcgroups.com/forums/showthread.php?2801815
+- PC GUI Interface project for Chorus RF Laptimer (outdated: doesn't support latest Arduino firmware): https://github.com/anunique/ChorusGUI
+- Delta5 Race Timer Facebook group (alternative DIY race timer project): https://www.facebook.com/groups/Delta5RaceTimer/
+- LiveTime Scoring Engine (PC software for racing organization with support for Chorus): https://www.livetimescoring.com/
+- Chorus32 project (very promising port of Chorus API to ESP32 hardware): https://github.com/AlessandroAU/Chorus32-ESP32LapTimer
 
 ## Add-ins/Extensions:
 
@@ -47,7 +57,7 @@ Thanks for your support!
 - [Limitations](#limitations)
 - [How it works](#how-it-works)
 - [Hardware](#hardware)
-    - [Used parts:](#used-parts)
+    - [Used parts](#used-parts)
     - [Bluetooth module setup](#bluetooth-module-setup)
     - [WiFi module setup](#wifi-module-setup)
     - [RX5808 SPI patch \(required\)](#rx5808-spi-patch-required)
@@ -107,7 +117,7 @@ Each Solo device measures a VTx signal strength (RSSI value) and compares it wit
 ## Hardware
 
 <a name="used-parts"></a>
-### Used parts:
+### Used parts
  - RX5808 (with SPI patch) (**N** items)
  - Arduino Pro Mini **5V 16MHz** or Nano v.3.0 (**N** items)
  - HC-06/HC-05 (HM-10 for iOS) Bluetooth module (**1** item)
@@ -125,9 +135,9 @@ Generalized steps:
 
 1. Connect HC-06 -> USB-UART Adapter -> PC
 2. Open Arduino IDE, set adapter's COM port, run Serial Monitor
-3. Send command: "AT+BAUD8" (module replies "OK115200")
+3. Send commands
 
-You might also like to change BT device name and default PIN (which is "1234") using commands "AT+NAMEdevicename" and "AT+PINxxxx" respectively.
+More details for HC-06 are on [this wiki page](https://github.com/voroshkov/Chorus-RF-Laptimer/wiki/Bluetooth-Module-Setup)
 
 <a name="wifi-module-setup"></a>
 ### WiFi module setup
@@ -179,7 +189,7 @@ It seems to work fine being connected this way, however adding 100 Ω resistors 
 <img src="docs/img/wiring_resistors.png" alt="Wiring with resistors" width="">
 
 <a name="schematic-and-pcb"></a>
-### Schematic and PCB
+### Schematic and PCBs
 Schematic and PCB design in DipTrace format are available in the **DipTrace** folder.
 
 <img src="docs/img/Schematic.png" alt="Schematic" width="400">
@@ -189,6 +199,11 @@ Schematic and PCB design in DipTrace format are available in the **DipTrace** fo
 [**PCB by Joao Reis**](contributors/PCB/Joao_Reis_PCB_Project_v1.1.zip) (Gerber format, SeedStudio compatible):
 
 <img src="docs/img/pcb_reis.png" alt="PCB by Joao Reis" width="200">
+
+[**PCB by Philip Seidel**](https://github.com/ps915/Chorus-RF-Laptimer-PCB) (4 node, DipTrace, Gerber):
+
+<img src="https://github.com/ps915/Chorus-RF-Laptimer-PCB/blob/master/p3.JPG" alt="PCB by Philipp Seidel" width="400">
+
 
 <a name="assembly-of-a-solo-device"></a>
 ### Assembly of a Solo device
@@ -263,7 +278,7 @@ Controls on the tabs are mostly self-explanatory. Still some clarifications migh
 - **Minimal Lap Time**: use +/- to increase/decrease minimal lap time. Set enough time to let a drone leave the "above-threshold RSSI area" after lap time is captured.
 - **Skip first lap**: tick if start table is located before the start/finish gate (first lap time will be skipped because it's not a full lap); untick if start table is located right behind the laptimer (first lap time will be tracked only if minimal lap time is passed after the race start).
 - **RSSI Threshold**: use +/- to fine-tune RSSI threshold.
-- **Set/Clear**: long tap to capture/clear currently measured RSSI value as a threshold.
+- **Clear/Set**: clear current RSSI threshold / set threshold automatically (described below).
 - **Calibrate Timers**: different Arduino devices have different oscillators accuracy and it may slightly deviate from 16MHz. In order to make sure that same timespan is measured equally on different devices, you need to calibrate them before the race.
 - **Start Race**: tap to start tracking laps. This same button is used to Stop the race.
 
@@ -279,20 +294,42 @@ Adjust until measured voltage corresponds to the voltage of your LiPo battery wh
 
 <a name="setup-and-usage-guide"></a>
 ## Setup and Usage Guide
- 1. Power on the Chorus device and put it on the ground in the middle of the finish gate facing upwards.
+ 1. Power on the Chorus device and put it on the ground in a corner of the finish gate facing the opposite side at 45 degrees upwards.
  2. Start the mobile app and connect to the Chorus device.
- 3. Setup VTX Band/Channel for each Solo device in Android app (on the "Freq" tab)
+ 3. Setup VTX Band/Channel for each Solo device in Android app on the "Freq" tab.
  4. Fully prepare racing drones and power them up (VTX must be powered in racing mode).
- 5. Take a powered drone a bit above the gate.
- 6. Capture current RSSI value as a threshold using the Android app (use "Set" button for appropriate channel on "Pilots" tab).
- 7. Repeat steps 5,6 for each drone taking part in a race.
+ 5. Setup threshold values for each channel on the "Pilots" tab (see detailed description below).
+ 7. Repeat step 5 for each drone taking part in a race.
  8. Calibrate timers using the corresponding button on a "Race" tab (in case you have more than 1 Solo device).
  6. Start Race in the app.
  7. Fly the track and see the lap times being captured.
 
-<img src="docs/img/placementAndSetup.png" alt="Device placement and setup" width="">
-
 Also consider shielding the Chorus device with a piece of metal on one side where drones are approaching from. It might increase the accuracy by partially blocking the VTx signal before a drone is inside a gate.
+
+<a name="threshold-setup"></a>
+### RSSI Threshold Setup
+
+When you first start the device, it has predefined threshold values of 190 on each channel, which is more or less suitable value for 25mW VTx. But if you want to have accurate laps tracking, you should consider individual thresholds setup for each participating drone.
+
+You can set RSSI threshold in 2 alternative ways:
+
+#### Manually:
+ 1. Hold a powered drone at the opposite side of the gate.
+ 2. Note the RSSI value.
+ 3. Use +/- buttons to change the threshold to match the noted value (short press changes by 1, long press changes by 30).
+
+<img src="docs/img/placementAndSetup.png" alt="Manual Threshold Setup" width="">
+
+#### Automatically:
+ 1. Hold a powered drone far enough from the device (10-20 meters), so that current RSSI is significantly lower compared to when the drone is near.
+ 2. Long press "Set" button - notice yellow circle progress bar which means that Chorus is wating for RSSI to start rising.
+ 3. Walk towards the opposite side of the gate. At some point notice the yellow progress bar changing color to blue, which means that Chorus recognized the rise of RSSI and is now tracking the maximum value). Continue approaching the gate (RSSI should rise).
+ 4. Pass the gate (don't stop) and move away from it (either return or go forward). Make sure that you pass Chorus a bit farther than the most distant point of the gate where you want Chorus to capture a flying drone during the race.
+ 5. At some point distant from the gate, the blue progress bar will change to the captured RSSI threshold value. You're done!
+
+Note: you can set thresholds for all pilots in a heat at once. Just start threshold setup for each pilot and have all pilots walk by the gate.
+
+<img src="docs/img/autoThresholdSetup.png" alt="Automatic Threshold Setup" width="">
 
 <a name="troubleshooting"></a>
 ## Troubleshooting
@@ -316,12 +353,21 @@ Android app:
 - Gleb Godonoga (SidhNor) - internationalization support, Russian localization, permissions tuning
 - Jose Luis Ortiz (JLOFPV) - Spanish localization
 - thestealth131205, anunique - German localization
+- Nicola Gorghetto (nikybiasion) - Italian localization
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
 
 iOS app:
 - Lazar Djordjevic (lazar89nis) - entire app implementation!
+
+Alternative PCB design:
+- Joao Reis
+- Philipp Seidel
+
+LiveTime integration:
+- David Lewis - building and contributing several Chorus nodes to LiveTime team for integration testing
+- Cory Kroll - implementation of Chorus support in LiveTime
 
 <a name="contacts"></a>
 ## Contacts

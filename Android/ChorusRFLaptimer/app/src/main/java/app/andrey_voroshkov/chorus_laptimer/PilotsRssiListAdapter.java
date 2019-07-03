@@ -1,6 +1,8 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -37,6 +39,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         EditText edPilotName;
         TextView txtChannelLabel;
         TextView txtThresh;
+        ProgressBar spinThresholdSetup;
         Button btnDecThr;
         Button btnIncThr;
         Button btnSetThr;
@@ -89,6 +92,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             viewHolder.edPilotName = (EditText) convertView.findViewById(R.id.editPilotName);
             viewHolder.txtChannelLabel = (TextView) convertView.findViewById(R.id.txtChannelLabel);
             viewHolder.txtThresh = (TextView) convertView.findViewById(R.id.txtThreshold);
+            viewHolder.spinThresholdSetup = (ProgressBar) convertView.findViewById(R.id.spinThresholdSetup);
             viewHolder.btnDecThr = (Button) convertView.findViewById(R.id.btnDecThresh);
             viewHolder.btnIncThr = (Button) convertView.findViewById(R.id.btnIncThresh);
             viewHolder.btnSetThr = (Button) convertView.findViewById(R.id.btnCapture);
@@ -106,6 +110,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             convertView.setTag(viewHolder);
         }
 
+
         //this listener should be initialized prior to changing text in edPilotName
         viewHolder.edPilotName.addTextChangedListener(viewHolder.edPilotTextWatcher);
 
@@ -118,10 +123,26 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             }
         });
 
+        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
+        viewHolder.isPilotEnabled.setChecked(isEnabled);
+
         final DeviceState ds = AppState.getInstance().deviceStates.get(position);
         String ch = AppState.getInstance().getChannelText(position);
         String band = AppState.getInstance().getBandText(position);
-        Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
+        int thresholdSetupState = AppState.getInstance().getThresholdSetupState(position);
+
+        if (thresholdSetupState > 0) {
+            //showThresholdSetupProgress;
+            viewHolder.spinThresholdSetup.setVisibility(View.VISIBLE);
+            viewHolder.txtThresh.setVisibility(View.GONE);
+            int colorId = (thresholdSetupState == 1) ?  R.color.colorWarn : R.color.colorPrimary;
+            int color = ContextCompat.getColor(mContext, colorId);
+            viewHolder.spinThresholdSetup.getIndeterminateDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+        } else {
+            //hideThresholdSetupProgress;
+            viewHolder.spinThresholdSetup.setVisibility(View.GONE);
+            viewHolder.txtThresh.setVisibility(View.VISIBLE);
+        }
 
         String mhzString = mContext.getString(R.string.mhz_string);
         String freq = AppState.getInstance().getFrequencyText(position) + " " + mhzString;
@@ -130,7 +151,6 @@ public class PilotsRssiListAdapter extends BaseAdapter {
 
         viewHolder.txtThresh.setText(Integer.toString(ds.threshold));
         viewHolder.txtChannelLabel.setText(mContext.getString(R.string.channel_descriptor, band, ch, freq));
-        viewHolder.isPilotEnabled.setChecked(isEnabled);
 
         if (ds.threshold == 0) {
             viewHolder.btnSetThr.setText(R.string.setup_set_threshold);
@@ -145,7 +165,11 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         viewHolder.btnDecThr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "t");
+                int newThresh = ds.threshold - 1;
+                if (newThresh < 0) {
+                    newThresh = 0;
+                }
+                AppState.getInstance().sendBtCommand("R" + deviceId + "T" + String.format("%04X", newThresh));
             }
         });
 
@@ -156,7 +180,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
                 if (newThresh < 0) {
                     newThresh = 0;
                 }
-                AppState.getInstance().sendBtCommand("R" + deviceId + "S" + String.format("%04X", newThresh));
+                AppState.getInstance().sendBtCommand("R" + deviceId + "T" + String.format("%04X", newThresh));
                 return true;
             }
         });
@@ -164,7 +188,8 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         viewHolder.btnIncThr.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "T");
+                int newThresh = ds.threshold + 1;
+                AppState.getInstance().sendBtCommand("R" + deviceId + "T" + String.format("%04X", newThresh));
             }
         });
 
@@ -175,7 +200,7 @@ public class PilotsRssiListAdapter extends BaseAdapter {
                 if (newThresh > AppState.MAX_RSSI) {
                     newThresh = AppState.MAX_RSSI;
                 }
-                AppState.getInstance().sendBtCommand("R" + deviceId + "S" + String.format("%04X", newThresh));
+                AppState.getInstance().sendBtCommand("R" + deviceId + "T" + String.format("%04X", newThresh));
                 return true;
             }
         });
@@ -183,7 +208,11 @@ public class PilotsRssiListAdapter extends BaseAdapter {
         viewHolder.btnSetThr.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                AppState.getInstance().sendBtCommand("R" + deviceId + "S");
+                if (ds.threshold == 0) {
+                    AppState.getInstance().sendBtCommand("R" + deviceId + "H1");
+                } else {
+                    AppState.getInstance().sendBtCommand("R" + deviceId + "T0000");
+                }
                 return false;
             }
         });

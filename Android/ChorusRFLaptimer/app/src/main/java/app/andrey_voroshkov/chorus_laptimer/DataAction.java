@@ -11,9 +11,11 @@ public enum DataAction {
     DeviceThreshold,
     RaceMinLap,
     RaceLaps,
+    RandomStartTime,
     RaceState,
     LapResult,
     SoundEnable,
+    UseExperimentalFeatures,
     DeviceCalibrationStatus,
     DeviceCalibrationValue,
     RaceIsFinished,
@@ -30,5 +32,8 @@ public enum DataAction {
     BatteryVoltage,
     VoltageAdjustmentConst,
     LiPoMonitorEnable,
-    Disconnect
+    WrongApiVersion,
+    ThresholdSetupState,
+    Disconnect,
+    ConnectionTester
 }

@@ -7,7 +7,11 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <application>
-        <activity android:name="app.akexorcist.bluetotohspp.library.DeviceList" />
+        <activity
+            android:name="app.akexorcist.bluetotohspp.library.DeviceList"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"
+        />
     </application>
 
 </manifest>

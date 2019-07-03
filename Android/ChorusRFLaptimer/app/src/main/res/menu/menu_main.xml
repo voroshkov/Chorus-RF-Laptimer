@@ -7,16 +7,15 @@
         android:title="@string/menu_bt_connect"
         app:showAsAction="never" />
     <item
-        android:id="@+id/menuBTDisconnect"
-        android:title="@string/menu_disconnect"
-        android:visible="false"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/menuUDPConnect"
         android:title="@string/menu_udp_connect"
         app:showAsAction="never" />
     <item
-        android:id="@+id/menuUDPDisconnect"
+        android:id="@+id/menuUSBConnect"
+        android:title="@string/menu_usb_connect"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/menuDisconnect"
         android:title="@string/menu_disconnect"
         android:visible="false"
         app:showAsAction="never" />

@@ -21,6 +21,7 @@ public class AppPreferences {
     public static final String MIN_LAP_TIME = "min_lap_time";
     public static final String PREPARATION_TIME = "preparation_time";
     public static final String ENABLE_DEVICE_SOUNDS = "enable_device_sounds";
+    public static final String USE_EXPERIMENTAL_FEATURES = "use_experimental_features";
     public static final String DEVICE_BANDS = "device_bands";
     public static final String DEVICE_CHANNELS = "device_channels";
     public static final String DEVICE_PILOTS = "device_pilots";
@@ -28,6 +29,7 @@ public class AppPreferences {
     public static final String DEVICE_THRESHOLDS = "device_thresholds";
     public static final String LIPO_MONITOR_ENABLED = "lipo_mon_enabled";
     public static final String LIPO_ADJUSTMENT_CONST = "lipo_adjust_const";
+    public static final String RANDOM_START_TIME = "random_start_time";
 
 
     public String[] mBands;
@@ -98,9 +100,14 @@ public class AppPreferences {
             case PREPARATION_TIME:
                 editor.putInt(PREPARATION_TIME, app.timeToPrepareForRace);
                 break;
+            case RANDOM_START_TIME:
+                editor.putInt(RANDOM_START_TIME, app.randomStartTime);
+                break;
             case ENABLE_DEVICE_SOUNDS:
                 editor.putBoolean(ENABLE_DEVICE_SOUNDS, app.isDeviceSoundEnabled);
                 break;
+            case USE_EXPERIMENTAL_FEATURES:
+                editor.putBoolean(USE_EXPERIMENTAL_FEATURES, app.shouldUseExperimentalFeatures);
             case DEVICE_BANDS:
                 if (app.deviceStates == null) break;
                 ArrayList<String> bandsList = new ArrayList<>();
@@ -169,6 +176,7 @@ public class AppPreferences {
         app.changeShouldSpeakMessages(app.preferences.getBoolean(SPEAK_MESSAGES, true));
         app.changeShouldSpeakEnglishOnly(app.preferences.getBoolean(SPEAK_ENGLISH_ONLY, false));
         app.changeTimeToPrepareForRace(app.preferences.getInt(PREPARATION_TIME, 5));
+        app.changeRandomStartTime(app.preferences.getInt(RANDOM_START_TIME, 0));
         app.changeRaceLaps(app.preferences.getInt(LAPS_TO_GO, 5));
         app.changeAdjustmentConst(app.preferences.getInt(LIPO_ADJUSTMENT_CONST, 0));
         app.changeEnableLiPoMonitor(app.preferences.getBoolean(LIPO_MONITOR_ENABLED, true));
@@ -207,19 +215,25 @@ public class AppPreferences {
         boolean prefSkipFirstLap = app.preferences.getBoolean(SKIP_FIRST_LAP, true);
         if (app.shouldSkipFirstLap != prefSkipFirstLap) {
             app.changeSkipFirstLap(prefSkipFirstLap);
-            app.sendBtCommand("R*F");
+            app.sendBtCommand("R*1" + (prefSkipFirstLap ? "0" : "1"));
         }
 
         boolean prefEnableDeviceSounds = app.preferences.getBoolean(ENABLE_DEVICE_SOUNDS, true);
         if (app.isDeviceSoundEnabled != prefEnableDeviceSounds) {
             app.changeDeviceSoundState(prefEnableDeviceSounds);
-            app.sendBtCommand("R*D");
+            app.sendBtCommand("R*S" + (prefEnableDeviceSounds ? "1" : "0"));
+        }
+
+        boolean prefUseExperimentalFeatures = app.preferences.getBoolean(USE_EXPERIMENTAL_FEATURES, false);
+        if (app.shouldUseExperimentalFeatures != prefUseExperimentalFeatures) {
+            app.changeExperimentalFeatureState(prefUseExperimentalFeatures);
+            app.sendBtCommand("R*E" + (prefUseExperimentalFeatures? "1" : "0"));
         }
 
         if (app.raceState != null) {
             int prefMLT = app.preferences.getInt(MIN_LAP_TIME, 3);
             app.changeRaceMinLapTime(prefMLT);
-            app.sendBtCommand("R*L" + String.format("%02X", prefMLT));
+            app.sendBtCommand("R*M" + String.format("%02X", prefMLT));
         }
 
         if (app.deviceStates != null) {
@@ -233,7 +247,7 @@ public class AppPreferences {
                     if (i < bandsCount) {
                         int prefBand = Integer.parseInt(bandsArray[i]);
                         app.changeDeviceBand(i, prefBand);
-                        app.sendBtCommand("R" +  String.format("%X", i) + "N" + String.format("%X", prefBand));
+                        app.sendBtCommand("R" +  String.format("%X", i) + "B" + String.format("%X", prefBand));
                     }
                 }
             }
@@ -248,7 +262,7 @@ public class AppPreferences {
                    if (i < channelsCount) {
                         int prefChannel = Integer.parseInt(channelsArray[i]);
                         app.changeDeviceChannel(i, prefChannel);
-                        app.sendBtCommand("R" +  String.format("%X", i) + "H" + String.format("%X", prefChannel));
+                        app.sendBtCommand("R" +  String.format("%X", i) + "C" + String.format("%X", prefChannel));
                     }
                 }
             }
@@ -263,7 +277,7 @@ public class AppPreferences {
                     if (i < thresholdsCount) {
                         int prefThreshold = Integer.parseInt(thresholdsArray[i]);
                         app.changeDeviceThreshold(i, prefThreshold);
-                        app.sendBtCommand("R" +  String.format("%X", i) + "S" + String.format("%04X", prefThreshold));
+                        app.sendBtCommand("R" +  String.format("%X", i) + "T" + String.format("%04X", prefThreshold));
                     }
                 }
             }

@@ -19,6 +19,7 @@ import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -42,11 +43,24 @@ public class RaceResultFragment extends Fragment {
                 if (counter == 0) {
                     //last beep
                     AppState.getInstance().playTone(AppState.TONE_GO, AppState.DURATION_GO);
-                    AppState.getInstance().sendBtCommand("R*R");
+                    AppState.getInstance().sendBtCommand("R*R1");
                 } else {
-                    this.sendEmptyMessageDelayed(counter - 1, 1000);
+                    // apply conditional randomization for the last beep time
+                    if (counter == 1) {
+                        int lastBeepDelay = 1000; // default is 1 second delay
+                        int randomStartTime = AppState.getInstance().randomStartTime;
+                        if (randomStartTime > 0)  {
+                            Random rand = new Random();
+                            // let's have a min delay of 500 and max would be the specified upper bound
+                            lastBeepDelay = rand.nextInt(randomStartTime * 1000) + 1000;
+                        }
+                        this.sendEmptyMessageDelayed(0, lastBeepDelay);
+                    } else {
+                        this.sendEmptyMessageDelayed(counter - 1, 1000);
+                    }
                     //first 3 beeps
-                    if (counter < 4) {
+                    if (counter < AppState.START_BEEPS_COUNT) {
+                        AppState.getInstance().sendBtCommand("T" + String.format("%01X", counter));
                         AppState.getInstance().playTone(AppState.TONE_PREPARE, AppState.DURATION_PREPARE);
                     }
                 }
@@ -77,6 +91,8 @@ public class RaceResultFragment extends Fragment {
         AppState.getInstance().addListener(new IDataListener() {
             @Override
             public void onDataChange(DataAction dataItemName) {
+                if (!isAdded()) return;
+
                 switch (dataItemName) {
                     case RaceState:
                     case NDevices:
@@ -91,8 +107,6 @@ public class RaceResultFragment extends Fragment {
                         break;
                     case DeviceThreshold:
                     case Disconnect:
-                        updateButtons(rootView);
-                        break;
                     case DeviceCalibrationStatus:
                         updateButtons(rootView);
                         break;
@@ -125,6 +139,8 @@ public class RaceResultFragment extends Fragment {
                 pd.setCancelable(false);
                 pd.setProgressNumberFormat(null);
                 pd.show();
+                AppState.getInstance().clearOldCalibrationTimes();
+                final long msStart = System.currentTimeMillis();
                 final Handler h = new Handler() {
                     public void handleMessage(Message msg) {
                         switch(msg.what) {
@@ -135,13 +151,15 @@ public class RaceResultFragment extends Fragment {
                                 }
                                 break;
                             case 1:
-                                AppState.getInstance().sendBtCommand("R*i");
+                                long msEnd = System.currentTimeMillis();
+                                AppState.getInstance().sendBtCommand("R*t");
+                                AppState.getInstance().setCalibrationActualTime((int)(msEnd - msStart));
                                 pd.dismiss();
                                 break;
                         }
                     }
                 };
-                AppState.getInstance().sendBtCommand("R*I");
+                AppState.getInstance().sendBtCommand("R*t");
                 h.sendEmptyMessage(0);
                 h.sendEmptyMessageDelayed(1, AppState.CALIBRATION_TIME_MS);
             }
@@ -153,10 +171,11 @@ public class RaceResultFragment extends Fragment {
                 boolean isStarted = AppState.getInstance().raceState.isStarted;
                 if (!isStarted && !mIsStartingRace) {
                     //stop rssi monitoring first, then start race
-                    AppState.getInstance().sendBtCommand("R*v");
+                    AppState.getInstance().sendBtCommand("R*I0000");
 
                     Button btnRace = (Button) rootView.findViewById(R.id.btnStartRace);
                     btnRace.setText(R.string.starting_race);
+                    AppState.getInstance().sendBtCommand("TP");
                     mIsStartingRace = true;
                     int timeBeforeRace = AppState.getInstance().timeToPrepareForRace;
                     if (timeBeforeRace >= AppState.MIN_TIME_BEFORE_RACE_TO_SPEAK)
@@ -174,12 +193,14 @@ public class RaceResultFragment extends Fragment {
                 boolean isStarted = AppState.getInstance().raceState.isStarted;
                 if (isStarted) {
                     //stop race and start RSSI monitoring
-                    AppState.getInstance().sendBtCommand("R*r");
-                    AppState.getInstance().sendBtCommand("R*V");
+                    AppState.getInstance().sendBtCommand("R*R0");
+                    AppState.getInstance().sendBtCommand("R*I0064");
                     return true;
                 }  else if (mIsStartingRace) {
                     //TODO: move mIsStartingRace flag into appState, use updateButtons to update button captions
                     mIsStartingRace = false;
+                    AppState.getInstance().sendBtCommand("R*R0"); // send end race (workaround for the led gate to switch to no-race mode)
+                    AppState.getInstance().sendBtCommand("R*I0064");
                     mRaceStartingHandler.removeCallbacksAndMessages(null);
                     updateButtons(rootView);
                     return true;

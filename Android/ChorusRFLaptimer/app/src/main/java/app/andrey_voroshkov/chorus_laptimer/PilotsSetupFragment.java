@@ -60,6 +60,7 @@ public class PilotsSetupFragment extends Fragment {
                     case DeviceBand:
                     case DeviceThreshold:
                     case PilotEnabledDisabled:
+                    case ThresholdSetupState:
                         updateResults();
                         break;
                     case DeviceRSSI:
@@ -88,8 +89,18 @@ public class PilotsSetupFragment extends Fragment {
     public void updatePilotNames() {
         ListView mListView = (ListView)mRootView.findViewById(R.id.lvPilots);
         int count = AppState.getInstance().deviceStates.size();
-        for (int i = 0; i < count; i++) {
-            View convertView = mListView.getChildAt(i);
+        int firstVisibleItemPos = mListView.getFirstVisiblePosition();
+        int lastVisibleItemPos = mListView.getLastVisiblePosition();
+
+        // detect possible faulty edge cases
+        if (firstVisibleItemPos > lastVisibleItemPos ||
+                firstVisibleItemPos < 0 ||
+                lastVisibleItemPos > count - 1 ) return;
+
+        // update only visible list items
+        for (int i = firstVisibleItemPos; i <= lastVisibleItemPos; i++) {
+            // children enumeration starts with zero
+            View convertView = mListView.getChildAt(i - firstVisibleItemPos);
             if (convertView != null) {
                 EditText pilotName = (EditText) convertView.findViewById(R.id.editPilotName);
                 String curPilotName = AppState.getInstance().deviceStates.get(i).pilotName;

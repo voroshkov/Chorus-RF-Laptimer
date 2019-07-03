@@ -4,6 +4,7 @@
     <!-- Menu -->
     <string name="menu_bt_connect">Подключить по Bluetooth</string>
     <string name="menu_udp_connect">Подключить по WiFi</string>
+    <string name="menu_usb_connect">Подключить по USB</string>
     <string name="menu_disconnect">Отключиться</string>
 
     <!-- Tabs -->
@@ -31,6 +32,9 @@
     <string name="setup_enable_device_sounds">Звук на устройстве</string>
     <string name="setup_speak_lap_times">Говорить время кругов</string>
     <string name="setup_speak_messages">Говорить оповещения</string>
+    <string name="setup_speak_english_only">Говорить на английском</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Случайный старт</string>
     <string name="freq_channel">Канал №</string>
     <string name="freq_rf_band">Диапазон</string>
     <string name="plus_sign">+</string>
@@ -71,7 +75,12 @@
     <string name="connection_failed">Не подключено</string>
     <string name="connected_to">Подключено к %s</string>
     <string name="disconnected">Соединение прервано</string>
-    <string name="setup_speak_english_only">Говорить на английском</string>
+
+    <string name="api_err_title">Ошибка совместимости</string>
+    <string name="api_err_message">Прошивка модулей № %1$s устарела.\n\nПожалуйста установите прошивку с версией API не ниже %2$d и попробуйте подключиться снова.</string>
+    <string name="api_err_button">Отключиться</string>
+
+    <string name="cannotAccessUsbDevice">Нет доступа к USB</string>
 
     <plurals name="pilots_in_race">
         <item quantity="one">Начать гонку (%1$d пилот)</item>
