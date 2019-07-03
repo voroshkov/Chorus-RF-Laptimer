@@ -2,9 +2,7 @@
 *.apk
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
-/.idea/caches
+/.idea
 /app/release
 .DS_Store
 /build
