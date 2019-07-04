@@ -38,7 +38,7 @@ TODO: there's possible optimization in send queue:
     remove already existing items from queue
 */
 
-#define API_VERSION 5 // version number to be increased with each API change (int16)
+#define API_VERSION 6 // version number to be increased with each API change (int16)
 
 #define EXPERIMENTAL_FEATURES_AVAILABLE // comment out if current code version doesn't contain any experimental features
 

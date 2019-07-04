@@ -195,18 +195,7 @@ public class AppPreferences {
             }
         }
 
-        if (app.deviceStates != null) {
-            String statuses = app.preferences.getString(DEVICE_ENABLED, "");
-            if (!statuses.equals("")) {
-                String[] statusesArray = TextUtils.split(statuses, STRING_ITEMS_DELIMITER);
-                int statusesCount = statusesArray.length;
-                for(int i = 0; i < app.deviceStates.size(); i++) {
-                    if (i < statusesCount) {
-                        app.changeDeviceEnabled(i, Boolean.parseBoolean(statusesArray[i]));
-                    }
-                }
-            }
-        }
+
     }
 
     public static void applyDeviceDependentPreferences() {
@@ -278,6 +267,19 @@ public class AppPreferences {
                         int prefThreshold = Integer.parseInt(thresholdsArray[i]);
                         app.changeDeviceThreshold(i, prefThreshold);
                         app.sendBtCommand("R" +  String.format("%X", i) + "T" + String.format("%04X", prefThreshold));
+                    }
+                }
+            }
+
+            String enabledStatuses = app.preferences.getString(DEVICE_ENABLED, "");
+            if (!enabledStatuses.equals("")) {
+                String[] enabledStatusesArray = TextUtils.split(enabledStatuses, STRING_ITEMS_DELIMITER);
+                int statusesCount = enabledStatusesArray.length;
+                for(int i = 0; i < app.deviceStates.size(); i++) {
+                    if (i < statusesCount) {
+                        boolean prefEnabledStatus = Boolean.parseBoolean(enabledStatusesArray[i]);
+                        app.changeDeviceEnabled(i, prefEnabledStatus);
+                        app.sendBtCommand("R" +  String.format("%X", i) + "A" + (prefEnabledStatus ? "1" : "0"));
                     }
                 }
             }
