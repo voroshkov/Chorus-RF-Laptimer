@@ -77,8 +77,9 @@ void PowerDownFeatures(uint32_t features)
     digitalLow(slaveSelectPin);
     delayMicroseconds(1);
     
+    // send 0x0A
     SERIAL_SENDBIT0();
-    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT1();
     SERIAL_SENDBIT0();
     SERIAL_SENDBIT1();
 
