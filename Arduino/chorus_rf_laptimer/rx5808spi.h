@@ -77,8 +77,9 @@ void PowerDownFeatures(uint32_t features)
     digitalLow(slaveSelectPin);
     delayMicroseconds(1);
     
+    // send 0x0A
     SERIAL_SENDBIT0();
-    SERIAL_SENDBIT0();
+    SERIAL_SENDBIT1();
     SERIAL_SENDBIT0();
     SERIAL_SENDBIT1();
 
@@ -111,6 +112,38 @@ void setupSPIpins() {
     delayMicroseconds(1);
     
     PowerDownFeatures(PD_IFAF | PD_DIV4 | PD_5GVCO | PD_REG1D8 | PD_DIV80 | PD_PLL1D8 | PD_IF_DEMOD | PD_VAMP | PD_VCLAMP | PD_MIXER | PD_IFABF | PD_6M5 | PD_AU6M5 | PD_6M | PD_AU6M | PD_SYN | PD_REGIF);
+}
+
+void powerDownModule() {
+    // Power down all features
+    PowerDownFeatures(PD_PLL1D8 | PD_DIV80 | PD_MIXER | PD_IFABF | PD_REG1D8 | PD_6M5 | PD_AU6M5 | PD_6M | PD_AU6M | PD_SYN | PD_5GVCO | PD_DIV4 | PD_DIV4 | PD_BC | PD_REGIF | PD_REGBS | PD_RSSI_SQUELCH | PD_IFAF | PD_IF_DEMOD | PD_VAMP | PD_VCLAMP);
+}
+
+// Reset needs to be used to wake the module up if it is completely powered down
+void resetModule() {
+    digitalLow(spiClockPin);
+    digitalLow(slaveSelectPin);
+    delayMicroseconds(1);
+
+    // State register 0x0F
+    SERIAL_SENDBIT1();
+    SERIAL_SENDBIT1();
+    SERIAL_SENDBIT1();
+    SERIAL_SENDBIT1();
+
+    // write
+    SERIAL_SENDBIT1();
+
+    // set all bits to zero -> reset
+    for (int i = 20; i > 0; i--) {
+        SERIAL_SENDBIT0();
+    }
+
+    // Finished clocking data in
+    digitalHigh(slaveSelectPin);
+    delayMicroseconds(1);
+
+    delay(MIN_TUNE_TIME);
 }
 
 uint16_t setModuleFrequency(uint16_t frequency) {

@@ -123,6 +123,13 @@ public class PilotsRssiListAdapter extends BaseAdapter {
             }
         });
 
+        viewHolder.isPilotEnabled.setOnClickListener(new CompoundButton.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppState.getInstance().sendBtCommand("R" + deviceId + "A" + (((CompoundButton)v).isChecked() ? 1 : 0));
+            }
+        });
+
         Boolean isEnabled = AppState.getInstance().getIsPilotEnabled(position);
         viewHolder.isPilotEnabled.setChecked(isEnabled);
 
