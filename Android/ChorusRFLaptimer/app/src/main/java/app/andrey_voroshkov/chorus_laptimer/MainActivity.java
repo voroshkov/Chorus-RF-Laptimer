@@ -10,12 +10,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -243,8 +247,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
                 startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
                 break;
             case R.id.menuUDPConnect:
-                udp.connect(getGatewayIP(), 0);
-                useUDP();
+                preferWifiAndConnectUDP();
                 break;
             case R.id.menuUSBConnect:
                 checkUSBPermissionsAndConnectIfAllowed();
@@ -256,6 +259,25 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void preferWifiAndConnectUDP() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for (Network net : cm.getAllNetworks()) {
+                NetworkInfo networkInfo = cm.getNetworkInfo(net);
+                if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                    cm.bindProcessToNetwork(net);
+                    break;
+                }
+            }
+        }
+
+        udp.connect(getGatewayIP(), 0);
+        useUDP();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            cm.bindProcessToNetwork(null);
+        }
     }
 
     private boolean checkIsWifiOnAndConnected() {
