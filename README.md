@@ -354,9 +354,11 @@ Android app:
 - Jose Luis Ortiz (JLOFPV) - Spanish localization
 - thestealth131205, anunique - German localization
 - Nicola Gorghetto (nikybiasion) - Italian localization
+- Kevin (@Smeat) - power-down mode for inactive nodes
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
+- Kevin (@Smeat) - power-down mode for inactive nodes
 
 iOS app:
 - Lazar Djordjevic (lazar89nis) - entire app implementation!
