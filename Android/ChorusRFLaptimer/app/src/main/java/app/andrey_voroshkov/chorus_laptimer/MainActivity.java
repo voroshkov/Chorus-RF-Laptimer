@@ -284,8 +284,12 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         if (!wifiMgr.isWifiEnabled()) return false;  // Wi-Fi adapter is OFF
 
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        return wifiInfo.getNetworkId() != -1; // if true, then connected to an access point
+        ConnectivityManager cm =
+            (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        // Deprecated in Android 10, but should still be fine
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
     private String getGatewayIP() {
