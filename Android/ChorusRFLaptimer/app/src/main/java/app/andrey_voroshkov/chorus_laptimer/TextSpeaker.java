@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 
 import java.text.DecimalFormatSymbols;
 import java.util.HashMap;

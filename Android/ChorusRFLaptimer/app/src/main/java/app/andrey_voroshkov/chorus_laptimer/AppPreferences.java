@@ -283,7 +283,13 @@ public class AppPreferences {
                     }
                 }
             }
-
+            else {
+                // forcibly enable all devices if prefs are not saved
+                for(int i = 0; i < app.deviceStates.size(); i++) {
+                    app.changeDeviceEnabled(i, true);
+                    app.sendBtCommand("R" +  String.format("%X", i) + "A1");
+                }
+            }
         }
     }
 

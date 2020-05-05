@@ -1,7 +1,7 @@
 package app.andrey_voroshkov.chorus_laptimer;
 
 import android.content.Context;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

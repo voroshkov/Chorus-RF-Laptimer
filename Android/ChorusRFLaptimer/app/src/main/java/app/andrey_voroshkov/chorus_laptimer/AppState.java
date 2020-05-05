@@ -5,7 +5,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.StringRes;
+import androidx.annotation.StringRes;
 import android.text.TextUtils;
 
 import java.util.ArrayList;

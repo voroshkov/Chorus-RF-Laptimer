@@ -9,7 +9,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 26
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -22,7 +22,7 @@ android {
 
 dependencies {
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'commons-net:commons-net:3.6'
     androidTestImplementation 'org.apache.commons:commons-lang3:3.7'
 }

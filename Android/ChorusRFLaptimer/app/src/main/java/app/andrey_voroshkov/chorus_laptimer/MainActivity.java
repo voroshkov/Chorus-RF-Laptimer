@@ -10,21 +10,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
-import android.net.wifi.WifiInfo;
+import android.net.Network;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.design.widget.TabLayout;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.tabs.TabLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -243,8 +246,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
                 startActivityForResult(intent, BluetoothState.REQUEST_CONNECT_DEVICE);
                 break;
             case R.id.menuUDPConnect:
-                udp.connect(getGatewayIP(), 0);
-                useUDP();
+                preferWifiAndConnectUDP();
                 break;
             case R.id.menuUSBConnect:
                 checkUSBPermissionsAndConnectIfAllowed();
@@ -258,12 +260,35 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         return super.onOptionsItemSelected(item);
     }
 
+    private void preferWifiAndConnectUDP() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            for (Network net : cm.getAllNetworks()) {
+                NetworkInfo networkInfo = cm.getNetworkInfo(net);
+                if (networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                    cm.bindProcessToNetwork(net);
+                    break;
+                }
+            }
+        }
+
+        udp.connect(getGatewayIP(), 0);
+        useUDP();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            cm.bindProcessToNetwork(null);
+        }
+    }
+
     private boolean checkIsWifiOnAndConnected() {
         WifiManager wifiMgr = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         if (!wifiMgr.isWifiEnabled()) return false;  // Wi-Fi adapter is OFF
 
-        WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
-        return wifiInfo.getNetworkId() != -1; // if true, then connected to an access point
+        ConnectivityManager cm =
+            (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        // Deprecated in Android 10, but should still be fine
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+        return isConnected;
     }
 
     private String getGatewayIP() {
