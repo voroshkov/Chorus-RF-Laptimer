@@ -3,8 +3,8 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +13,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import app.andrey_voroshkov.chorus_laptimer.R;
 
 /**
  * A placeholder fragment containing a simple view.

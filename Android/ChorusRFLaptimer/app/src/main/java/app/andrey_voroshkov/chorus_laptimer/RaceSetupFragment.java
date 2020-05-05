@@ -3,10 +3,10 @@ package app.andrey_voroshkov.chorus_laptimer;
 import android.content.Context;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -417,8 +417,10 @@ public class RaceSetupFragment extends Fragment {
                 float scale = getResources().getDisplayMetrics().density;
                 int dpAsPixels = (int) (3 * scale + 0.5f);
                 layout.setPadding(dpAsPixels, dpAsPixels,dpAsPixels,dpAsPixels);
+                layout.setBackgroundColor(getResources().getColor(R.color.colorAccent));
             } else {
                 layout.setPadding(0,0,0,0);
+                layout.setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
             }
         }
     }

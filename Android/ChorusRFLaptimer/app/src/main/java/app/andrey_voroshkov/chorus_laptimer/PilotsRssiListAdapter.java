@@ -2,7 +2,7 @@ package app.andrey_voroshkov.chorus_laptimer;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
