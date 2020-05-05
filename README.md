@@ -354,7 +354,8 @@ Android app:
 - Jose Luis Ortiz (JLOFPV) - Spanish localization
 - thestealth131205, anunique - German localization
 - Nicola Gorghetto (nikybiasion) - Italian localization
-- Kevin (@Smeat) - power-down mode for inactive nodes
+- Kevin (@Smeat) - power-down mode for inactive nodes, fix for wifi connectivity on Android 10 (#112)
+- @Nisse43 - Fix connectivity issue #81 
 
 Arduino app:
 - anunique - arbitrary frequency setting, predefined Connex frequencies, improvements to Arduino code
