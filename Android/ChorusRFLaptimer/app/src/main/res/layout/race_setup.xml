@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
+    android:layout_height="wrap_content">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:animateLayoutChanges="true">
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/colorBatteryMonitor">
+            android:background="@color/colorBatteryMonitor"
+            android:orientation="horizontal">
 
             <CheckBox
                 android:id="@+id/chkLiPoMonitor"
@@ -22,16 +22,16 @@
                 android:layout_height="40dp"
                 android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:text="@string/setup_lipo_monitor"
-                android:checked="true" />
+                android:checked="true"
+                android:text="@string/setup_lipo_monitor" />
 
             <LinearLayout
+                android:id="@+id/layoutVoltage"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
                 android:longClickable="true"
-                android:id="@+id/layoutVoltage"
+                android:orientation="vertical"
                 android:paddingTop="5dp">
 
                 <TextView
@@ -40,8 +40,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:longClickable="true"
-                    tools:text="0.00V"
-                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+                    android:textColor="?android:attr/textColorPrimaryNoDisable"
+                    tools:text="0.00V" />
 
                 <ProgressBar
                     android:id="@+id/batteryCharge"
@@ -50,9 +50,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:max="100"
-                    android:progress="0"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
+                    android:progress="0"
                     android:visibility="visible" />
             </LinearLayout>
 
@@ -61,11 +61,11 @@
 
         <LinearLayout
             android:id="@+id/adjustmentLayout"
-            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorBatteryMonitor"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -81,8 +81,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:text="@string/setup_adjust_voltage"
-                    android:gravity="center_vertical" />
+                    android:gravity="center_vertical"
+                    android:text="@string/setup_adjust_voltage" />
             </LinearLayout>
 
             <LinearLayout
@@ -123,11 +123,9 @@
 
             <TextView
                 android:id="@+id/textView5"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:elevation="1dp"
                 android:text="@string/setup_nr_laps" />
 
             <LinearLayout
@@ -168,10 +166,9 @@
 
             <TextView
                 android:id="@+id/textView4"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_min_lap_time" />
 
@@ -194,8 +191,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
-                    tools:text="5 sec."
-                    android:textColor="?android:attr/textColorPrimaryNoDisable" />
+                    android:textColor="?android:attr/textColorPrimaryNoDisable"
+                    tools:text="5 sec." />
 
                 <Button
                     android:id="@+id/btnIncMinLapTime"
@@ -214,10 +211,9 @@
 
             <TextView
                 android:id="@+id/textView7"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_skip_first_lap" />
 
@@ -244,10 +240,9 @@
 
             <TextView
                 android:id="@+id/textView11"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_time_to_prepare" />
 
@@ -290,10 +285,9 @@
 
             <TextView
                 android:id="@+id/textView51"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_random_start_time" />
 
@@ -335,10 +329,9 @@
 
             <TextView
                 android:id="@+id/textView6"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_enable_device_sounds" />
 
@@ -364,10 +357,9 @@
 
             <TextView
                 android:id="@+id/textView9"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_speak_lap_times" />
 
@@ -394,10 +386,9 @@
 
             <TextView
                 android:id="@+id/textView10"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_speak_messages" />
 
@@ -426,10 +417,9 @@
 
             <TextView
                 android:id="@+id/textView12"
+                style="@style/raceSetupTextViewStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
                 android:elevation="1dp"
                 android:text="@string/setup_speak_english_only" />
 
@@ -451,20 +441,18 @@
         </LinearLayout>
 
 
-
         <LinearLayout
             android:id="@+id/layoutAdvancedActivator"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:orientation="horizontal">
-        </LinearLayout>
+            android:orientation="horizontal"></LinearLayout>
 
         <LinearLayout
             android:id="@+id/layoutAdvanced"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -496,7 +484,7 @@
                 </LinearLayout>
 
             </LinearLayout>
-            
+
             <androidx.legacy.widget.Space
                 android:layout_width="match_parent"
                 android:layout_height="30dp" />
@@ -504,13 +492,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="visible"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:visibility="visible">
 
                 <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_weight="2"
                     android:layout_height="wrap_content"
+                    android:layout_weight="2"
                     android:orientation="vertical">
 
                     <TextView
