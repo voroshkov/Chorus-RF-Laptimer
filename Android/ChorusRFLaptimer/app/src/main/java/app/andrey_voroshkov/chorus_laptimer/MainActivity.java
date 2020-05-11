@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
     private ViewPager mViewPager;
     private Menu menu;
     private BroadcastReceiver mUsbReceiver;
+    private BroadcastReceiver mBluetoothReceiver;
     private PendingIntent mPermissionIntent;
     BTService bt;
     UDPService udp;
@@ -150,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
+        initBroadcastReceiverForBluetooth();
         initBluetooth();
         initUDP();
         initBroadcastReceiverForUsbPermissions();
@@ -366,8 +368,15 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
             if (resultCode == Activity.RESULT_OK) {
-                bt.connect(data);
-                useBT();
+                if(bt.isServiceAvailable()) {
+                    bt.connect(data);
+                    useBT();
+                } else {
+                    Toast.makeText(getApplicationContext()
+                            , "Bluetooth busy. Try again in a few seconds."
+                            , Toast.LENGTH_SHORT).show();
+                    bt.runService(); // Try to start the service again, in case it failed somewhere
+                }
             }
         } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
             if (resultCode == Activity.RESULT_OK) {
@@ -389,6 +398,22 @@ public class MainActivity extends AppCompatActivity implements ConnectionListene
                     new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     REQUEST_WRITE_STORAGE_CODE);
         }
+    }
+
+    private  void initBroadcastReceiverForBluetooth() {
+        mBluetoothReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(intent.getAction())) {
+                    if(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1) == BluetoothAdapter.STATE_ON) {
+                        bt.runService();
+                    } else {
+                        bt.stopService();
+                    }
+                }
+            }
+        };
+        registerReceiver(mBluetoothReceiver, new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
     }
 
     private void connectToUsbDevice() {
