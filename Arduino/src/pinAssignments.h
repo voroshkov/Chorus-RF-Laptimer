@@ -29,6 +29,8 @@ SOFTWARE.
 
 // Pin definitions
 
+#if defined(PINS_CHORUS)
+// Chorus Default
 #define ledPin 13
 #define spiDataPin 10
 #define slaveSelectPin 11
@@ -37,6 +39,18 @@ SOFTWARE.
 #define rssiPinA 3  //analog
 #define voltagePinA 0  //analog
 #define buzzerPin 9 // PWM buzzer
+
+#elif defined(PINS_PIDFLIGHT)
+// PIDFLIGHT BOARD REV2
+#define ledPin 13
+#define spiDataPin 10
+#define slaveSelectPin 11
+#define spiClockPin 12
+#define pinRaspiInt 5 //digital
+#define rssiPinA 6  //analog
+#define voltagePinA 0  //analog
+#define buzzerPin 9 // PWM buzzer
+#endif
 
 #ifdef DEBUG
     #define loopTimerPin 4

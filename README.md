@@ -229,6 +229,9 @@ I tried using different types of antennas and shields with RX5808 to achieve the
 ### Arduino
 Download the project from Arduino folder, open **chorus-rf-laptimer.ino** file with Arduino IDE and upload to each Solo device.
 
+#### Platformio
+You can now use plaformio to build and flash your devices
+
 <a name="android-app"></a>
 ### Android App
 The app is now available on Google Play.
