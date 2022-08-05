@@ -1,0 +1,94 @@
+<resources>
+    <string name="app_name">Chorus RF Laptimer</string>
+
+    <!-- Menu -->
+    <string name="menu_bt_connect">Connecter via Bluetooth</string>
+    <string name="menu_udp_connect">Connecter via WiFi</string>
+    <string name="menu_usb_connect">Connecter via USB</string>
+    <string name="menu_disconnect">Déconnecter</string>
+
+    <!-- Tabs -->
+    <string name="tab_race">Course</string>
+    <string name="tab_pilots">Pilotes</string>
+    <string name="tab_frequency">Freq</string>
+    <string name="tab_setup">Config.</string>
+
+    <!-- Setup -->
+    <string name="setup_pilot_name">Nom du pilote</string>
+    <string name="setup_rssi_threshold">Seuil RSSI</string>
+    <string name="setup_clear_threshold">Effacer</string>
+    <string name="setup_set_threshold">Enregistrer</string>
+    <string name="setup_calibrate_timers">Calibration des Timers</string>
+    <string name="device_number">Appareil #%d</string>
+    <string name="setup_time">%d sec.</string>
+    <string name="channel_descriptor">Canal: %1$s%2$s (%3$s)</string>
+    <string name="calibrate_timers">Calibration des timers…</string>
+    <string name="setup_lipo_monitor">Moniteur LiPo</string>
+    <string name="setup_adjust_voltage">Ajuster le Voltage</string>
+    <string name="setup_nr_laps">Tours restants</string>
+    <string name="setup_min_lap_time">Temps au tour mini.</string>
+    <string name="setup_skip_first_lap">Passer le premier tour</string>
+    <string name="setup_time_to_prepare">Temps de préparation pour la course</string>
+    <string name="setup_enable_device_sounds">Activer le son</string>
+    <string name="setup_speak_lap_times">Enoncer les temps au tour</string>
+    <string name="setup_speak_messages">Enoncer les messages</string>
+    <string name="setup_speak_english_only">Parler en anglais</string>
+    <string name="setup_use_experimental_features">--- EXPERIMENTAL ---</string>
+    <string name="setup_random_start_time">Démarrage aléatoire</string>
+    <string name="freq_channel">Canal #</string>
+    <string name="freq_rf_band">Bande RF</string>
+    <string name="plus_sign">+</string>
+    <string name="minus_sign">-</string>
+    <string name="mhz_string">MHz</string>
+
+    <!-- Race -->
+    <string name="starting_race">Démarrage…</string>
+    <string name="stop_race">Arreter la course (Long Press)</string>
+    <string name="start_race">Démarrer la course</string>
+    <string name="start_race_validation_pilots">Laisser les pilotes démarrer la course</string>
+    <string name="start_race_validation_thresholds">Configurer les seuils avant la course</string>
+    <string name="best_lap">Meilleur tour:</string>
+    <string name="best_lap_position">Meilleur position: %s</string>
+    <string name="lap_result">Tour # %1$d:  %2$s</string>
+    <string name="last_lap">Dernier tour:</string>
+    <string name="race_time">Temps de course: </string>
+    <string name="race_position">Position:</string>
+    <string name="race_result_finished">FINI</string>
+    <string name="race_results">%1$s (%2$s%3$s) Tours: %4$s %5$s</string>
+    <string name="race_announcement_finished">Fin de course</string>
+    <string name="race_announcement_starting">Démarrage de la course dans %d secondes</string>
+    <string name="race_lap_report">Tour %1$d.</string>
+    <string name="race_pilot_finished">%1$s fini.</string>
+    <string name="race_pilot_already_finished">%1$s déja fini.</string>
+    <string name="seconds_short">secondes</string>
+
+    <!-- Reports -->
+    <string name="report_file_name">Résultats enregistrés sous: %s</string>
+    <string name="report_failure">Impossible d\'enregister les résultats. Vérifiez si vous disposez d\'assez d\'espace.</string>
+
+    <!-- Voltage monitoring -->
+    <string name="battery_status_critical">Batterie critique</string>
+    <string name="battery_status_low">Batterie faible</string>
+
+    <!-- Bluetooth -->
+    <string name="connected">Connecté</string>
+    <string name="connection_failed">Non connecté</string>
+    <string name="connected_to">Connecté à %s</string>
+    <string name="disconnected">Déconnecté</string>
+
+    <string name="api_err_title">Erreur de compatibilité</string>
+    <string name="api_err_message">Les noeuds Chorus # %1$s sont flashés avec un ancien firmware.\n\nMerci de flasher le firmware avec l\'API version %2$d ou supérieur avant de réessayer.</string>
+    <string name="api_err_button">Déconnexion</string>
+
+    <string name="cannotAccessUsbDevice">Impossible d\'accéder au périphérique USB</string>
+
+    <plurals name="pilots_in_race">
+        <item quantity="one">Démarrer la course (%1$d pilote)</item>
+        <item quantity="other">Démarrer la course (%1$d pilotes)</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+</resources>
