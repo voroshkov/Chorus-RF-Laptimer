@@ -26,6 +26,7 @@ public class TextSpeaker implements TextToSpeech.OnInitListener {
         SUPPORTED_LOCALES.put("es", new Locale("es"));
         SUPPORTED_LOCALES.put("de", new Locale("de"));
         SUPPORTED_LOCALES.put("it", new Locale("it"));
+        SUPPORTED_LOCALES.put("fr", new Locale("fr"));
     }
 
     private TextToSpeech tts;
